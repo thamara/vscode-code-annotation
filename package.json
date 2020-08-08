@@ -10,16 +10,23 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:vscode-code-annotation.helloWorld"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "vscode-code-annotation.helloWorld",
-				"title": "Hello World"
+				"command": "vscode-code-annotation.addNote",
+				"title": "Code Annotation: Add note"
 			}
-		]
+		],
+		"menus":
+			{
+			"editor/context": [{
+				"command": "vscode-code-annotation.addNote",
+				"title": "Code Annotation: Add note"
+			}]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
