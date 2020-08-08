@@ -1,9 +1,83 @@
 import * as vscode from 'vscode';
+import * as path from "path";
+import * as fs from "fs";
+
+export const getAnnotationsFile = (): string => {
+	const workspaceFolder = vscode.workspace.rootPath;
+	if (workspaceFolder) {
+		const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
+		if (!fs.existsSync(extensionDirPath)) {
+			fs.mkdirSync(extensionDirPath, { recursive: true });
+		}
+		const extensionFilePath = path.join(extensionDirPath, "annotations.json");
+		if (!fs.existsSync(extensionFilePath)) {
+			fs.writeFileSync(extensionFilePath, '{"notes":[]}');
+		}
+		return extensionFilePath;
+	} else {
+	  	throw new Error("workspace not found");
+	}
+};
+
+class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
+	onDidChangeTreeData?: vscode.Event<TreeItem | null | undefined> | undefined;
+
+	data: TreeItem[];
+
+	constructor() {
+
+		const annotationFile = getAnnotationsFile();
+		console.log(`annotationFile: ${annotationFile}`);
+		const rawdata = fs.readFileSync(annotationFile, "utf8");
+		const annotations = JSON.parse(rawdata).notes;
+		console.log(annotations);
+
+		this.data = [new TreeItem('Root', undefined)]
+		for (let note in annotations) {
+			console.log(annotations[note]);
+			const itemText = annotations[note].text;
+			this.data[0].addChild(new TreeItem(itemText, undefined))
+		}
+	}
+
+	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
+	  return element;
+	}
+
+	getChildren(element?: TreeItem | undefined): vscode.ProviderResult<TreeItem[]> {
+	  if (element === undefined) {
+		return this.data;
+	  }
+	  return element.children;
+	}
+}
+
+class TreeItem extends vscode.TreeItem {
+	children: TreeItem[] | undefined;
+
+	constructor(label: string, children?: TreeItem[]) {
+	  super(
+		  label,
+		  children === undefined ? vscode.TreeItemCollapsibleState.None :
+								   vscode.TreeItemCollapsibleState.Expanded);
+	  this.children = children;
+	}
+
+	addChild(element: TreeItem) {
+		if (this.children === undefined) {
+			this.children = [];
+			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+		}
+		this.children.push(element)
+	}
+}
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Extension "vscode-code-annotation" is now active!');
+	console.log('Extension "code-annotation" is now active!');
 
-	let disposable = vscode.commands.registerCommand('vscode-code-annotation.addNote', async () => {
+	vscode.window.registerTreeDataProvider('codeAnnotationView', new TreeDataProvider());
+
+	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
 			const fsPath = editor.document.uri.fsPath;
@@ -14,6 +88,14 @@ export function activate(context: vscode.ExtensionContext) {
 			const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
 			if (annotationText) {
 				console.log(`annotationText: ${annotationText}`);
+
+				const annotationFile = getAnnotationsFile();
+				const rawdata = fs.readFileSync(annotationFile, "utf8");
+				let annotations = JSON.parse(rawdata);
+				annotations.notes.push({fileName: fsPath, text: annotationText});
+				const data = JSON.stringify(annotations);
+				fs.writeFileSync(annotationFile, data);
+
 				vscode.window.showInformationMessage('Annotation saved!');
 			}
 		}

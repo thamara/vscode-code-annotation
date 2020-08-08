@@ -1,5 +1,5 @@
 {
-	"name": "vscode-code-annotation",
+	"name": "code-annotation",
 	"displayName": "Code Annotation",
 	"description": "Create notes on your source code.",
 	"version": "0.0.1",
@@ -10,23 +10,32 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"*",
+		"onView:exampleView"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "vscode-code-annotation.addNote",
+				"command": "code-annotation.addNote",
 				"title": "Code Annotation: Add note"
 			}
 		],
 		"menus":
 			{
 			"editor/context": [{
-				"command": "vscode-code-annotation.addNote",
+				"command": "code-annotation.addNote",
 				"title": "Code Annotation: Add note"
 			}]
-		}
+		},
+		"views": {
+            "explorer": [
+                {
+                    "id": "codeAnnotationView",
+                    "name": "Code Annotation"
+                }
+            ]
+        }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
