@@ -22,11 +22,11 @@ export const getAnnotationsFile = (): string => {
 
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined> = new vscode.EventEmitter<TreeItem | undefined>();
-  	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+  	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 	refresh(): void {
-		this._onDidChangeTreeData.fire(undefined);
+		this._onDidChangeTreeData.fire(null);
 	}
 
 	data: TreeItem[];
@@ -48,7 +48,8 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	}
 
 	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
-	  return element;
+		console.log(`fsPath: ${element.label}`);
+	  	return element;
 	}
 
 	getChildren(element?: TreeItem | undefined): vscode.ProviderResult<TreeItem[]> {
@@ -76,6 +77,7 @@ class TreeItem extends vscode.TreeItem {
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		}
 		element.resourceUri = URI.parse(fileName);
+		element.tooltip = fileName
 		this.children.push(element)
 	}
 }
