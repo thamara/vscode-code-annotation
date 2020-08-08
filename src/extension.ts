@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
+import { URI } from 'vscode-uri'
 
 export const getAnnotationsFile = (): string => {
 	const workspaceFolder = vscode.workspace.rootPath;
@@ -20,7 +21,13 @@ export const getAnnotationsFile = (): string => {
 };
 
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
-	onDidChangeTreeData?: vscode.Event<TreeItem | null | undefined> | undefined;
+
+	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined> = new vscode.EventEmitter<TreeItem | undefined>();
+  	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined> = this._onDidChangeTreeData.event;
+
+	refresh(): void {
+		this._onDidChangeTreeData.fire(undefined);
+	}
 
 	data: TreeItem[];
 
@@ -36,7 +43,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		for (let note in annotations) {
 			console.log(annotations[note]);
 			const itemText = annotations[note].text;
-			this.data[0].addChild(new TreeItem(itemText, undefined))
+			this.data[0].addChild(new TreeItem(itemText, undefined), annotations[note].fileName);
 		}
 	}
 
@@ -63,11 +70,12 @@ class TreeItem extends vscode.TreeItem {
 	  this.children = children;
 	}
 
-	addChild(element: TreeItem) {
+	addChild(element: TreeItem, fileName: string) {
 		if (this.children === undefined) {
 			this.children = [];
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		}
+		element.resourceUri = URI.parse(fileName);
 		this.children.push(element)
 	}
 }
@@ -75,7 +83,11 @@ class TreeItem extends vscode.TreeItem {
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Extension "code-annotation" is now active!');
 
-	vscode.window.registerTreeDataProvider('codeAnnotationView', new TreeDataProvider());
+	const tree = new TreeDataProvider();
+	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
+	vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
+		tree.refresh()
+	);
 
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
 		const editor = vscode.window.activeTextEditor;
@@ -96,6 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const data = JSON.stringify(annotations);
 				fs.writeFileSync(annotationFile, data);
 
+				vscode.commands.executeCommand('code-annotation.refreshEntry');
 				vscode.window.showInformationMessage('Annotation saved!');
 			}
 		}
