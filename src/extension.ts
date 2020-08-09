@@ -12,7 +12,7 @@ export const getAnnotationsFile = (): string => {
 		}
 		const extensionFilePath = path.join(extensionDirPath, "annotations.json");
 		if (!fs.existsSync(extensionFilePath)) {
-			fs.writeFileSync(extensionFilePath, '{"notes":[]}');
+			fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
 		}
 		return extensionFilePath;
 	} else {
@@ -127,7 +127,9 @@ export function activate(context: vscode.ExtensionContext) {
 				const annotationFile = getAnnotationsFile();
 				const rawdata = fs.readFileSync(annotationFile, "utf8");
 				let annotations = JSON.parse(rawdata);
+				const nextId = annotations.nextId;
 				annotations.notes.push({fileName: fsPath, text: annotationText});
+				annotations.nextId += 1;
 				const data = JSON.stringify(annotations);
 				fs.writeFileSync(annotationFile, data);
 
