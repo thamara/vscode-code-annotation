@@ -53,7 +53,6 @@ export const getNotesInMarkdown = (): string => {
 		}
 	}
 
-	console.log(result);
 	return result;
 };
 
@@ -232,6 +231,10 @@ export function activate(context: vscode.ExtensionContext) {
 			const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
 			const extensionFilePath = path.join(extensionDirPath, "summary.md");
 			fs.writeFileSync(extensionFilePath, content);
+			var openPath = vscode.Uri.file(extensionFilePath);
+			vscode.workspace.openTextDocument(openPath).then(doc => {
+				vscode.window.showTextDocument(doc).then(editor => {
+				})});
 		}
 	});
 
