@@ -20,6 +20,10 @@ export const getAnnotationsFile = (): string => {
 	}
 };
 
+export const getIconPath = (type: string, theme: string): string => {
+    return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
+}
+
 class TreeActions {
     constructor(private provider: TreeDataProvider) { }
 
@@ -130,6 +134,12 @@ class TreeItem extends vscode.TreeItem {
 		element.resourceUri = URI.parse(fileName);
 		element.tooltip = fileName
 		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
+		const noteType = (status === "pending") ? "todo" : "check";
+		element.iconPath = {
+			light: getIconPath(noteType, 'light'),
+			dark: getIconPath(noteType, 'dark')
+		};
+		console.log("icon: " + getIconPath(noteType, 'light'))
 		this.children.push(element)
 	}
 }
