@@ -38,12 +38,24 @@
 					"dark": "resources/dark/close.svg",
 					"light": "resources/light/close.svg"
 				}
+			},
+			{
+				"command": "code-annotation.checkNote",
+				"title": "Code Annotation: Check note",
+				"icon": {
+					"dark": "resources/dark/check.svg",
+					"light": "resources/light/check.svg"
+				}
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
 					"command": "code-annotation.removeNote",
+					"when": "false"
+				},
+				{
+					"command": "code-annotation.checkNote",
 					"when": "false"
 				}
 			],
@@ -62,8 +74,18 @@
 			],
 			"view/item/context": [
 				{
+					"command": "code-annotation.checkNote",
+					"when": "view == codeAnnotationView && viewItem == $PendingNote",
+					"group": "inline"
+				},
+				{
 					"command": "code-annotation.removeNote",
-					"when": "view == codeAnnotationView && viewItem == $Note",
+					"when": "view == codeAnnotationView && viewItem == $PendingNote",
+					"group": "inline"
+				},
+				{
+					"command": "code-annotation.removeNote",
+					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
 					"group": "inline"
 				}
 			]

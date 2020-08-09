@@ -25,7 +25,10 @@ class TreeActions {
 
     removeNote(item: TreeItem) {
         return this.provider.removeItem(item.id);
-    }
+	}
+	checkNote(item: TreeItem) {
+        return this.provider.checkItem(item.id);
+	}
 }
 
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
@@ -67,7 +70,21 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		fs.writeFileSync(annotationFile, data);
 
 		vscode.commands.executeCommand('code-annotation.refreshEntry');
+	}
 
+	checkItem(id: string | undefined): void {
+		const annotationFile = getAnnotationsFile();
+		const rawdata = fs.readFileSync(annotationFile, "utf8");
+		let annotations = JSON.parse(rawdata);
+		const indexToRemove = annotations.notes.findIndex((item: {fileName: String, text: String, status: String, id: Number}) => {
+			return item.id.toString() == id;
+		});
+		if (indexToRemove >= 0)
+			annotations.notes[indexToRemove].status = "done";
+		const data = JSON.stringify(annotations);
+		fs.writeFileSync(annotationFile, data);
+
+		vscode.commands.executeCommand('code-annotation.refreshEntry');
 	}
 
 	data: TreeItem[];
@@ -112,7 +129,7 @@ class TreeItem extends vscode.TreeItem {
 		}
 		element.resourceUri = URI.parse(fileName);
 		element.tooltip = fileName
-		element.contextValue = '$Note';
+		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
 		this.children.push(element)
 	}
 }
@@ -125,6 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
 
 
 	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
