@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { URI } from 'vscode-uri'
 
-import { getAnnotationsFile, getNotes } from './utils'
+import { getAnnotationsFile, getNotes, saveNotes } from './utils'
 import { generateMarkdownReport } from './reporting'
 
 export const getIconPath = (type: string, theme: string): string => {
@@ -35,9 +35,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	}
 
 	sourceData(): void {
-		const annotationFile = getAnnotationsFile();
-		const rawdata = fs.readFileSync(annotationFile, "utf8");
-		const annotations = JSON.parse(rawdata).notes;
+		const annotations = getNotes();
 
 		this.data = [];
 		this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")]
@@ -51,44 +49,37 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	}
 
 	removeItem(id: string | undefined): void {
-		const annotationFile = getAnnotationsFile();
-		const rawdata = fs.readFileSync(annotationFile, "utf8");
-		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
+		const notes = getNotes();
+		const indexToRemove = notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
-		if (indexToRemove >= 0)
-			annotations.notes.splice(indexToRemove, 1);
-		const data = JSON.stringify(annotations);
-		fs.writeFileSync(annotationFile, data);
 
-		vscode.commands.executeCommand('code-annotation.refreshEntry');
+		if (indexToRemove >= 0)
+			notes.splice(indexToRemove, 1);
+
+		saveNotes(notes);
 	}
 
 	checkItem(id: string | undefined): void {
-		const annotationFile = getAnnotationsFile();
-		const rawdata = fs.readFileSync(annotationFile, "utf8");
-		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
+		const notes = getNotes();
+		const index = notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
-		if (indexToRemove >= 0)
-			annotations.notes[indexToRemove].status = "done";
-		const data = JSON.stringify(annotations);
-		fs.writeFileSync(annotationFile, data);
 
-		vscode.commands.executeCommand('code-annotation.refreshEntry');
+		if (index >= 0)
+			notes[index].status = "done";
+
+		saveNotes(notes);
 	}
 
 	openItem(id: string | undefined): void {
-		const annotationFile = getAnnotationsFile();
-		const rawdata = fs.readFileSync(annotationFile, "utf8");
-		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
+		const notes = getNotes();
+		const index = notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
-		if (indexToRemove >= 0) {
-			const note = annotations.notes[indexToRemove];
+
+		if (index >= 0) {
+			const note = notes[index];
 			const fileName = note.fileName;
 			const fileLine = note.fileLine;
 

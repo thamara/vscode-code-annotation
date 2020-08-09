@@ -18,6 +18,11 @@ export interface Note {
     id: number;
 }
 
+export interface NotesDb {
+    notes: Note[];
+    nextId: number;
+}
+
 export const getAnnotationsFile = (): string => {
 	const workspaceFolder = vscode.workspace.rootPath;
 	if (workspaceFolder) {
@@ -35,9 +40,28 @@ export const getAnnotationsFile = (): string => {
 	}
 };
 
-export const getNotes = (): Note[] => {
+export const getNotesDb = (): NotesDb => {
     const annotationFile = getAnnotationsFile();
 	const rawdata = fs.readFileSync(annotationFile, "utf8");
     let annotations = JSON.parse(rawdata);
-    return annotations.notes;
+    return annotations;
+}
+
+export const getNotes = (): Note[] => {
+    return getNotesDb().notes;
+}
+
+export const saveNotes = (notes: Note[]) => {
+    let db = getNotesDb();
+
+    // Replace notes by the one passed
+    db.notes = notes;
+
+    // Save Db in Json file
+    const data = JSON.stringify(db);
+    const annotationFile = getAnnotationsFile();
+    fs.writeFileSync(annotationFile, data);
+
+    // Whenever updating the db, we need to update the tree
+    vscode.commands.executeCommand('code-annotation.refreshEntry');
 }
