@@ -2,6 +2,22 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
 
+export interface Position {
+    line: number;
+    character: number;
+}
+
+export interface Note {
+    fileName: string;
+    fileLine: number;
+    positionStart: Position;
+    positionEnd: Position;
+    text: string;
+    codeSnippet: string;
+    status: 'pending' | 'done';
+    id: number;
+}
+
 export const getAnnotationsFile = (): string => {
 	const workspaceFolder = vscode.workspace.rootPath;
 	if (workspaceFolder) {
@@ -18,3 +34,10 @@ export const getAnnotationsFile = (): string => {
 	  	throw new Error("workspace not found");
 	}
 };
+
+export const getNotes = (): Note[] => {
+    const annotationFile = getAnnotationsFile();
+	const rawdata = fs.readFileSync(annotationFile, "utf8");
+    let annotations = JSON.parse(rawdata);
+    return annotations.notes;
+}

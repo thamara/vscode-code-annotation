@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { URI } from 'vscode-uri'
 
-import { getAnnotationsFile } from './utils'
+import { getAnnotationsFile, getNotes } from './utils'
 
 export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: string): string => {
 	let result = `### ${text}\n\n`;
@@ -15,15 +15,13 @@ export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: s
 };
 
 export const getNotesInMarkdown = (): string => {
-	const annotationFile = getAnnotationsFile();
-	const rawdata = fs.readFileSync(annotationFile, "utf8");
-	let annotations = JSON.parse(rawdata);
+	const notes = getNotes();
 
 	let result = `# Code Annotator - Summary\n`;
 	result += `## Pending\n`;
 
-	for (let i in annotations.notes) {
-		const note = annotations.notes[i];
+	for (let i in notes) {
+		const note = notes[i];
 		if (note.status === "pending") {
 			result += getNoteInMarkdown(note.text, note.fileName, note.codeSnippet);
 		}
@@ -31,8 +29,8 @@ export const getNotesInMarkdown = (): string => {
 
 	result += `## Done\n`;
 
-	for (let i in annotations.notes) {
-		const note = annotations.notes[i];
+	for (let i in notes) {
+		const note = notes[i];
 		if (note.status !== "pending") {
 			result += getNoteInMarkdown(note.text, note.fileName, note.codeSnippet);
 		}
