@@ -46,6 +46,10 @@
 					"dark": "resources/dark/check.svg",
 					"light": "resources/light/check.svg"
 				}
+			},
+			{
+				"command": "code-annotation.openNote",
+				"title": "Code Annotation: Open note"
 			}
 		],
 		"menus": {
@@ -56,6 +60,10 @@
 				},
 				{
 					"command": "code-annotation.checkNote",
+					"when": "false"
+				},
+				{
+					"command": "code-annotation.openNote",
 					"when": "false"
 				}
 			],
@@ -87,6 +95,16 @@
 					"command": "code-annotation.removeNote",
 					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
 					"group": "inline"
+				},
+				{
+					"command": "code-annotation.openNote",
+					"when": "view == codeAnnotationView && viewItem == $PendingNote",
+					"group": "3_open"
+				},
+				{
+					"command": "code-annotation.openNote",
+					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
+					"group": "3_open"
 				}
 			]
 		},
