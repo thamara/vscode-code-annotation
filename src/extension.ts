@@ -223,7 +223,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
 
 	vscode.commands.registerCommand('code-annotation.summary', () => {
-		console.log('code-annotation.summary')
 		let content = getNotesInMarkdown();
 
 		const workspaceFolder = vscode.workspace.rootPath;
