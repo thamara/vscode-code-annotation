@@ -139,6 +139,7 @@
 		"vscode-test": "^1.4.0"
 	},
 	"dependencies": {
+		"jinja": "^0.13.4",
 		"vscode-uri": "^2.1.2"
 	}
 }
