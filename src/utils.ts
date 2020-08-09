@@ -24,25 +24,25 @@ export interface NotesDb {
 }
 
 export const getAnnotationsFile = (): string => {
-	const workspaceFolder = vscode.workspace.rootPath;
-	if (workspaceFolder) {
-		const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
-		if (!fs.existsSync(extensionDirPath)) {
-			fs.mkdirSync(extensionDirPath, { recursive: true });
-		}
-		const extensionFilePath = path.join(extensionDirPath, "annotations.json");
-		if (!fs.existsSync(extensionFilePath)) {
-			fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
-		}
-		return extensionFilePath;
-	} else {
+    const workspaceFolder = vscode.workspace.rootPath;
+    if (workspaceFolder) {
+        const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
+        if (!fs.existsSync(extensionDirPath)) {
+            fs.mkdirSync(extensionDirPath, { recursive: true });
+        }
+        const extensionFilePath = path.join(extensionDirPath, "annotations.json");
+        if (!fs.existsSync(extensionFilePath)) {
+            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
+        }
+        return extensionFilePath;
+    } else {
 	  	throw new Error("workspace not found");
-	}
+    }
 };
 
 export const getNotesDb = (): NotesDb => {
     const annotationFile = getAnnotationsFile();
-	const rawdata = fs.readFileSync(annotationFile, "utf8");
+    const rawdata = fs.readFileSync(annotationFile, "utf8");
     let annotations = JSON.parse(rawdata);
     return annotations;
 };

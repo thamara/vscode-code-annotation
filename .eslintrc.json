@@ -13,6 +13,7 @@
         "@typescript-eslint/semi": "warn",
         "curly": "warn",
         "eqeqeq": "warn",
+        "indent": "error",
         "no-throw-literal": "warn",
         "semi": "off"
     }

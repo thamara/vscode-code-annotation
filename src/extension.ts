@@ -15,13 +15,13 @@ class TreeActions {
 
     removeNote(item: TreeItem) {
         return this.provider.removeItem(item.id);
-	}
-	checkNote(item: TreeItem) {
+    }
+    checkNote(item: TreeItem) {
         return this.provider.checkItem(item.id);
-	}
-	openNote(item: TreeItem) {
+    }
+    openNote(item: TreeItem) {
         return this.provider.openItem(item.id);
-	}
+    }
 }
 
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
@@ -29,86 +29,86 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
   	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-	refresh(): void {
-		this.sourceData();
-		this._onDidChangeTreeData.fire(null);
-	}
+  	refresh(): void {
+  	    this.sourceData();
+  	    this._onDidChangeTreeData.fire(null);
+  	}
 
-	sourceData(): void {
-		const annotations = getNotes();
+  	sourceData(): void {
+  	    const annotations = getNotes();
 
-		this.data = [];
-		this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")];
-		for (let note in annotations) {
-			const itemText = annotations[note].text;
-			let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
-			rootByStatus.addChild(new TreeItem(itemText, undefined, annotations[note].id.toString()),
+  	    this.data = [];
+  	    this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")];
+  	    for (let note in annotations) {
+  	        const itemText = annotations[note].text;
+  	        let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
+  	        rootByStatus.addChild(new TreeItem(itemText, undefined, annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
-		}
-	}
+  	    }
+  	}
 
-	removeItem(id: string | undefined): void {
-		const notes = getNotes();
-		const indexToRemove = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() === id;
-		});
+  	removeItem(id: string | undefined): void {
+  	    const notes = getNotes();
+  	    const indexToRemove = notes.findIndex((item: {id: Number}) => {
+  	        return item.id.toString() === id;
+  	    });
 
-		if (indexToRemove >= 0)
-			{notes.splice(indexToRemove, 1);}
+  	    if (indexToRemove >= 0)
+  	    {notes.splice(indexToRemove, 1);}
 
-		saveNotes(notes);
-	}
+  	    saveNotes(notes);
+  	}
 
-	checkItem(id: string | undefined): void {
-		const notes = getNotes();
-		const index = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() === id;
-		});
+  	checkItem(id: string | undefined): void {
+  	    const notes = getNotes();
+  	    const index = notes.findIndex((item: {id: Number}) => {
+  	        return item.id.toString() === id;
+  	    });
 
-		if (index >= 0)
-			{notes[index].status = "done";}
+  	    if (index >= 0)
+  	    {notes[index].status = "done";}
 
-		saveNotes(notes);
-	}
+  	    saveNotes(notes);
+  	}
 
-	openItem(id: string | undefined): void {
-		const notes = getNotes();
-		const index = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() === id;
-		});
+  	openItem(id: string | undefined): void {
+  	    const notes = getNotes();
+  	    const index = notes.findIndex((item: {id: Number}) => {
+  	        return item.id.toString() === id;
+  	    });
 
-		if (index >= 0) {
-			const note = notes[index];
-			const fileName = note.fileName;
-			const fileLine = note.fileLine;
+  	    if (index >= 0) {
+  	        const note = notes[index];
+  	        const fileName = note.fileName;
+  	        const fileLine = note.fileLine;
 
-			var openPath = vscode.Uri.file(fileName);
-			vscode.workspace.openTextDocument(openPath).then(doc => {
-				vscode.window.showTextDocument(doc).then(editor => {
-					var range = new vscode.Range(fileLine, 0, fileLine, 0);
-					editor.revealRange(range);
+  	        var openPath = vscode.Uri.file(fileName);
+  	        vscode.workspace.openTextDocument(openPath).then(doc => {
+  	            vscode.window.showTextDocument(doc).then(editor => {
+  	                var range = new vscode.Range(fileLine, 0, fileLine, 0);
+  	                editor.revealRange(range);
 
-					var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
-					var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
-					editor.selection = new vscode.Selection(start, end);
+  	                var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
+  	                var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
+  	                editor.selection = new vscode.Selection(start, end);
 
-					var range = new vscode.Range(start, start);
-					editor.revealRange(range);
-				});
-			});
-		}
-	}
+  	                var range = new vscode.Range(start, start);
+  	                editor.revealRange(range);
+  	            });
+  	        });
+  	    }
+  	}
 
 	data: TreeItem[];
 
 	constructor() {
-		vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
-			this.refresh()
-		);
+	    vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
+	        this.refresh()
+	    );
 
-		this.data = [];
-		this.sourceData();
+	    this.data = [];
+	    this.sourceData();
 	}
 
 	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -117,7 +117,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
 	getChildren(element?: TreeItem | undefined): vscode.ProviderResult<TreeItem[]> {
 	  if (element === undefined) {
-		return this.data;
+	        return this.data;
 	  }
 	  return element.children;
 	}
@@ -136,75 +136,75 @@ class TreeItem extends vscode.TreeItem {
 	}
 
 	addChild(element: TreeItem, fileName: string, status: string) {
-		if (this.children === undefined) {
-			this.children = [];
-			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
-		}
-		element.resourceUri = URI.parse(fileName);
-		element.tooltip = fileName;
-		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
-		const noteType = (status === "pending") ? "todo" : "check";
-		element.iconPath = {
-			light: getIconPath(noteType, 'light'),
-			dark: getIconPath(noteType, 'dark')
-		};
-		this.children.push(element);
+	    if (this.children === undefined) {
+	        this.children = [];
+	        this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+	    }
+	    element.resourceUri = URI.parse(fileName);
+	    element.tooltip = fileName;
+	    element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
+	    const noteType = (status === "pending") ? "todo" : "check";
+	    element.iconPath = {
+	        light: getIconPath(noteType, 'light'),
+	        dark: getIconPath(noteType, 'dark')
+	    };
+	    this.children.push(element);
 	}
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Extension "code-annotation" is now active!');
+    console.log('Extension "code-annotation" is now active!');
 
-	const tree = new TreeDataProvider();
+    const tree = new TreeDataProvider();
     const treeActions = new TreeActions(tree);
 
-	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
+    vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
 
-	vscode.commands.registerCommand('code-annotation.summary', () => {
-		generateMarkdownReport();
-	});
+    vscode.commands.registerCommand('code-annotation.summary', () => {
+        generateMarkdownReport();
+    });
 
-	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
-		const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
+    vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
+        const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
         const enableAction = 'I\'m sure';
         const cancelAction = 'Cancel';
-		const userResponse = await vscode.window.showInformationMessage(message, enableAction, cancelAction);
-		const clearAllNotes = userResponse === enableAction ? true : false;
+        const userResponse = await vscode.window.showInformationMessage(message, enableAction, cancelAction);
+        const clearAllNotes = userResponse === enableAction ? true : false;
 
-		if (clearAllNotes) {
-			const annotationFile = getAnnotationsFile();
-			fs.unlinkSync(annotationFile);
-			vscode.commands.executeCommand('code-annotation.refreshEntry');
-			vscode.window.showInformationMessage('All notes cleared!');
-		}
-	});
+        if (clearAllNotes) {
+            const annotationFile = getAnnotationsFile();
+            fs.unlinkSync(annotationFile);
+            vscode.commands.executeCommand('code-annotation.refreshEntry');
+            vscode.window.showInformationMessage('All notes cleared!');
+        }
+    });
 
-	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			const fsPath = editor.document.uri.fsPath;
-			const selection = editor.selection;
-			const text = editor.document.getText(selection);
-			const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
-			if (annotationText) {
-				const nextId = getNextId();
-				addNote({fileName: fsPath,
-					fileLine: selection.start.line,
-					positionStart: {line: selection.start.line, character: selection.start.character},
-					positionEnd: {line: selection.end.line, character: selection.end.character},
-					text: annotationText,
-					codeSnippet: text,
-					status: "pending",
-					id: nextId});
-				vscode.window.showInformationMessage('Annotation saved!');
-			}
-		}
-	});
+    let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const fsPath = editor.document.uri.fsPath;
+            const selection = editor.selection;
+            const text = editor.document.getText(selection);
+            const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
+            if (annotationText) {
+                const nextId = getNextId();
+                addNote({fileName: fsPath,
+                    fileLine: selection.start.line,
+                    positionStart: {line: selection.start.line, character: selection.start.character},
+                    positionEnd: {line: selection.end.line, character: selection.end.character},
+                    text: annotationText,
+                    codeSnippet: text,
+                    status: "pending",
+                    id: nextId});
+                vscode.window.showInformationMessage('Annotation saved!');
+            }
+        }
+    });
 
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);
 }
 
 // this method is called when your extension is deactivated
