@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
-import { URI } from 'vscode-uri'
+import { URI } from 'vscode-uri';
 
-import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './utils'
-import { generateMarkdownReport } from './reporting'
+import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './utils';
+import { generateMarkdownReport } from './reporting';
 
 export const getIconPath = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
-}
+};
 
 class TreeActions {
     constructor(private provider: TreeDataProvider) { }
@@ -38,10 +38,10 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		const annotations = getNotes();
 
 		this.data = [];
-		this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")]
+		this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")];
 		for (let note in annotations) {
 			const itemText = annotations[note].text;
-			let rootByStatus = annotations[note].status == "pending" ? this.data[0] : this.data[1];
+			let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
 			rootByStatus.addChild(new TreeItem(itemText, undefined, annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
@@ -51,11 +51,11 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	removeItem(id: string | undefined): void {
 		const notes = getNotes();
 		const indexToRemove = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() == id;
+			return item.id.toString() === id;
 		});
 
 		if (indexToRemove >= 0)
-			notes.splice(indexToRemove, 1);
+			{notes.splice(indexToRemove, 1);}
 
 		saveNotes(notes);
 	}
@@ -63,11 +63,11 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	checkItem(id: string | undefined): void {
 		const notes = getNotes();
 		const index = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() == id;
+			return item.id.toString() === id;
 		});
 
 		if (index >= 0)
-			notes[index].status = "done";
+			{notes[index].status = "done";}
 
 		saveNotes(notes);
 	}
@@ -75,7 +75,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	openItem(id: string | undefined): void {
 		const notes = getNotes();
 		const index = notes.findIndex((item: {id: Number}) => {
-			return item.id.toString() == id;
+			return item.id.toString() === id;
 		});
 
 		if (index >= 0) {
@@ -107,7 +107,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 			this.refresh()
 		);
 
-		this.data = []
+		this.data = [];
 		this.sourceData();
 	}
 
@@ -141,14 +141,14 @@ class TreeItem extends vscode.TreeItem {
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		}
 		element.resourceUri = URI.parse(fileName);
-		element.tooltip = fileName
+		element.tooltip = fileName;
 		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
 		const noteType = (status === "pending") ? "todo" : "check";
 		element.iconPath = {
 			light: getIconPath(noteType, 'light'),
 			dark: getIconPath(noteType, 'dark')
 		};
-		this.children.push(element)
+		this.children.push(element);
 	}
 }
 
@@ -180,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.commands.executeCommand('code-annotation.refreshEntry');
 			vscode.window.showInformationMessage('All notes cleared!');
 		}
-	})
+	});
 
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
 		const editor = vscode.window.activeTextEditor;

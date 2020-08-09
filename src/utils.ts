@@ -45,21 +45,21 @@ export const getNotesDb = (): NotesDb => {
 	const rawdata = fs.readFileSync(annotationFile, "utf8");
     let annotations = JSON.parse(rawdata);
     return annotations;
-}
+};
 
 export const getNotes = (): Note[] => {
     return getNotesDb().notes;
-}
+};
 
 export const getNextId = (): number => {
     return getNotesDb().nextId;
-}
+};
 
 export const saveDb = (db: NotesDb) => {
     const data = JSON.stringify(db);
     fs.writeFileSync(getAnnotationsFile(), data);
     vscode.commands.executeCommand('code-annotation.refreshEntry');
-}
+};
 
 export const saveNotes = (notes: Note[]) => {
     let db = getNotesDb();
@@ -69,7 +69,7 @@ export const saveNotes = (notes: Note[]) => {
 
     // Save Db in JSON file
     saveDb(db);
-}
+};
 
 export const addNote = (note: Note) => {
     let db = getNotesDb();
@@ -78,4 +78,4 @@ export const addNote = (note: Note) => {
     db.nextId++;
 
     saveDb(db);
-}
+};

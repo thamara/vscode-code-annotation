@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
 
-import { getNotes } from './utils'
+import { getNotes } from './utils';
 
 // TODO: We should use Jinja or something like this to generate these markdown files
 export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: string): string => {
@@ -51,6 +51,6 @@ export const generateMarkdownReport = (): void => {
         var openPath = vscode.Uri.file(extensionFilePath);
         vscode.workspace.openTextDocument(openPath).then(doc => {
             vscode.window.showTextDocument(doc).then(editor => {
-        })});
+        });});
     }
-}
+};
