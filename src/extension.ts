@@ -139,7 +139,6 @@ class TreeItem extends vscode.TreeItem {
 			light: getIconPath(noteType, 'light'),
 			dark: getIconPath(noteType, 'dark')
 		};
-		console.log("icon: " + getIconPath(noteType, 'light'))
 		this.children.push(element)
 	}
 }
