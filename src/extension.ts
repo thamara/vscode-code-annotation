@@ -3,22 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { URI } from 'vscode-uri'
 
-export const getAnnotationsFile = (): string => {
-	const workspaceFolder = vscode.workspace.rootPath;
-	if (workspaceFolder) {
-		const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
-		if (!fs.existsSync(extensionDirPath)) {
-			fs.mkdirSync(extensionDirPath, { recursive: true });
-		}
-		const extensionFilePath = path.join(extensionDirPath, "annotations.json");
-		if (!fs.existsSync(extensionFilePath)) {
-			fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
-		}
-		return extensionFilePath;
-	} else {
-	  	throw new Error("workspace not found");
-	}
-};
+import { getAnnotationsFile } from './utils'
 
 export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: string): string => {
 	let result = `### ${text}\n\n`;
@@ -104,7 +89,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		const annotationFile = getAnnotationsFile();
 		const rawdata = fs.readFileSync(annotationFile, "utf8");
 		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {fileName: String, fileLine: Number, text: String, status: String, id: Number}) => {
+		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
 		if (indexToRemove >= 0)
@@ -119,7 +104,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		const annotationFile = getAnnotationsFile();
 		const rawdata = fs.readFileSync(annotationFile, "utf8");
 		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {fileName: String, fileLine: Number, text: String, status: String, id: Number}) => {
+		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
 		if (indexToRemove >= 0)
@@ -134,7 +119,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		const annotationFile = getAnnotationsFile();
 		const rawdata = fs.readFileSync(annotationFile, "utf8");
 		let annotations = JSON.parse(rawdata);
-		const indexToRemove = annotations.notes.findIndex((item: {fileName: String, fileLine: Number, text: String, status: String, id: Number}) => {
+		const indexToRemove = annotations.notes.findIndex((item: {id: Number}) => {
 			return item.id.toString() == id;
 		});
 		if (indexToRemove >= 0) {
