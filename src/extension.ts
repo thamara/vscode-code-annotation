@@ -20,6 +20,43 @@ export const getAnnotationsFile = (): string => {
 	}
 };
 
+export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: string): string => {
+	let result = `### ${text}\n\n`;
+	result += `${fileName}\n`;
+	result += `\`\`\`\n`;
+	result += `${codeSnippet}\n`;
+	result += `\`\`\`\n`;
+	return result;
+};
+
+export const getNotesInMarkdown = (): string => {
+	const annotationFile = getAnnotationsFile();
+	const rawdata = fs.readFileSync(annotationFile, "utf8");
+	let annotations = JSON.parse(rawdata);
+
+	let result = `# Code Annotator - Summary\n`;
+	result += `## Pending\n`;
+
+	for (let i in annotations.notes) {
+		const note = annotations.notes[i];
+		if (note.status === "pending") {
+			result += getNoteInMarkdown(note.text, note.fileName, note.codeSnippet);
+		}
+	}
+
+	result += `## Done\n`;
+
+	for (let i in annotations.notes) {
+		const note = annotations.notes[i];
+		if (note.status !== "pending") {
+			result += getNoteInMarkdown(note.text, note.fileName, note.codeSnippet);
+		}
+	}
+
+	console.log(result);
+	return result;
+};
+
 export const getIconPath = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
 }
@@ -186,6 +223,17 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
 
+	vscode.commands.registerCommand('code-annotation.summary', () => {
+		console.log('code-annotation.summary')
+		let content = getNotesInMarkdown();
+
+		const workspaceFolder = vscode.workspace.rootPath;
+		if (workspaceFolder) {
+			const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
+			const extensionFilePath = path.join(extensionDirPath, "summary.md");
+			fs.writeFileSync(extensionFilePath, content);
+		}
+	});
 
 	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
 		const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
@@ -219,6 +267,7 @@ export function activate(context: vscode.ExtensionContext) {
 										positionStart: {line: selection.start.line, character: selection.start.character},
 										positionEnd: {line: selection.end.line, character: selection.end.character},
 										text: annotationText,
+										codeSnippet: text,
 										status: "pending",
 										id: nextId});
 				annotations.nextId += 1;

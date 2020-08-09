@@ -32,6 +32,14 @@
 				}
 			},
 			{
+				"command": "code-annotation.summary",
+				"title": "Code Annotation: Summary",
+				"icon": {
+					"light": "resources/light/summary.svg",
+					"dark": "resources/dark/summary.svg"
+				}
+			},
+			{
 				"command": "code-annotation.removeNote",
 				"title": "Code Annotation: Remove",
 				"icon": {
@@ -76,6 +84,11 @@
 			"view/title": [
 				{
 					"command": "code-annotation.refreshEntry",
+					"when": "view == codeAnnotationView",
+					"group": "navigation"
+				},
+				{
+					"command": "code-annotation.summary",
 					"when": "view == codeAnnotationView",
 					"group": "navigation"
 				}
@@ -139,7 +152,6 @@
 		"vscode-test": "^1.4.0"
 	},
 	"dependencies": {
-		"jinja": "^0.13.4",
 		"vscode-uri": "^2.1.2"
 	}
 }
