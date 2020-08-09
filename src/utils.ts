@@ -51,17 +51,31 @@ export const getNotes = (): Note[] => {
     return getNotesDb().notes;
 }
 
+export const getNextId = (): number => {
+    return getNotesDb().nextId;
+}
+
+export const saveDb = (db: NotesDb) => {
+    const data = JSON.stringify(db);
+    fs.writeFileSync(getAnnotationsFile(), data);
+    vscode.commands.executeCommand('code-annotation.refreshEntry');
+}
+
 export const saveNotes = (notes: Note[]) => {
     let db = getNotesDb();
 
     // Replace notes by the one passed
     db.notes = notes;
 
-    // Save Db in Json file
-    const data = JSON.stringify(db);
-    const annotationFile = getAnnotationsFile();
-    fs.writeFileSync(annotationFile, data);
+    // Save Db in JSON file
+    saveDb(db);
+}
 
-    // Whenever updating the db, we need to update the tree
-    vscode.commands.executeCommand('code-annotation.refreshEntry');
+export const addNote = (note: Note) => {
+    let db = getNotesDb();
+
+    db.notes.push(note);
+    db.nextId++;
+
+    saveDb(db);
 }

@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { URI } from 'vscode-uri'
 
-import { getAnnotationsFile, getNotes, saveNotes } from './utils'
+import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './utils'
 import { generateMarkdownReport } from './reporting'
 
 export const getIconPath = (type: string, theme: string): string => {
@@ -190,23 +190,15 @@ export function activate(context: vscode.ExtensionContext) {
 			const text = editor.document.getText(selection);
 			const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
 			if (annotationText) {
-				const annotationFile = getAnnotationsFile();
-				const rawdata = fs.readFileSync(annotationFile, "utf8");
-				let annotations = JSON.parse(rawdata);
-				const nextId = annotations.nextId;
-				annotations.notes.push({fileName: fsPath,
-										fileLine: selection.start.line,
-										positionStart: {line: selection.start.line, character: selection.start.character},
-										positionEnd: {line: selection.end.line, character: selection.end.character},
-										text: annotationText,
-										codeSnippet: text,
-										status: "pending",
-										id: nextId});
-				annotations.nextId += 1;
-				const data = JSON.stringify(annotations);
-				fs.writeFileSync(annotationFile, data);
-
-				vscode.commands.executeCommand('code-annotation.refreshEntry');
+				const nextId = getNextId();
+				addNote({fileName: fsPath,
+					fileLine: selection.start.line,
+					positionStart: {line: selection.start.line, character: selection.start.character},
+					positionEnd: {line: selection.end.line, character: selection.end.character},
+					text: annotationText,
+					codeSnippet: text,
+					status: "pending",
+					id: nextId});
 				vscode.window.showInformationMessage('Annotation saved!');
 			}
 		}
