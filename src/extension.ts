@@ -26,25 +26,34 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 	refresh(): void {
+		this.sourceData();
 		this._onDidChangeTreeData.fire(null);
 	}
 
-	data: TreeItem[];
-
-	constructor() {
-
+	sourceData(): void {
 		const annotationFile = getAnnotationsFile();
 		console.log(`annotationFile: ${annotationFile}`);
 		const rawdata = fs.readFileSync(annotationFile, "utf8");
 		const annotations = JSON.parse(rawdata).notes;
 		console.log(annotations);
 
+		this.data = [];
 		this.data = [new TreeItem('Root', undefined)]
 		for (let note in annotations) {
 			console.log(annotations[note]);
 			const itemText = annotations[note].text;
 			this.data[0].addChild(new TreeItem(itemText, undefined), annotations[note].fileName);
 		}
+	}
+
+	data: TreeItem[];
+
+	constructor() {
+		vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
+			this.refresh()
+		);
+		this.data = []
+		this.sourceData();
 	}
 
 	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -87,9 +96,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const tree = new TreeDataProvider();
 	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
-	vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
-		tree.refresh()
-	);
 
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
 		const editor = vscode.window.activeTextEditor;
