@@ -102,12 +102,21 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 			return item.id.toString() == id;
 		});
 		if (indexToRemove >= 0) {
-			const fileName = annotations.notes[indexToRemove].fileName;
-			const fileLine = annotations.notes[indexToRemove].fileLine;
+			const note = annotations.notes[indexToRemove];
+			const fileName = note.fileName;
+			const fileLine = note.fileLine;
+
 			var openPath = vscode.Uri.file(fileName);
 			vscode.workspace.openTextDocument(openPath).then(doc => {
 				vscode.window.showTextDocument(doc).then(editor => {
 					var range = new vscode.Range(fileLine, 0, fileLine, 0);
+					editor.revealRange(range);
+
+					var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
+					var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
+					editor.selection = new vscode.Selection(start, end);
+
+					var range = new vscode.Range(start, start);
 					editor.revealRange(range);
 				});
 			});
@@ -207,6 +216,8 @@ export function activate(context: vscode.ExtensionContext) {
 				const nextId = annotations.nextId;
 				annotations.notes.push({fileName: fsPath,
 										fileLine: selection.start.line,
+										positionStart: {line: selection.start.line, character: selection.start.character},
+										positionEnd: {line: selection.end.line, character: selection.end.character},
 										text: annotationText,
 										status: "pending",
 										id: nextId});
