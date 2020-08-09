@@ -97,6 +97,21 @@ export function activate(context: vscode.ExtensionContext) {
 	const tree = new TreeDataProvider();
 	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
 
+	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
+		const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
+        const enableAction = 'I\'m sure';
+        const cancelAction = 'Cancel';
+		const userResponse = await vscode.window.showInformationMessage(message, enableAction, cancelAction);
+		const clearAllNotes = userResponse === enableAction ? true : false;
+
+		if (clearAllNotes) {
+			const annotationFile = getAnnotationsFile();
+			fs.unlinkSync(annotationFile);
+			vscode.commands.executeCommand('code-annotation.refreshEntry');
+			vscode.window.showInformationMessage('All notes cleared!');
+		}
+	})
+
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {

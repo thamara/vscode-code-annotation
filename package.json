@@ -20,6 +20,10 @@
 				"title": "Code Annotation: Add note"
 			},
 			{
+				"command": "code-annotation.clearAllNotes",
+				"title": "Code Annotation: Clear all notes"
+			},
+			{
 				"command": "code-annotation.refreshEntry",
 				"title": "Code Annotation: Refresh",
 				"icon": {
