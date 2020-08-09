@@ -20,6 +20,14 @@ export const getAnnotationsFile = (): string => {
 	}
 };
 
+class TreeActions {
+    constructor(private provider: TreeDataProvider) { }
+
+    removeNote(item: TreeItem) {
+        return this.provider.removeItem(item.id);
+    }
+}
+
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
 	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
@@ -32,21 +40,33 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
 	sourceData(): void {
 		const annotationFile = getAnnotationsFile();
-		console.log(`annotationFile: ${annotationFile}`);
 		const rawdata = fs.readFileSync(annotationFile, "utf8");
 		const annotations = JSON.parse(rawdata).notes;
-		console.log(annotations);
 
 		this.data = [];
-		this.data = [new TreeItem('Pending', undefined), new TreeItem('Done', undefined)]
+		this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")]
 		for (let note in annotations) {
-			console.log(annotations[note]);
 			const itemText = annotations[note].text;
 			let rootByStatus = annotations[note].status == "pending" ? this.data[0] : this.data[1];
-			rootByStatus.addChild(new TreeItem(itemText, undefined),
+			rootByStatus.addChild(new TreeItem(itemText, undefined, annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
 		}
+	}
+
+	removeItem(id: string | undefined): void {
+		const annotationFile = getAnnotationsFile();
+		const rawdata = fs.readFileSync(annotationFile, "utf8");
+		let annotations = JSON.parse(rawdata);
+		const indexToRemove = annotations.notes.findIndex((item: {fileName: String, text: String, status: String, id: Number}) => {
+			return item.id.toString() == id;
+		});
+		if (indexToRemove >= 0)
+			annotations.notes.splice(indexToRemove, 1);
+		const data = JSON.stringify(annotations);
+		fs.writeFileSync(annotationFile, data);
+
+		vscode.commands.executeCommand('code-annotation.refreshEntry');
 
 	}
 
@@ -56,12 +76,12 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
 			this.refresh()
 		);
+
 		this.data = []
 		this.sourceData();
 	}
 
 	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
-		console.log(`fsPath: ${element.label}`);
 	  	return element;
 	}
 
@@ -76,12 +96,13 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 class TreeItem extends vscode.TreeItem {
 	children: TreeItem[] | undefined;
 
-	constructor(label: string, children?: TreeItem[]) {
+	constructor(label: string, children: TreeItem[] | undefined, noteId: string) {
 	  super(
 		  label,
 		  children === undefined ? vscode.TreeItemCollapsibleState.None :
 								   vscode.TreeItemCollapsibleState.Expanded);
 	  this.children = children;
+	  this.id = noteId;
 	}
 
 	addChild(element: TreeItem, fileName: string, status: string) {
@@ -91,6 +112,7 @@ class TreeItem extends vscode.TreeItem {
 		}
 		element.resourceUri = URI.parse(fileName);
 		element.tooltip = fileName
+		element.contextValue = '$Note';
 		this.children.push(element)
 	}
 }
@@ -99,7 +121,11 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Extension "code-annotation" is now active!');
 
 	const tree = new TreeDataProvider();
+    const treeActions = new TreeActions(tree);
+
 	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
+    vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
+
 
 	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
 		const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
@@ -120,19 +146,15 @@ export function activate(context: vscode.ExtensionContext) {
 		const editor = vscode.window.activeTextEditor;
 		if (editor) {
 			const fsPath = editor.document.uri.fsPath;
-			console.log(`fsPath: ${fsPath}`);
 			const selection = editor.selection;
 			const text = editor.document.getText(selection);
-			console.log(`textRange: ${text}`);
 			const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
 			if (annotationText) {
-				console.log(`annotationText: ${annotationText}`);
-
 				const annotationFile = getAnnotationsFile();
 				const rawdata = fs.readFileSync(annotationFile, "utf8");
 				let annotations = JSON.parse(rawdata);
 				const nextId = annotations.nextId;
-				annotations.notes.push({fileName: fsPath, text: annotationText, status: "pending"});
+				annotations.notes.push({fileName: fsPath, text: annotationText, status: "pending", id: nextId});
 				annotations.nextId += 1;
 				const data = JSON.stringify(annotations);
 				fs.writeFileSync(annotationFile, data);

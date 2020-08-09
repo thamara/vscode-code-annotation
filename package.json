@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onView:codeAnnotationView"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -30,9 +30,23 @@
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
 				}
+			},
+			{
+				"command": "code-annotation.removeNote",
+				"title": "Code Annotation: Remove",
+				"icon": {
+					"dark": "resources/dark/close.svg",
+					"light": "resources/light/close.svg"
+				}
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "code-annotation.removeNote",
+					"when": "false"
+				}
+			],
 			"editor/context": [
 				{
 					"command": "code-annotation.addNote",
@@ -44,6 +58,13 @@
 					"command": "code-annotation.refreshEntry",
 					"when": "view == codeAnnotationView",
 					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "code-annotation.removeNote",
+					"when": "view == codeAnnotationView && viewItem == $Note",
+					"group": "inline"
 				}
 			]
 		},
