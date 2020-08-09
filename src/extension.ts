@@ -38,12 +38,16 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		console.log(annotations);
 
 		this.data = [];
-		this.data = [new TreeItem('Pending', undefined)]
+		this.data = [new TreeItem('Pending', undefined), new TreeItem('Done', undefined)]
 		for (let note in annotations) {
 			console.log(annotations[note]);
 			const itemText = annotations[note].text;
-			this.data[0].addChild(new TreeItem(itemText, undefined), annotations[note].fileName);
+			let rootByStatus = annotations[note].status == "pending" ? this.data[0] : this.data[1];
+			rootByStatus.addChild(new TreeItem(itemText, undefined),
+								  annotations[note].fileName,
+								  annotations[note].status);
 		}
+
 	}
 
 	data: TreeItem[];
@@ -80,7 +84,7 @@ class TreeItem extends vscode.TreeItem {
 	  this.children = children;
 	}
 
-	addChild(element: TreeItem, fileName: string) {
+	addChild(element: TreeItem, fileName: string, status: string) {
 		if (this.children === undefined) {
 			this.children = [];
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
@@ -128,7 +132,7 @@ export function activate(context: vscode.ExtensionContext) {
 				const rawdata = fs.readFileSync(annotationFile, "utf8");
 				let annotations = JSON.parse(rawdata);
 				const nextId = annotations.nextId;
-				annotations.notes.push({fileName: fsPath, text: annotationText});
+				annotations.notes.push({fileName: fsPath, text: annotationText, status: "pending"});
 				annotations.nextId += 1;
 				const data = JSON.stringify(annotations);
 				fs.writeFileSync(annotationFile, data);
