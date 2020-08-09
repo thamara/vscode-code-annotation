@@ -38,7 +38,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		console.log(annotations);
 
 		this.data = [];
-		this.data = [new TreeItem('Root', undefined)]
+		this.data = [new TreeItem('Pending', undefined)]
 		for (let note in annotations) {
 			console.log(annotations[note]);
 			const itemText = annotations[note].text;
