@@ -14,7 +14,7 @@ To test the extension download the [VSIX file](https://github.com/thamara/vscode
 4. Select the VSIX file you download and click install
 
 The "Code Annotation" can be found in the "Explorer" pane, below the projects tree.
-Feel free to open (issues)[https://github.com/thamara/vscode-code-annotation/issues] and suggest [new features](https://github.com/thamara/vscode-code-annotation/projects/1) for the extension.
+Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/issues) and suggest [new features](https://github.com/thamara/vscode-code-annotation/projects/1) for the extension.
 
 ## Features
 
