@@ -5,6 +5,7 @@ import { URI } from 'vscode-uri';
 
 import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './utils';
 import { generateMarkdownReport } from './reporting';
+import { getConfiguration } from './configuration';
 
 export const getIconPath = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
@@ -60,17 +61,20 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 				rootByStatus = this.data[1];
 				countDone++;
 			}
-			const fullPathFileName = annotations[note].fileName;
-			const workspacePath = vscode.workspace.rootPath;
-			let relativePath = workspacePath;
-			if (workspacePath) {
-				relativePath = fullPathFileName.replace(workspacePath, '');
-				if (relativePath.charAt(0) === '/')
-					relativePath = relativePath.substr(1);
+			let details = undefined;
+			if (getConfiguration().showFileName) {
+				const fullPathFileName = annotations[note].fileName;
+				const workspacePath = vscode.workspace.rootPath;
+				let relativePath = workspacePath;
+				if (workspacePath) {
+					relativePath = fullPathFileName.replace(workspacePath, '');
+					if (relativePath.charAt(0) === '/')
+						relativePath = relativePath.substr(1);
+				}
+				details = [new TreeItem(`File: ${relativePath}`)];
 			}
-			let details = new TreeItem(`File: ${relativePath}`);
 
-  	        rootByStatus.addChild(new TreeItem(itemText, [details], annotations[note].id.toString()),
+  	        rootByStatus.addChild(new TreeItem(itemText, details, annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
 		}

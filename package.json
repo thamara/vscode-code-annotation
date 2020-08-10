@@ -163,6 +163,16 @@
 					"name": "Code Annotation"
 				}
 			]
+		},
+		"configuration": {
+			"title": "Code Annotation",
+			"properties": {
+			  "showFileName": {
+				"type": "boolean",
+				"default": true,
+				"description": "Show file name under annotation"
+			  }
+			}
 		}
 	},
 	"scripts": {
