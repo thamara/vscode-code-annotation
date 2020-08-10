@@ -97,7 +97,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   	                editor.selection = new vscode.Selection(start, end);
 
   	                var range = new vscode.Range(start, start);
-  	                editor.revealRange(range);
+  	                editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
   	            });
   	        });
   	    }
