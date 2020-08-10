@@ -17,7 +17,10 @@ class TreeActions {
         return this.provider.removeItem(item.id);
     }
     checkNote(item: TreeItem) {
-        return this.provider.checkItem(item.id);
+        return this.provider.checkItem(item.id, 'done');
+	}
+	uncheckNote(item: TreeItem) {
+        return this.provider.checkItem(item.id, 'pending');
     }
     openNote(item: TreeItem) {
         return this.provider.openItem(item.id);
@@ -74,17 +77,18 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   	    saveNotes(notes);
   	}
 
-  	checkItem(id: string | undefined): void {
+  	checkItem(id: string | undefined, status: 'pending' | 'done'): void {
   	    const notes = getNotes();
   	    const index = notes.findIndex((item: {id: Number}) => {
   	        return item.id.toString() === id;
   	    });
 
-  	    if (index >= 0)
-  	    {notes[index].status = "done";}
+  	    if (index >= 0) {
+			  notes[index].status = status;
+		}
 
   	    saveNotes(notes);
-  	}
+	}
 
   	openItem(id: string | undefined): void {
   	    const notes = getNotes();
@@ -189,6 +193,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
 	vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
 	vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
 		treeActions.openNoteFromId(id);

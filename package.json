@@ -56,6 +56,14 @@
 				}
 			},
 			{
+				"command": "code-annotation.uncheckNote",
+				"title": "Code Annotation: Uncheck note",
+				"icon": {
+					"dark": "resources/dark/uncheck.svg",
+					"light": "resources/light/uncheck.svg"
+				}
+			},
+			{
 				"command": "code-annotation.openNote",
 				"title": "Code Annotation: Open note"
 			}
@@ -68,6 +76,10 @@
 				},
 				{
 					"command": "code-annotation.checkNote",
+					"when": "false"
+				},
+				{
+					"command": "code-annotation.uncheckNote",
 					"when": "false"
 				},
 				{
@@ -97,17 +109,22 @@
 				{
 					"command": "code-annotation.checkNote",
 					"when": "view == codeAnnotationView && viewItem == $PendingNote",
-					"group": "inline"
+					"group": "inline@1"
+				},
+				{
+					"command": "code-annotation.uncheckNote",
+					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
+					"group": "inline@1"
 				},
 				{
 					"command": "code-annotation.removeNote",
 					"when": "view == codeAnnotationView && viewItem == $PendingNote",
-					"group": "inline"
+					"group": "inline@2"
 				},
 				{
 					"command": "code-annotation.removeNote",
 					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
-					"group": "inline"
+					"group": "inline@2"
 				},
 				{
 					"command": "code-annotation.openNote",
