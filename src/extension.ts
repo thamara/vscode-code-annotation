@@ -41,11 +41,22 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   	    const annotations = getNotes();
 
   	    this.data = [];
-  	    this.data = [new TreeItem('Pending', undefined, "-1"), new TreeItem('Done', undefined, "-2")];
+  	    this.data = [new TreeItem('Pending'), new TreeItem('Done')];
   	    for (let note in annotations) {
   	        const itemText = annotations[note].text;
-  	        let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
-  	        rootByStatus.addChild(new TreeItem(itemText, undefined, annotations[note].id.toString()),
+			let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
+
+			const fullPathFileName = annotations[note].fileName;
+			const workspacePath = vscode.workspace.rootPath;
+			let relativePath = workspacePath;
+			if (workspacePath) {
+				relativePath = fullPathFileName.replace(workspacePath, '');
+				if (relativePath.charAt(0) === '/')
+					relativePath = relativePath.substr(1);
+			}
+			let details = new TreeItem(`File: ${relativePath}`);
+
+  	        rootByStatus.addChild(new TreeItem(itemText, [details], annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
   	    }
@@ -139,13 +150,14 @@ class OpenFileCommand implements vscode.Command {
 class TreeItem extends vscode.TreeItem {
 	children: TreeItem[] | undefined;
 
-	constructor(label: string, children: TreeItem[] | undefined, noteId: string) {
+	constructor(label: string, children?: TreeItem[] | undefined, noteId?: string | undefined) {
 	  super(
 		  label,
 		  children === undefined ? vscode.TreeItemCollapsibleState.None :
 								   vscode.TreeItemCollapsibleState.Expanded);
 	  this.children = children;
-	  this.id = noteId;
+	  if (noteId)
+	  	this.id = noteId;
 	}
 
 	addChild(element: TreeItem, fileName: string, status: string) {
