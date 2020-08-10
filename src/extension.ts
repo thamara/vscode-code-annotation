@@ -172,7 +172,7 @@ class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	}
 }
 
-class OpenFileCommand implements vscode.Command {
+class OpenNoteCommand implements vscode.Command {
 	command = 'code-annotation.openNoteFromId';
 	title = 'Open File';
 	arguments?: any[];
@@ -205,7 +205,7 @@ class NoteItem extends vscode.TreeItem {
 		element.tooltip = fileName;
 		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
 		if (element.id) {
-			element.command = new OpenFileCommand(element.id);
+			element.command = new OpenNoteCommand(element.id);
 		}
 		const noteType = (status === "pending") ? "todo" : "check";
 		element.iconPath = {
