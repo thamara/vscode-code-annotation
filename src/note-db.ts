@@ -71,11 +71,69 @@ export const saveNotes = (notes: Note[]) => {
     saveDb(db);
 };
 
-export const addNote = (note: Note) => {
+const createNote = (annotationText: string, fromSelection: boolean) => {
+    const nextId = getNextId();
+
+    let codeSnippet = "";
+    let fileName = "";
+    let selection = undefined;
+    let positionStart: Position = {line: 0, character: 0};
+    let positionEnd: Position = {line: 0, character: 0};
+
+    const editor = vscode.window.activeTextEditor;
+    if (fromSelection && editor) {
+        const fsPath = editor.document.uri.fsPath;
+        selection = editor.selection;
+        if (selection) {
+            codeSnippet = editor.document.getText(selection);
+            positionStart = { line: selection.start.line, character: selection.start.character };
+            positionEnd = { line: selection.end.line, character: selection.end.character };
+        }
+    }
+    const note: Note = {
+        fileName: fileName,
+        fileLine: selection ? selection.start.line : 0,
+        positionStart: positionStart,
+        positionEnd: positionEnd,
+        text: annotationText,
+        codeSnippet: codeSnippet,
+        status: "pending",
+        id: nextId
+    };
+    return note;
+}
+
+const createNoteFromSelection = (annotationText: string) => {
+    return createNote(annotationText, true);
+}
+
+const createPlainNote = (annotationText: string) => {
+    return createNote(annotationText, false);
+}
+
+const addNoteToDb = (note: Note) => {
     let db = getNotesDb();
 
     db.notes.push(note);
     db.nextId++;
 
     saveDb(db);
+    vscode.window.showInformationMessage('Annotation saved!');
 };
+
+export const addNote = async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+        const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
+        if (annotationText) {
+            addNoteToDb(createNoteFromSelection(annotationText));
+        }
+    }
+}
+
+export const addPlainNote = async () => {
+    const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
+    if (annotationText) {
+        addNoteToDb(createPlainNote(annotationText));
+    }
+}

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from "fs";
 
-import { getAnnotationsFile, getNextId, addNote } from './note-db';
+import { getAnnotationsFile, addNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 
@@ -41,27 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
-		const editor = vscode.window.activeTextEditor;
-		if (editor) {
-			const fsPath = editor.document.uri.fsPath;
-			const selection = editor.selection;
-			const text = editor.document.getText(selection);
-			const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
-			if (annotationText) {
-				const nextId = getNextId();
-				addNote({
-					fileName: fsPath,
-					fileLine: selection.start.line,
-					positionStart: { line: selection.start.line, character: selection.start.character },
-					positionEnd: { line: selection.end.line, character: selection.end.character },
-					text: annotationText,
-					codeSnippet: text,
-					status: "pending",
-					id: nextId
-				});
-				vscode.window.showInformationMessage('Annotation saved!');
-			}
-		}
+		addNote();
 	});
 
 	context.subscriptions.push(disposable);
