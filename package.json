@@ -66,6 +66,10 @@
 			{
 				"command": "code-annotation.openNote",
 				"title": "Code Annotation: Open note"
+			},
+			{
+				"command": "code-annotation.editNote",
+				"title": "Code Annotation: Edit note"
 			}
 		],
 		"menus": {
@@ -84,6 +88,10 @@
 				},
 				{
 					"command": "code-annotation.openNote",
+					"when": "false"
+				},
+				{
+					"command": "code-annotation.editNote",
 					"when": "false"
 				}
 			],
@@ -129,12 +137,22 @@
 				{
 					"command": "code-annotation.openNote",
 					"when": "view == codeAnnotationView && viewItem == $PendingNote",
-					"group": "3_open"
+					"group": "3_open@1"
 				},
 				{
 					"command": "code-annotation.openNote",
 					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
-					"group": "3_open"
+					"group": "3_open@1"
+				},
+				{
+					"command": "code-annotation.editNote",
+					"when": "view == codeAnnotationView && viewItem == $PendingNote",
+					"group": "3_open@2"
+				},
+				{
+					"command": "code-annotation.editNote",
+					"when": "view == codeAnnotationView && viewItem == $CompleteNote",
+					"group": "3_open@2"
 				}
 			]
 		},

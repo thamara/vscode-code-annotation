@@ -27,7 +27,10 @@ class TreeActions {
 	}
 	openNoteFromId(id: string) {
         return this.provider.openItem(id);
-    }
+	}
+	editNote(item: TreeItem) {
+        return this.provider.editItem(item.id);
+	}
 }
 
 class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
@@ -99,6 +102,20 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
   	    saveNotes(notes);
 	}
+
+	editItem(id: string | undefined): void {
+		vscode.window.showInputBox({ placeHolder: 'New text for annotation...' }).then(annotationText => {
+			const notes = getNotes();
+			const index = notes.findIndex((item: {id: Number}) => {
+				return item.id.toString() === id;
+			});
+			if (index >= 0 && annotationText) {
+				notes[index].text = annotationText;
+				saveNotes(notes);
+				vscode.window.showInformationMessage('Annotation edited!');
+			}
+		});
+  }
 
   	openItem(id: string | undefined): void {
   	    const notes = getNotes();
@@ -205,6 +222,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
 	vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
+	vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
 	vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
 		treeActions.openNoteFromId(id);
     });
