@@ -40,9 +40,6 @@ const createNoteItem = (note: Note): NoteItem => {
     }
 
     let noteItem = new NoteItem(note.text, details, note.id.toString());
-    if (fullPathFileName.length > 0) {
-        noteItem.resourceUri = URI.parse(fullPathFileName);
-    }
     if (noteItem.id) {
         noteItem.command = new OpenNoteCommand(noteItem.id);
     }
