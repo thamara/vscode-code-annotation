@@ -10,7 +10,7 @@ const getIconPathFromType = (type: string, theme: string): string => {
 };
 
 const getIconPath = (status: string): any => {
-	const noteType = (status === 'peding') ? "todo" : "check";
+	const noteType = (status === 'pending') ? "todo" : "check";
 	return {
 		light: getIconPathFromType(noteType, 'light'),
 		dark: getIconPathFromType(noteType, 'dark')
@@ -18,7 +18,7 @@ const getIconPath = (status: string): any => {
 }
 
 const getContextValue = (status: string): string => {
-	return (status === 'peding') ? '$PendingNote' : '$CompleteNote';
+	return (status === 'pending') ? '$PendingNote' : '$CompleteNote';
 }
 
 const createNoteItem = (note: Note): NoteItem => {
