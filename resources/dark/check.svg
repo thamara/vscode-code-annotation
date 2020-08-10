@@ -9,14 +9,14 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:version="1.0rc1 (09960d6, 2020-04-09)"
    sodipodi:docname="check.svg"
+   id="svg844"
    version="1.1"
-   width="512"
-   viewBox="0 0 515.556 515.556"
-   height="512"
-   enable-background="new 0 0 515.556 515.556"
-   id="Capa_1">
+   enable-background="new 3 3 16 16"
+   viewBox="3 3 16 16"
+   height="16"
+   width="16">
   <metadata
-     id="metadata919">
+     id="metadata850">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -28,19 +28,21 @@
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs917" />
+     id="defs848" />
   <sodipodi:namedview
-     inkscape:current-layer="Capa_1"
-     inkscape:window-maximized="0"
+     inkscape:current-layer="svg844"
+     inkscape:window-maximized="1"
      inkscape:window-y="23"
      inkscape:window-x="0"
-     inkscape:cy="256"
-     inkscape:cx="256"
-     inkscape:zoom="1.1777344"
+     inkscape:cy="7.2132842"
+     inkscape:cx="3.3351543"
+     inkscape:zoom="30.797043"
+     inkscape:guide-bbox="true"
+     showguides="true"
      showgrid="false"
-     id="namedview915"
-     inkscape:window-height="480"
-     inkscape:window-width="776"
+     id="namedview846"
+     inkscape:window-height="811"
+     inkscape:window-width="1440"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      guidetolerance="10"
@@ -48,9 +50,27 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff" />
+     pagecolor="#ffffff">
+    <sodipodi:guide
+       id="guide1422"
+       orientation="1,0"
+       position="3.6635875,7.6930284" />
+    <sodipodi:guide
+       id="guide1424"
+       orientation="1,0"
+       position="12.417858,8.9071243" />
+    <sodipodi:guide
+       id="guide1426"
+       orientation="0,-1"
+       position="10.845,12.317" />
+    <sodipodi:guide
+       id="guide1428"
+       orientation="0,-1"
+       position="9.7340667,3.6034424" />
+  </sodipodi:namedview>
   <path
-     style="fill:#ffffff"
-     id="path912"
-     d="m0 274.226 176.549 176.886 339.007-338.672-48.67-47.997-290.337 290-128.553-128.552z" />
+     style="fill:#f5f5f5;fill-opacity:1;stroke-width:0.022451"
+     inkscape:connector-curvature="0"
+     d="M 5.2126122,11.369286 9.1763238,15.340563 16.787388,7.7370196 15.694696,6.659437 9.1763238,13.170242 6.2901734,10.284114 Z"
+     id="path833" />
 </svg>

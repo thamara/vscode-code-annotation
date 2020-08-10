@@ -9,36 +9,38 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:version="1.0rc1 (09960d6, 2020-04-09)"
    sodipodi:docname="uncheck.svg"
+   id="svg844"
    version="1.1"
-   width="512"
-   viewBox="0 0 515.556 515.556"
-   height="512"
-   enable-background="new 0 0 515.556 515.556"
-   id="Capa_1">
+   enable-background="new 3 3 16 16"
+   viewBox="3 3 16 16"
+   height="16"
+   width="16">
   <metadata
-     id="metadata919">
+     id="metadata850">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs917" />
+     id="defs848" />
   <sodipodi:namedview
-     inkscape:current-layer="Capa_1"
+     inkscape:current-layer="svg844"
      inkscape:window-maximized="1"
      inkscape:window-y="23"
      inkscape:window-x="0"
-     inkscape:cy="256"
-     inkscape:cx="256"
-     inkscape:zoom="1.1777344"
+     inkscape:cy="8.0706786"
+     inkscape:cx="8.52448"
+     inkscape:zoom="46.264422"
+     inkscape:guide-bbox="true"
+     showguides="true"
      showgrid="false"
-     id="namedview915"
+     id="namedview846"
      inkscape:window-height="811"
      inkscape:window-width="1440"
      inkscape:pageshadow="2"
@@ -48,13 +50,29 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff"
-     inkscape:document-rotation="0" />
+     pagecolor="#ffffff">
+    <sodipodi:guide
+       id="guide1422"
+       orientation="1,0"
+       position="2.2479477,10.315286" />
+    <sodipodi:guide
+       id="guide1424"
+       orientation="1,0"
+       position="13.811909,10.380131" />
+    <sodipodi:guide
+       id="guide1426"
+       orientation="0,-1"
+       position="10.845,12.317" />
+    <sodipodi:guide
+       id="guide1428"
+       orientation="0,-1"
+       position="9.7340667,3.6034424" />
+  </sodipodi:namedview>
   <rect
-     style="fill:#f5f5f5;stroke:#ffffff;stroke-width:1.90288"
-     id="rect1426"
-     width="495.89133"
-     height="73.528717"
-     x="9.8323364"
-     y="221.01364" />
+     y="10.265094"
+     x="5.2180195"
+     height="1.4698119"
+     width="11.563961"
+     id="rect1545"
+     style="fill:#f5f5f5;fill-opacity:1;stroke:none;stroke-width:1.88976" />
 </svg>
