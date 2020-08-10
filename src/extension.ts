@@ -12,32 +12,32 @@ export const getIconPath = (type: string, theme: string): string => {
 };
 
 class TreeActions {
-	constructor(private provider: TreeDataProvider) { }
+	constructor(private provider: NotesTree) { }
 
-	removeNote(item: TreeItem) {
+	removeNote(item: NoteItem) {
 		return this.provider.removeItem(item.id);
 	}
-	checkNote(item: TreeItem) {
+	checkNote(item: NoteItem) {
 		return this.provider.checkItem(item.id, 'done');
 	}
-	uncheckNote(item: TreeItem) {
+	uncheckNote(item: NoteItem) {
 		return this.provider.checkItem(item.id, 'pending');
 	}
-	openNote(item: TreeItem) {
+	openNote(item: NoteItem) {
 		return this.provider.openItem(item.id);
 	}
 	openNoteFromId(id: string) {
 		return this.provider.openItem(id);
 	}
-	editNote(item: TreeItem) {
+	editNote(item: NoteItem) {
 		return this.provider.editItem(item.id);
 	}
 }
 
-class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
+class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
-	readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<NoteItem | undefined | null | void> = new vscode.EventEmitter<NoteItem | undefined | null | void>();
+	readonly onDidChangeTreeData: vscode.Event<NoteItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 	refresh(): void {
 		this.sourceData();
@@ -49,7 +49,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		let countPeding = 0;
 		let countDone = 0;
 		this.data = [];
-		this.data = [new TreeItem('Pending'), new TreeItem('Done')];
+		this.data = [new NoteItem('Pending'), new NoteItem('Done')];
 		for (let note in annotations) {
 			const itemText = annotations[note].text;
 			const isPending = annotations[note].status === "pending";
@@ -70,10 +70,10 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 					relativePath = fullPathFileName.replace(workspacePath, '');
 					if (relativePath.charAt(0) === '/') { relativePath = relativePath.substr(1); }
 				}
-				details = [new TreeItem(`File: ${relativePath}`)];
+				details = [new NoteItem(`File: ${relativePath}`)];
 			}
 
-			rootByStatus.addChild(new TreeItem(itemText, details, annotations[note].id.toString()),
+			rootByStatus.addChild(new NoteItem(itemText, details, annotations[note].id.toString()),
 				annotations[note].fileName,
 				annotations[note].status);
 		}
@@ -149,7 +149,7 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		}
 	}
 
-	data: TreeItem[];
+	data: NoteItem[];
 
 	constructor() {
 		vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
@@ -160,11 +160,11 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 		this.sourceData();
 	}
 
-	getTreeItem(element: TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
+	getTreeItem(element: NoteItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		return element;
 	}
 
-	getChildren(element?: TreeItem | undefined): vscode.ProviderResult<TreeItem[]> {
+	getChildren(element?: NoteItem | undefined): vscode.ProviderResult<NoteItem[]> {
 		if (element === undefined) {
 			return this.data;
 		}
@@ -182,10 +182,10 @@ class OpenFileCommand implements vscode.Command {
 	}
 }
 
-class TreeItem extends vscode.TreeItem {
-	children: TreeItem[] | undefined;
+class NoteItem extends vscode.TreeItem {
+	children: NoteItem[] | undefined;
 
-	constructor(label: string, children?: TreeItem[] | undefined, noteId?: string | undefined) {
+	constructor(label: string, children?: NoteItem[] | undefined, noteId?: string | undefined) {
 		super(
 			label,
 			children === undefined ? vscode.TreeItemCollapsibleState.None :
@@ -196,7 +196,7 @@ class TreeItem extends vscode.TreeItem {
 		}
 	}
 
-	addChild(element: TreeItem, fileName: string, status: string) {
+	addChild(element: NoteItem, fileName: string, status: string) {
 		if (this.children === undefined) {
 			this.children = [];
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
@@ -219,7 +219,7 @@ class TreeItem extends vscode.TreeItem {
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Extension "code-annotation" is now active!');
 
-	const tree = new TreeDataProvider();
+	const tree = new NotesTree();
 	const treeActions = new TreeActions(tree);
 
 	vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
