@@ -1,7 +1,7 @@
 {
 	"name": "code-annotation",
 	"displayName": "Code Annotation",
-	"description": "Create notes on your source code.",
+	"description": "Create and track notes on your source code.",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.47.0"
