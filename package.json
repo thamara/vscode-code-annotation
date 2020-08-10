@@ -65,11 +65,11 @@
 			},
 			{
 				"command": "code-annotation.openNote",
-				"title": "Code Annotation: Open note"
+				"title": "Open note"
 			},
 			{
 				"command": "code-annotation.editNote",
-				"title": "Code Annotation: Edit note"
+				"title": "Edit note"
 			}
 		],
 		"menus": {
