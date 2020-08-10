@@ -18,6 +18,7 @@ export const getNotesInMarkdown = (): string => {
     const notes = getNotes();
 
     let result = `# Code Annotator - Summary\n`;
+    result += `\n---\n`;
     result += `## Pending\n`;
 
     for (let i in notes) {
@@ -27,6 +28,7 @@ export const getNotesInMarkdown = (): string => {
         }
     }
 
+    result += `\n---\n`;
     result += `## Done\n`;
 
     for (let i in notes) {
