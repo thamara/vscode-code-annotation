@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from "fs";
 
-import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './note-db';
+import { getAnnotationsFile, getNextId, addNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 
