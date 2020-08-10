@@ -2,12 +2,56 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import { URI } from 'vscode-uri';
 
-import { getNotes, saveNotes } from './note-db';
+import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
 
-export const getIconPath = (type: string, theme: string): string => {
+const getIconPathFromType = (type: string, theme: string): string => {
 	return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
 };
+
+const getIconPath = (status: string): any => {
+	const noteType = (status === 'peding') ? "todo" : "check";
+	return {
+		light: getIconPathFromType(noteType, 'light'),
+		dark: getIconPathFromType(noteType, 'dark')
+	};
+}
+
+const getContextValue = (status: string): string => {
+	return (status === 'peding') ? '$PendingNote' : '$CompleteNote';
+}
+
+const createNoteItem = (note: Note): NoteItem => {
+	const fullPathFileName = note.fileName;
+	let details = undefined;
+
+	if (getConfiguration().showFileName && fullPathFileName.length > 0) {
+		// Creates an item under the main note with the File name (if existing)
+		const fullPathFileName = note.fileName;
+		const workspacePath = vscode.workspace.rootPath;
+		let relativePath = workspacePath;
+		if (workspacePath) {
+			relativePath = fullPathFileName.replace(workspacePath, '');
+			if (relativePath && relativePath.charAt(0) === '/') {
+				relativePath = relativePath.substr(1);
+			}
+		}
+		details = [new NoteItem(`File: ${relativePath}`)];
+	}
+
+	let noteItem = new NoteItem(note.text, details, note.id.toString());
+	if (fullPathFileName.length > 0) {
+		noteItem.resourceUri = URI.parse(fullPathFileName);
+	}
+	if (noteItem.id) {
+		noteItem.command = new OpenNoteCommand(noteItem.id);
+	}
+	noteItem.tooltip = note.text;
+	noteItem.contextValue = getContextValue(note.status);
+	noteItem.iconPath = getIconPath(note.status);
+
+	return noteItem;
+}
 
 export class TreeActions {
 	constructor(private provider: NotesTree) { }
@@ -49,32 +93,15 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 		this.data = [];
 		this.data = [new NoteItem('Pending'), new NoteItem('Done')];
 		for (let note in annotations) {
-			const itemText = annotations[note].text;
+			const noteItem = createNoteItem(annotations[note]);
 			const isPending = annotations[note].status === "pending";
-			let rootByStatus = undefined;
 			if (isPending) {
-				rootByStatus = this.data[0];
+				this.data[0].addChild(noteItem);
 				countPeding++;
 			} else {
-				rootByStatus = this.data[1];
+				this.data[1].addChild(noteItem);
 				countDone++;
 			}
-			const fullPathFileName = annotations[note].fileName;
-			let details = undefined;
-			if (getConfiguration().showFileName && fullPathFileName.length > 0) {
-				const fullPathFileName = annotations[note].fileName;
-				const workspacePath = vscode.workspace.rootPath;
-				let relativePath = workspacePath;
-				if (workspacePath) {
-					relativePath = fullPathFileName.replace(workspacePath, '');
-					if (relativePath.charAt(0) === '/') { relativePath = relativePath.substr(1); }
-				}
-				details = [new NoteItem(`File: ${relativePath}`)];
-			}
-
-			rootByStatus.addChild(new NoteItem(itemText, details, annotations[note].id.toString()),
-				annotations[note].fileName,
-				annotations[note].status);
 		}
 		this.data[0].label += ` (${countPeding})`;
 		this.data[1].label += ` (${countDone})`;
@@ -199,24 +226,11 @@ class NoteItem extends vscode.TreeItem {
 		}
 	}
 
-	addChild(element: NoteItem, fileName: string, status: string) {
+	addChild(element: NoteItem) {
 		if (this.children === undefined) {
 			this.children = [];
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		}
-		if (fileName.length > 0) {
-			element.resourceUri = URI.parse(fileName);
-		}
-		element.tooltip = fileName;
-		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
-		if (element.id) {
-			element.command = new OpenNoteCommand(element.id);
-		}
-		const noteType = (status === "pending") ? "todo" : "check";
-		element.iconPath = {
-			light: getIconPath(noteType, 'light'),
-			dark: getIconPath(noteType, 'dark')
-		};
 		this.children.push(element);
 	}
 }
