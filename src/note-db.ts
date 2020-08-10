@@ -82,7 +82,7 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
 
     const editor = vscode.window.activeTextEditor;
     if (fromSelection && editor) {
-        const fsPath = editor.document.uri.fsPath;
+        fileName = editor.document.uri.fsPath;
         selection = editor.selection;
         if (selection) {
             codeSnippet = editor.document.getText(selection);

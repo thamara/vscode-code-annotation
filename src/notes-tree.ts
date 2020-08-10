@@ -59,8 +59,9 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 				rootByStatus = this.data[1];
 				countDone++;
 			}
+			const fullPathFileName = annotations[note].fileName;
 			let details = undefined;
-			if (getConfiguration().showFileName) {
+			if (getConfiguration().showFileName && fullPathFileName.length > 0) {
 				const fullPathFileName = annotations[note].fileName;
 				const workspacePath = vscode.workspace.rootPath;
 				let relativePath = workspacePath;
@@ -129,6 +130,10 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 			const note = notes[index];
 			const fileName = note.fileName;
 			const fileLine = note.fileLine;
+
+			if (fileName.length <= 0) {
+				return
+			}
 
 			var openPath = vscode.Uri.file(fileName);
 			vscode.workspace.openTextDocument(openPath).then(doc => {
@@ -199,7 +204,9 @@ class NoteItem extends vscode.TreeItem {
 			this.children = [];
 			this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		}
-		element.resourceUri = URI.parse(fileName);
+		if (fileName.length > 0) {
+			element.resourceUri = URI.parse(fileName);
+		}
 		element.tooltip = fileName;
 		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
 		if (element.id) {

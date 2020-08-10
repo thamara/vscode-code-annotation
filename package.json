@@ -28,6 +28,10 @@
 				"title": "Code Annotation: Add note"
 			},
 			{
+				"command": "code-annotation.addPlainNote",
+				"title": "Code Annotation: Add plain note"
+			},
+			{
 				"command": "code-annotation.clearAllNotes",
 				"title": "Code Annotation: Clear all notes"
 			},

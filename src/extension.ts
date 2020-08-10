@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from "fs";
 
-import { getAnnotationsFile, addNote } from './note-db';
+import { getAnnotationsFile, addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 
@@ -38,6 +38,10 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.commands.executeCommand('code-annotation.refreshEntry');
 			vscode.window.showInformationMessage('All notes cleared!');
 		}
+	});
+
+	vscode.commands.registerCommand('code-annotation.addPlainNote', async () => {
+		addPlainNote();
 	});
 
 	let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
