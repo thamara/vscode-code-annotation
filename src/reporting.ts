@@ -53,6 +53,7 @@ export const generateMarkdownReport = (): void => {
         var openPath = vscode.Uri.file(extensionFilePath);
         vscode.workspace.openTextDocument(openPath).then(doc => {
             vscode.window.showTextDocument(doc).then(editor => {
-            });});
+            });
+        });
     }
 };

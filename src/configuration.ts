@@ -12,4 +12,4 @@ export const getConfiguration = (): Configuration => {
     };
 
     return config;
-}
+};
