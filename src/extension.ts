@@ -21,6 +21,9 @@ class TreeActions {
     }
     openNote(item: TreeItem) {
         return this.provider.openItem(item.id);
+	}
+	openNoteFromId(id: string) {
+        return this.provider.openItem(id);
     }
 }
 
@@ -123,6 +126,16 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 	}
 }
 
+class OpenFileCommand implements vscode.Command {
+    command = 'code-annotation.openNoteFromId';
+    title = 'Open File';
+    arguments?: any[];
+
+    constructor(id: string) {
+        this.arguments = [id];
+    }
+}
+
 class TreeItem extends vscode.TreeItem {
 	children: TreeItem[] | undefined;
 
@@ -142,7 +155,10 @@ class TreeItem extends vscode.TreeItem {
 	    }
 	    element.resourceUri = URI.parse(fileName);
 	    element.tooltip = fileName;
-	    element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
+		element.contextValue = (status === "pending") ? '$PendingNote' : '$CompleteNote';
+		if (element.id) {
+			element.command = new OpenFileCommand(element.id);
+		}
 	    const noteType = (status === "pending") ? "todo" : "check";
 	    element.iconPath = {
 	        light: getIconPath(noteType, 'light'),
@@ -161,13 +177,16 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
+	vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
+	vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
+		treeActions.openNoteFromId(id);
+    });
 
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
-    });
+	});
 
-    vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
+	vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
         const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
         const enableAction = 'I\'m sure';
         const cancelAction = 'Cancel';
