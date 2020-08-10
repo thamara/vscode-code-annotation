@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as path from "path";
-import * as fs from "fs";
+import * as path from 'path';
+import * as fs from 'fs';
 
 export interface Position {
     line: number;
@@ -26,23 +26,23 @@ export interface NotesDb {
 export const getAnnotationsFile = (): string => {
     const workspaceFolder = vscode.workspace.rootPath;
     if (workspaceFolder) {
-        const extensionDirPath = path.join(workspaceFolder, ".vscode", "code-annotation");
+        const extensionDirPath = path.join(workspaceFolder, '.vscode', 'code-annotation');
         if (!fs.existsSync(extensionDirPath)) {
             fs.mkdirSync(extensionDirPath, { recursive: true });
         }
-        const extensionFilePath = path.join(extensionDirPath, "annotations.json");
+        const extensionFilePath = path.join(extensionDirPath, 'annotations.json');
         if (!fs.existsSync(extensionFilePath)) {
             fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
         }
         return extensionFilePath;
     } else {
-	  	throw new Error("workspace not found");
+	  	throw new Error('workspace not found');
     }
 };
 
 export const getNotesDb = (): NotesDb => {
     const annotationFile = getAnnotationsFile();
-    const rawdata = fs.readFileSync(annotationFile, "utf8");
+    const rawdata = fs.readFileSync(annotationFile, 'utf8');
     let annotations = JSON.parse(rawdata);
     return annotations;
 };
@@ -74,8 +74,8 @@ export const saveNotes = (notes: Note[]) => {
 const createNote = (annotationText: string, fromSelection: boolean) => {
     const nextId = getNextId();
 
-    let codeSnippet = "";
-    let fileName = "";
+    let codeSnippet = '';
+    let fileName = '';
     let selection = undefined;
     let positionStart: Position = {line: 0, character: 0};
     let positionEnd: Position = {line: 0, character: 0};
@@ -97,19 +97,19 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
         positionEnd: positionEnd,
         text: annotationText,
         codeSnippet: codeSnippet,
-        status: "pending",
+        status: 'pending',
         id: nextId
     };
     return note;
-}
+};
 
 const createNoteFromSelection = (annotationText: string) => {
     return createNote(annotationText, true);
-}
+};
 
 const createPlainNote = (annotationText: string) => {
     return createNote(annotationText, false);
-}
+};
 
 const addNoteToDb = (note: Note) => {
     let db = getNotesDb();
@@ -129,11 +129,11 @@ export const addNote = async () => {
             addNoteToDb(createNoteFromSelection(annotationText));
         }
     }
-}
+};
 
 export const addPlainNote = async () => {
     const annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...' });
     if (annotationText) {
         addNoteToDb(createPlainNote(annotationText));
     }
-}
+};

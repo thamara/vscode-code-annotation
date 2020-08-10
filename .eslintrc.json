@@ -12,9 +12,32 @@
         "@typescript-eslint/naming-convention": "warn",
         "@typescript-eslint/semi": "warn",
         "curly": "warn",
-        "eqeqeq": "warn",
         "indent": "error",
         "no-throw-literal": "warn",
-        "semi": "off"
+        "semi": "error",
+        "block-spacing": "error",
+        "eqeqeq": [
+            "error", "always"
+        ],
+        "func-call-spacing": [
+            "error", "never"
+        ],
+        "keyword-spacing": "error",
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-extra-semi": "error",
+        "no-lonely-if": "error",
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi-spacing": [
+            "error", {
+                "before": false,
+                "after": true
+          }
+        ]
     }
 }
