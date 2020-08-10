@@ -2,6 +2,7 @@
 	"name": "code-annotation",
 	"displayName": "Code Annotation",
 	"description": "Create and track notes on your source code.",
+	"icon": "resources/code-annotation.png",
 	"publisher": "thamara",
 	"author": "Thamara Andrade",
 	"homepage": "https://github.com/thamara/vscode-code-annotation#readme",
