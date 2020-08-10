@@ -9,6 +9,10 @@ Create and track annotations from your source code without actually committing c
 - Check/Uncheck items as you complete them
 - Generate a report in Markdown with the pending and complete items
 
+## Limitation
+
+- Currently works only on workspace
+
 ## Requirements
 
 TODO
