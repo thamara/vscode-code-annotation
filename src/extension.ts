@@ -42,13 +42,21 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
 
   	sourceData(): void {
   	    const annotations = getNotes();
-
-  	    this.data = [];
+		let countPeding = 0;
+		let countDone = 0;
+		this.data = [];
   	    this.data = [new TreeItem('Pending'), new TreeItem('Done')];
   	    for (let note in annotations) {
-  	        const itemText = annotations[note].text;
-			let rootByStatus = annotations[note].status === "pending" ? this.data[0] : this.data[1];
-
+			const itemText = annotations[note].text;
+			const isPending = annotations[note].status === "pending";
+			let rootByStatus = undefined;
+			if (isPending) {
+				rootByStatus = this.data[0];
+				countPeding++;
+			} else {
+				rootByStatus = this.data[1];
+				countDone++;
+			}
 			const fullPathFileName = annotations[note].fileName;
 			const workspacePath = vscode.workspace.rootPath;
 			let relativePath = workspacePath;
@@ -62,8 +70,10 @@ class TreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
   	        rootByStatus.addChild(new TreeItem(itemText, [details], annotations[note].id.toString()),
 								  annotations[note].fileName,
 								  annotations[note].status);
-  	    }
-  	}
+		}
+		this.data[0].label += ` (${countPeding})`;
+		this.data[1].label += ` (${countDone})`;
+	}
 
   	removeItem(id: string | undefined): void {
   	    const notes = getNotes();
