@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { URI } from 'vscode-uri';
 
-import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './utils';
+import { getAnnotationsFile, getNotes, saveNotes, getNextId, addNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { getConfiguration } from './configuration';
 

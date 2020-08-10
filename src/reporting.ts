@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from "fs";
 
-import { getNotes } from './utils';
+import { getNotes } from './note-db';
 
 // TODO: We should use Jinja or something like this to generate these markdown files
 export const getNoteInMarkdown = (text: string, fileName: string, codeSnippet: string): string => {
