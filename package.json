@@ -2,6 +2,13 @@
 	"name": "code-annotation",
 	"displayName": "Code Annotation",
 	"description": "Create and track notes on your source code.",
+	"publisher": "thamara",
+	"author": "Thamara Andrade",
+	"homepage": "https://github.com/thamara/vscode-code-annotation#readme",
+	"repository": {
+		"type": "git",
+		"url": "github:thamara/vscode-code-annotation.git"
+	},
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.47.0"
