@@ -4,6 +4,7 @@ import { URI } from 'vscode-uri';
 
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
+import { getRelativePathForFileName } from './utils'
 
 const getIconPathFromType = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
@@ -27,15 +28,7 @@ const createNoteItem = (note: Note): NoteItem => {
 
     if (getConfiguration().showFileName && fullPathFileName.length > 0) {
         // Creates an item under the main note with the File name (if existing)
-        const fullPathFileName = note.fileName;
-        const workspacePath = vscode.workspace.rootPath;
-        let relativePath = workspacePath;
-        if (workspacePath) {
-            relativePath = fullPathFileName.replace(workspacePath, '');
-            if (relativePath && relativePath.charAt(0) === '/') {
-                relativePath = relativePath.substr(1);
-            }
-        }
+        const relativePath = getRelativePathForFileName(note.fileName);
         details = [new NoteItem(`File: ${relativePath}`)];
     }
 
