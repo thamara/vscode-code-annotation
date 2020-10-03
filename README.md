@@ -23,10 +23,6 @@ Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/iss
 - Check/Uncheck items as you complete them
 - Generate a report in Markdown with the pending and complete items
 
-## Limitation
-
-- Currently works only on workspace
-
 ## Requirements
 
 TODO

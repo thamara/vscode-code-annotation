@@ -1,12 +1,15 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { getAnnotationsFile, addNote, addPlainNote } from './note-db';
+import { addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
+import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Extension "code-annotation" is now active!');
+
+    initializeStorageLocation(context.globalStoragePath);
 
     const tree = new NotesTree();
     const treeActions = new TreeActions(tree);
@@ -33,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
         const clearAllNotes = userResponse === enableAction ? true : false;
 
         if (clearAllNotes) {
-            const annotationFile = getAnnotationsFile();
+            const annotationFile = getAnnotationFilePath();
             fs.unlinkSync(annotationFile);
             vscode.commands.executeCommand('code-annotation.refreshEntry');
             vscode.window.showInformationMessage('All notes cleared!');
