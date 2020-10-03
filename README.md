@@ -25,6 +25,17 @@ Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/iss
 - Check/Uncheck items as you complete them
 - Generate a report in Markdown with the pending and complete items
 
+## Development
+
+- For the development you'll need to use VSCode
+- Install Node/Npm
+- After forking/cloning the repository, run:
+```
+npm install
+npm run compile
+```
+- And to run/test the extension, go the the Run view and hit the green button on `Run Extension`. This will open a new VSCode window with the extension enabled.
+
 ## Requirements
 
 TODO
