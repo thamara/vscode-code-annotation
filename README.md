@@ -2,6 +2,8 @@
 
 Create and track annotations from your source code without actually committing comments on your code.
 
+![](https://github.com/thamara/vscode-code-annotation/blob/main/demo/Code%20Annotation.png)
+
 ### Attention
 
 This is still **work in progress**. You are welcome to test and give feedback on the extension, but we cannot guarantee compatibility with upcoming releases.
