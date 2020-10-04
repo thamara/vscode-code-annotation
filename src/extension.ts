@@ -4,12 +4,17 @@ import * as fs from 'fs';
 import { addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
-import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
+import { initializeStorageLocation, getAnnotationFilePath, getConfiguration } from './configuration';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Extension "code-annotation" is now active!');
 
-    initializeStorageLocation(context.globalStoragePath);
+    const configuration = getConfiguration();
+
+    // if path is '', use global.
+    const storagePath = !configuration.saveLocation ? context.globalStoragePath : configuration.saveLocation;
+
+    initializeStorageLocation(storagePath);
 
     const tree = new NotesTree();
     const treeActions = new TreeActions(tree);
