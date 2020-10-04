@@ -82,6 +82,10 @@
       {
         "command": "code-annotation.editNote",
         "title": "Edit note"
+      },
+      {
+        "command": "code-annotation.copyNote",
+        "title": "Copy note"
       }
     ],
     "menus": {
@@ -104,6 +108,10 @@
         },
         {
           "command": "code-annotation.editNote",
+          "when": "false"
+        },
+        {
+          "command": "code-annotation.copyNote",
           "when": "false"
         }
       ],
@@ -165,6 +173,16 @@
           "command": "code-annotation.editNote",
           "when": "view == codeAnnotationView && viewItem == $CompleteNote",
           "group": "3_open@2"
+        },
+        {
+          "command": "code-annotation.copyNote",
+          "when": "view == codeAnnotationView && viewItem == $PendingNote",
+          "group": "3_open@3"
+        },
+        {
+          "command": "code-annotation.copyNote",
+          "when": "view == codeAnnotationView && viewItem == $CompleteNote",
+          "group": "3_open@3"
         }
       ]
     },

@@ -20,10 +20,11 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
         treeActions.openNoteFromId(id);
     });
-
+    
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
     });
