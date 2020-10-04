@@ -12,6 +12,7 @@ export const getAnnotationFilePath = (): string => {
 export const initializeStorageLocation = (location: string) => {
     if (location) {
         storageLocation = path.resolve(location);
+        console.log('Save location is: ' + storageLocation);
         if (!fs.existsSync(storageLocation)) {
             fs.mkdirSync(storageLocation, { recursive: true });
         }
