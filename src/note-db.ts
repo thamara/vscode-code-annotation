@@ -108,7 +108,7 @@ const addNoteToDb = (note: Note) => {
 const getTODOFromSelectedText = (): string | undefined => {
     const editor = vscode.window.activeTextEditor;
     const selectedText = editor?.selection ? editor.document.getText(editor.selection) : '';
-    const todoSelector = /\/\/ TODO: (.*)\n/;
+    const todoSelector = /\/\/ TODO: (.*)/;
     let matchArray = selectedText.match(todoSelector);
     return matchArray?.length ? matchArray[1] : undefined;
 };
@@ -117,8 +117,7 @@ export const addNote = async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
         const todoText = getTODOFromSelectedText();
-        let annotationText = await vscode.window.showInputBox({ placeHolder: todoText ?? 'Give the annotation some text...' });
-        annotationText = annotationText?.length ? annotationText : todoText;
+        let annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...', value: todoText });
         if (annotationText) {
             addNoteToDb(createNoteFromSelection(annotationText));
         }
