@@ -36,6 +36,10 @@ const createNoteItem = (note: Note): NoteItem => {
     if (noteItem.id) {
         noteItem.command = new OpenNoteCommand(noteItem.id);
     }
+    if (details) {
+        // If details isn't undefined, set the command to the same as the parent
+        details[0].command = noteItem.command;
+    }
     noteItem.tooltip = note.text;
     noteItem.contextValue = getContextValue(note.status);
     noteItem.iconPath = getIconPath(note.status);
