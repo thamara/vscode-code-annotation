@@ -192,8 +192,14 @@
           "type": "boolean",
           "default": true,
           "description": "Show file name under annotation"
+        },
+        "saveLocation": {
+          "type":"string",
+          "default": "",
+          "description": "Set a save location. Default is VSCode Global path"
         }
       }
+      
     }
   },
   "scripts": {
