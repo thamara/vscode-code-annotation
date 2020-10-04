@@ -11,7 +11,7 @@ export const getAnnotationFilePath = (): string => {
 
 export const initializeStorageLocation = (location: string) => {
     if (location) {
-        storageLocation = location;
+        storageLocation = path.resolve(location);
         if (!fs.existsSync(storageLocation)) {
             fs.mkdirSync(storageLocation, { recursive: true });
         }
@@ -26,13 +26,17 @@ export const initializeStorageLocation = (location: string) => {
 
 export interface Configuration {
     showFileName: boolean;
+    saveLocation: string;
 }
 
 export const getConfiguration = (): Configuration => {
     const configuration = vscode.workspace.getConfiguration();
     const showFileName = configuration.get('showFileName');
+    const saveLocation = configuration.get('saveLocation');
+
     const config: Configuration = {
-        showFileName: typeof showFileName === 'boolean' ? showFileName : false
+        showFileName: typeof showFileName === 'boolean' ? showFileName : false,
+        saveLocation: typeof saveLocation === 'string' ? saveLocation : ''
     };
 
     return config;
