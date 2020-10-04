@@ -7,11 +7,11 @@ const annotationFile : string = 'annotations.json';
 
 export const getAnnotationFilePath = (): string => {
     return path.join(storageLocation, annotationFile);
-}
+};
 
 export const initializeStorageLocation = (location: string) => {
     if (location) {
-        storageLocation = location
+        storageLocation = location;
         if (!fs.existsSync(storageLocation)) {
             fs.mkdirSync(storageLocation, { recursive: true });
         }
@@ -22,7 +22,7 @@ export const initializeStorageLocation = (location: string) => {
     } else {
 	  	throw new Error('Error loading Storage for Extension');
     }
-}
+};
 
 export interface Configuration {
     showFileName: boolean;

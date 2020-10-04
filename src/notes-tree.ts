@@ -4,7 +4,7 @@ import { URI } from 'vscode-uri';
 
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
-import { getRelativePathForFileName } from './utils'
+import { getRelativePathForFileName } from './utils';
 
 const getIconPathFromType = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');

@@ -11,4 +11,4 @@ export const getRelativePathForFileName = (fullPathFileName: string): string => 
         }
     }
     return fullPathFileName;
-}
+};

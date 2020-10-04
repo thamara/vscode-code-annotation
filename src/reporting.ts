@@ -3,10 +3,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { getNotes, Note } from './note-db';
-import { getRelativePathForFileName } from './utils'
+import { getRelativePathForFileName } from './utils';
 
 const getCodeSnippetString = (note: Note): string => {
-    const moreThanOneLine = note.positionEnd.line != note.positionStart.line;
+    const moreThanOneLine = note.positionEnd.line !== note.positionStart.line;
     const firstLineOffset = moreThanOneLine ? note.positionStart.character : 0;
     let codeSnippet = note.codeSnippet;
     if (moreThanOneLine && firstLineOffset) {
@@ -14,7 +14,7 @@ const getCodeSnippetString = (note: Note): string => {
         codeSnippet = offsetSpace + codeSnippet;
     }
     return codeSnippet;
-}
+};
 
 // TODO: We should use Jinja or something like this to generate these markdown files
 export const getNoteInMarkdown = (note: Note): string => {
