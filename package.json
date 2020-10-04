@@ -88,6 +88,20 @@
         "title": "Copy note"
       }
     ],
+    "keybindings": [
+      {
+        "key": "ctrl+alt+n",
+        "command": "code-annotation.addNote",
+        "mac": "cmd+alt+k",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+p",
+        "command": "code-annotation.addPlainNote",
+        "mac": "cmd+alt+k",
+        "when": "editorTextFocus"
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
