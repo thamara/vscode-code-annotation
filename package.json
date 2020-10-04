@@ -82,6 +82,10 @@
       {
         "command": "code-annotation.editNote",
         "title": "Edit note"
+      },
+      {
+        "command": "code-annotation.copyNote",
+        "title": "Copy note"
       }
     ],
     "menus": {
@@ -104,6 +108,10 @@
         },
         {
           "command": "code-annotation.editNote",
+          "when": "false"
+        },
+        {
+          "command": "code-annotation.copyNote",
           "when": "false"
         }
       ],
@@ -138,33 +146,23 @@
         },
         {
           "command": "code-annotation.removeNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote",
-          "group": "inline@2"
-        },
-        {
-          "command": "code-annotation.removeNote",
-          "when": "view == codeAnnotationView && viewItem == $CompleteNote",
+          "when": "view == codeAnnotationView",
           "group": "inline@2"
         },
         {
           "command": "code-annotation.openNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote",
-          "group": "3_open@1"
-        },
-        {
-          "command": "code-annotation.openNote",
-          "when": "view == codeAnnotationView && viewItem == $CompleteNote",
+          "when": "view == codeAnnotationView",
           "group": "3_open@1"
         },
         {
           "command": "code-annotation.editNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote",
+          "when": "view == codeAnnotationView",
           "group": "3_open@2"
         },
         {
-          "command": "code-annotation.editNote",
-          "when": "view == codeAnnotationView && viewItem == $CompleteNote",
-          "group": "3_open@2"
+          "command": "code-annotation.copyNote",
+          "when": "view == codeAnnotationView",
+          "group": "3_open@3"
         }
       ]
     },

@@ -68,6 +68,9 @@ export class TreeActions {
     editNote(item: NoteItem) {
         return this.provider.editItem(item.id);
     }
+    copyNote(item: NoteItem) {
+        return this.provider.copyItem(item.id);
+    }
 }
 
 export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
@@ -171,6 +174,22 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	            });
 	        });
 	    }
+	}
+
+	copyItem(id: string | undefined): void {
+	    const notes = getNotes();
+	    const index = notes.findIndex((item: { id: Number }) => {
+	        return item.id.toString() === id;
+	    });
+
+	    if (index === -1) {
+	        return;
+	    }
+
+	    const content = notes[index].text;
+	    vscode.env.clipboard.writeText(content).then(() => {
+	        vscode.window.showInformationMessage('Note copied successfully');
+	    });
 	}
 
 	data: NoteItem[];
