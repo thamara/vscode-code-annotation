@@ -181,12 +181,12 @@
         },
         {
           "command": "code-annotation.checkAllNotes",
-          "when": "view == codeAnnotationView && viewItem == menu-pending",
+          "when": "view == codeAnnotationView && viewItem == $menu-pending",
           "group": "inline"
         },
         {
           "command": "code-annotation.uncheckAllNotes",
-          "when": "view == codeAnnotationView && viewItem == menu-done",
+          "when": "view == codeAnnotationView && viewItem == $menu-done",
           "group": "inline"
         },
         {

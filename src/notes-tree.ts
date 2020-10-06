@@ -61,6 +61,8 @@ export class TreeActions {
     }
     checkAllNotes(data: any): void {
         const children = data.children;
+        if (!children) { return; }
+
         for (let index = 0; index < children.length; index++) {
             const current = children[index];
             this.checkNote(current);
@@ -68,6 +70,9 @@ export class TreeActions {
     }
     uncheckAllNotes(data: any): void {
         const children = data.children;
+		
+        if (!children) { return; }
+
         for (let index = 0; index < children.length; index++) {
             const current = children[index];
             this.uncheckNote(current);
@@ -102,7 +107,7 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    let countPeding = 0;
 	    let countDone = 0;
 	    this.data = [];
-	    this.data = [new NoteItem('Pending', undefined, undefined, 'menu-pending'), new NoteItem('Done', undefined, undefined, 'menu-done')];
+	    this.data = [new NoteItem('Pending', undefined, undefined, '$menu-pending'), new NoteItem('Done', undefined, undefined, '$menu-done')];
 	    for (let note in annotations) {
 	        const noteItem = createNoteItem(annotations[note]);
 	        const isPending = annotations[note].status === 'pending';
