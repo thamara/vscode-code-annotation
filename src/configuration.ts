@@ -17,7 +17,7 @@ export const initializeStorageLocation = (location: string) => {
         }
         const extensionFilePath = getAnnotationFilePath();
         if (!fs.existsSync(extensionFilePath)) {
-            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
+            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1, "customTODO": []}');
         }
     } else {
 	  	throw new Error('Error loading Storage for Extension');
