@@ -59,6 +59,25 @@ export class TreeActions {
     uncheckNote(item: NoteItem) {
         return this.provider.checkItem(item.id, 'pending');
     }
+    checkAllNotes(data: any): void {
+        const children = data.children;
+        if (!children) { return; }
+
+        for (let index = 0; index < children.length; index++) {
+            const current = children[index];
+            this.checkNote(current);
+        }
+    }
+    uncheckAllNotes(data: any): void {
+        const children = data.children;
+		
+        if (!children) { return; }
+
+        for (let index = 0; index < children.length; index++) {
+            const current = children[index];
+            this.uncheckNote(current);
+        }
+    }
     openNote(item: NoteItem) {
         return this.provider.openItem(item.id);
     }
@@ -88,7 +107,7 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    let countPeding = 0;
 	    let countDone = 0;
 	    this.data = [];
-	    this.data = [new NoteItem('Pending'), new NoteItem('Done')];
+	    this.data = [new NoteItem('Pending', undefined, undefined, '$menu-pending'), new NoteItem('Done', undefined, undefined, '$menu-done')];
 	    for (let note in annotations) {
 	        const noteItem = createNoteItem(annotations[note]);
 	        const isPending = annotations[note].status === 'pending';
@@ -228,7 +247,7 @@ class OpenNoteCommand implements vscode.Command {
 class NoteItem extends vscode.TreeItem {
 	children: NoteItem[] | undefined;
 
-	constructor(label: string, children?: NoteItem[] | undefined, noteId?: string | undefined) {
+	constructor(label: string, children?: NoteItem[] | undefined, noteId?: string | undefined, context?: string | undefined) {
 	    super(
 	        label,
 	        children === undefined ? vscode.TreeItemCollapsibleState.None :
@@ -236,6 +255,9 @@ class NoteItem extends vscode.TreeItem {
 	    this.children = children;
 	    if (noteId) {
 	        this.id = noteId;
+	    }
+	    if (context) {
+	        this.contextValue = context;
 	    }
 	}
 

@@ -68,11 +68,27 @@
         }
       },
       {
+        "command": "code-annotation.checkAllNotes",
+        "title": "Code Annotation: Check all notes",
+        "icon": {
+          "dark": "resources/dark/checkall.svg",
+          "light": "resources/light/checkall.svg"
+        }
+      },
+      {
         "command": "code-annotation.uncheckNote",
         "title": "Code Annotation: Uncheck note",
         "icon": {
           "dark": "resources/dark/uncheck.svg",
           "light": "resources/light/uncheck.svg"
+        }
+      },
+      {
+        "command": "code-annotation.uncheckAllNotes",
+        "title": "Code Annotation: Uncheck all notes",
+        "icon": {
+          "dark": "resources/dark/uncheckall.svg",
+          "light": "resources/light/uncheckall.svg"
         }
       },
       {
@@ -162,6 +178,16 @@
           "command": "code-annotation.removeNote",
           "when": "view == codeAnnotationView",
           "group": "inline@2"
+        },
+        {
+          "command": "code-annotation.checkAllNotes",
+          "when": "view == codeAnnotationView && viewItem == $menu-pending",
+          "group": "inline"
+        },
+        {
+          "command": "code-annotation.uncheckAllNotes",
+          "when": "view == codeAnnotationView && viewItem == $menu-done",
+          "group": "inline"
         },
         {
           "command": "code-annotation.openNote",
