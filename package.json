@@ -36,18 +36,6 @@
         "title": "Code Annotation: Clear all notes"
       },
       {
-        "command": "code-annotation.addCustomTODO",
-        "title": "Code Annotation: Add custom TODO RegEx"
-      },
-      {
-        "command": "code-annotation.showCustomTODO",
-        "title": "Code Annotation: Show custom TODO RegEx's"
-      },
-      {
-        "command": "code-annotation.removeCustomTODO",
-        "title": "Code Annotation: Remove custom TODO RegEx"
-      },
-      {
         "command": "code-annotation.refreshEntry",
         "title": "Code Annotation: Refresh",
         "icon": {
@@ -216,6 +204,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show file name under annotation"
+        },
+        "customTODO": {
+          "type": "array",
+          "default": [],
+          "description": "An array of RegExps to use as TODO for note suggestions"
         }
       }
     }

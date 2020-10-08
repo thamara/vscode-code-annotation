@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addNote, addPlainNote, addCustomTODO, showCustomTODO, removeCustomTODO } from './note-db';
+import { addNote, addPlainNote} from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
@@ -23,18 +23,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
         treeActions.openNoteFromId(id);
-    });
-
-    vscode.commands.registerCommand('code-annotation.addCustomTODO', async () => {
-        addCustomTODO();
-    });
-
-    vscode.commands.registerCommand('code-annotation.showCustomTODO', async () => {
-        showCustomTODO();
-    });
-
-    vscode.commands.registerCommand('code-annotation.removeCustomTODO', async () => {
-        removeCustomTODO();
     });
 
     vscode.commands.registerCommand('code-annotation.summary', async () => {

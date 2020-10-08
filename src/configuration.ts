@@ -17,7 +17,7 @@ export const initializeStorageLocation = (location: string) => {
         }
         const extensionFilePath = getAnnotationFilePath();
         if (!fs.existsSync(extensionFilePath)) {
-            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1, "customTODO": []}');
+            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
         }
     } else {
 	  	throw new Error('Error loading Storage for Extension');
@@ -26,13 +26,16 @@ export const initializeStorageLocation = (location: string) => {
 
 export interface Configuration {
     showFileName: boolean;
+    customTODO: string[]
 }
 
 export const getConfiguration = (): Configuration => {
     const configuration = vscode.workspace.getConfiguration();
     const showFileName = configuration.get('showFileName');
+    const customTODO: string[] = configuration.get('customTODO') || [];
     const config: Configuration = {
-        showFileName: typeof showFileName === 'boolean' ? showFileName : false
+        showFileName: typeof showFileName === 'boolean' ? showFileName : false,
+        customTODO: customTODO,
     };
 
     return config;
