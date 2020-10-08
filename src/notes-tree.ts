@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { URI } from 'vscode-uri';
 
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
