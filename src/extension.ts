@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
         treeActions.openNoteFromId(id);
     });
 
-    vscode.commands.registerCommand('code-annotation.summary', async () => {
+    vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
     });
 
