@@ -78,6 +78,16 @@ export class TreeActions {
             this.uncheckNote(current);
         }
     }
+    removeAllNotes(data: any): void {
+        const children = data.children;
+		
+        if (!children) { return; }
+
+        for (let index = 0; index < children.length; index++) {
+            const current = children[index];
+            this.removeNote(current);
+        }
+    }
     openNote(item: NoteItem) {
         return this.provider.openItem(item.id);
     }
