@@ -1,0 +1,31 @@
+name: Package vsix
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure Git Agent
+        run: |
+          git config --global user.name 'Package Bot'
+          git config --global user.email 'Package-bot@users.noreply.github.com'
+        
+      - name: Install vsce
+        run: |
+          npm install -g vsce
+
+      - name: Package
+        run: |
+          vsce package
+          
+      - name: Commit file
+        run: |
+          git add code-annotation-0.0.1.vsix
+          git commit -nm "Updated vsix package"
+          git push
