@@ -92,6 +92,14 @@
         }
       },
       {
+        "command": "code-annotation.removeAllNotes",
+        "title": "Code Annotation: Remove all notes",
+        "icon": {
+          "dark": "resources/dark/removeall.svg",
+          "light": "resources/light/removeall.svg"
+        }
+      },
+      {
         "command": "code-annotation.openNote",
         "title": "Open note"
       },
@@ -190,18 +198,23 @@
           "group": "inline"
         },
         {
+          "command": "code-annotation.removeAllNotes",
+          "when": "view == codeAnnotationView && viewItem == $menu-done || view == codeAnnotationView && viewItem == $menu-pending",
+          "group": "inline@3"
+        },
+        {
           "command": "code-annotation.openNote",
-          "when": "view == codeAnnotationView",
+          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
           "group": "3_open@1"
         },
         {
           "command": "code-annotation.editNote",
-          "when": "view == codeAnnotationView",
+          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
           "group": "3_open@2"
         },
         {
           "command": "code-annotation.copyNote",
-          "when": "view == codeAnnotationView",
+          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
           "group": "3_open@3"
         }
       ]
