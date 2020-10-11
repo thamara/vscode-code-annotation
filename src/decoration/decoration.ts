@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { getNotes } from '../note-db';
 
 const decorationType = vscode.window.createTextEditorDecorationType({
-    backgroundColor: 'green',//add custom colors
+    backgroundColor: new vscode.ThemeColor('codeAnnotaion.mainColor')
 });
 
 export const setDecorations = (): void => {
@@ -23,10 +23,6 @@ export const setDecorations = (): void => {
 
 export function updateDecorations (context: vscode.ExtensionContext) {
     setDecorations();
-
-    // const workbenchConfig = vscode.workspace.getConfiguration('workbench');
-    // const theme = workbenchConfig.get('colorTheme');
-    // console.log(theme);
 
     vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {

@@ -245,7 +245,18 @@
           "description": "Show file name under annotation"
         }
       }
-    }
+    },
+    "colors": [
+      {
+        "id": "codennotaion.mainColor",
+        "description": "Main color.",
+        "defaults": {
+          "dark": "#FFFFFF13",
+          "light": "#0000000C",
+          "highContrast": "#FFFFFF13"
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
