@@ -26,13 +26,16 @@ export const initializeStorageLocation = (location: string) => {
 
 export interface Configuration {
     showFileName: boolean;
+    customTODO: string[]
 }
 
 export const getConfiguration = (): Configuration => {
     const configuration = vscode.workspace.getConfiguration();
     const showFileName = configuration.get('showFileName');
+    const customTODO: string[] = configuration.get('customTODO') || [];
     const config: Configuration = {
-        showFileName: typeof showFileName === 'boolean' ? showFileName : false
+        showFileName: typeof showFileName === 'boolean' ? showFileName : false,
+        customTODO: customTODO,
     };
 
     return config;
