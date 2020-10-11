@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 import * as fs from 'fs';
-import { getAnnotationFilePath } from './configuration';
+
+import { getAnnotationFilePath, getConfiguration } from './configuration';
 import { setDecorations } from './decoration/decoration';
 
 export interface Position {
@@ -109,9 +109,28 @@ const addNoteToDb = (note: Note) => {
 const getTODOFromSelectedText = (): string | undefined => {
     const editor = vscode.window.activeTextEditor;
     const selectedText = editor?.selection ? editor.document.getText(editor.selection) : '';
-    const todoSelector = /\/\/ TODO: (.*)/;
+    const todoSelector = /\/\/\s*(TODO|FIX):\s*(.*)/;
     let matchArray = selectedText.match(todoSelector);
-    return matchArray?.length ? matchArray[1] : undefined;
+    if (matchArray && matchArray.length) {
+        return matchArray[2];
+    }
+    for (const custom of getConfiguration().customTODO) {
+        try {
+            const customMatch = selectedText.match(custom);
+            if (customMatch && customMatch.length) {
+                // Use the second group to be consistent with the standard regex above
+                if (!customMatch[2]) {
+                    vscode.window.showWarningMessage(`Custom TODO RegEx (${custom}) doesn't have atleast two capture groups`);
+                } else {
+                    return customMatch[2];
+                }
+            }
+        } catch (e) {
+            vscode.window.showErrorMessage(`Error checking custom regex '${custom}': ${e.toString()}`);
+            continue;
+        }
+    }
+    return undefined;
 };
 
 export const addNote = async () => {
