@@ -253,7 +253,7 @@
     },
     "colors": [
       {
-        "id": "codennotaion.mainColor",
+        "id": "codeAnnotaion.mainColor",
         "description": "Main color.",
         "defaults": {
           "dark": "#FFFFFF13",
