@@ -12,7 +12,7 @@ export const setDecorations = (): void => {
 
     const ranges: vscode.Range[] = [];
     getNotes().forEach( note => {
-        if (note.fileName === openEditor.document.fileName){
+        if (note.fileName === openEditor.document.fileName) {
             const positionStart = new vscode.Position(note.positionStart.line, note.positionStart.character);
             const positionEnd = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
             ranges.push(new vscode.Range(positionStart, positionEnd));
