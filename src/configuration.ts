@@ -24,18 +24,31 @@ export const initializeStorageLocation = (location: string) => {
     }
 };
 
+export interface Color {
+    dark: string,
+    light: string,
+    highContrast: string
+}
+
 export interface Configuration {
     showFileName: boolean;
-    customTODO: string[]
+    customTODO: string[];
+    colors: {
+        mainColor: Color
+    }
 }
 
 export const getConfiguration = (): Configuration => {
     const configuration = vscode.workspace.getConfiguration();
     const showFileName = configuration.get('showFileName');
     const customTODO: string[] = configuration.get('customTODO') || [];
+    const mainColor: Color  = configuration.colors?.get('mainColor');
     const config: Configuration = {
         showFileName: typeof showFileName === 'boolean' ? showFileName : false,
         customTODO: customTODO,
+        colors: {
+            mainColor: mainColor
+        }
     };
 
     return config;
