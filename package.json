@@ -254,7 +254,7 @@
     "colors": [
       {
         "id": "codeAnnotaion.mainColor",
-        "description": "Main color.",
+        "description": "Color for the background for the annotation on the source code",
         "defaults": {
           "dark": "#FFFFFF13",
           "light": "#0000000C",
