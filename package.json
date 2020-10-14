@@ -250,7 +250,18 @@
           "description": "An array of RegExps to use as TODO for note suggestions"
         }
       }
-    }
+    },
+    "colors": [
+      {
+        "id": "codeAnnotaion.mainColor",
+        "description": "Color for the background for the annotation on the source code",
+        "defaults": {
+          "dark": "#FFFFFF13",
+          "light": "#0000000C",
+          "highContrast": "#FFFFFF13"
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+
 import { getAnnotationFilePath, getConfiguration } from './configuration';
+import { setDecorations } from './decoration/decoration';
 
 export interface Position {
     line: number;
@@ -140,6 +142,7 @@ export const addNote = async () => {
             addNoteToDb(createNoteFromSelection(annotationText));
         }
     }
+    setDecorations();
 };
 
 export const addPlainNote = async () => {

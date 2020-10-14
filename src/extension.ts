@@ -5,6 +5,7 @@ import { addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
+import { updateDecorations } from './decoration/decoration';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Extension "code-annotation" is now active!');
@@ -55,6 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
         addNote();
     });
 
+    updateDecorations(context);
+    
     context.subscriptions.push(disposable);
 }
 

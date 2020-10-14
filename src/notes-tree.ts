@@ -4,6 +4,7 @@ import * as path from 'path';
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
+import { setDecorations } from './decoration/decoration';
 
 const getIconPathFromType = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
@@ -143,6 +144,7 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    }
 
 	    saveNotes(notes);
+	    setDecorations();
 	}
 
 	checkItem(id: string | undefined, status: 'pending' | 'done'): void {
