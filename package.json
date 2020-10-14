@@ -239,29 +239,33 @@
     "configuration": {
       "title": "Code Annotation",
       "properties": {
-        "showFileName": {
+        "code-annotation.showFileName": {
           "type": "boolean",
           "default": true,
           "description": "Show file name under annotation"
         },
-        "customTODO": {
+        "code-annotation.customTODO": {
           "type": "array",
           "default": [],
           "description": "An array of RegExps to use as TODO for note suggestions"
+        },
+        "code-annotation.annotationBG.enableDecoration": {
+          "description": "Enable color for the background for the annotation on the source code",
+          "type": "boolean",
+          "default": true
+        },
+        "code-annotation.annotationBG.color.dark": {
+          "description": "Color for the background for the annotation on the source code in a Dark theme",
+          "type": "string",
+          "default": "#FFFFFF13"
+        },
+        "code-annotation.annotationBG.color.light": {
+          "description": "Color for the background for the annotation on the source code in a Light theme",
+          "type": "string",
+          "default": "#0000000C"
         }
       }
-    },
-    "colors": [
-      {
-        "id": "codeAnnotaion.mainColor",
-        "description": "Color for the background for the annotation on the source code",
-        "defaults": {
-          "dark": "#FFFFFF13",
-          "light": "#0000000C",
-          "highContrast": "#FFFFFF13"
-        }
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

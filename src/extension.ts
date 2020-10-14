@@ -56,8 +56,10 @@ export function activate(context: vscode.ExtensionContext) {
         addNote();
     });
 
+    vscode.workspace.onDidChangeConfiguration(() => updateDecorations(context) );
+
     updateDecorations(context);
-    
+
     context.subscriptions.push(disposable);
 }
 

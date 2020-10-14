@@ -27,27 +27,29 @@ export const initializeStorageLocation = (location: string) => {
 export interface Color {
     dark: string,
     light: string,
-    highContrast: string
 }
 
 export interface Configuration {
     showFileName: boolean;
     customTODO: string[];
-    colors: {
-        mainColor: Color
-    }
+    enableDecoration: boolean;
+    decorationColors: Color;
 }
 
 export const getConfiguration = (): Configuration => {
-    const configuration = vscode.workspace.getConfiguration();
+    const configuration = vscode.workspace.getConfiguration('code-annotation');
     const showFileName = configuration.get('showFileName');
     const customTODO: string[] = configuration.get('customTODO') || [];
-    const mainColor: Color  = configuration.colors?.get('mainColor');
+    const enableDecoration : boolean = configuration.get('annotationBG.enableDecoration') || false;
+    const decorationDarkColor: string = configuration.get('annotationBG.color.dark') || "";
+    const decorationLightColor: string = configuration.get('annotationBG.color.light') || "";
     const config: Configuration = {
         showFileName: typeof showFileName === 'boolean' ? showFileName : false,
         customTODO: customTODO,
-        colors: {
-            mainColor: mainColor
+        enableDecoration: enableDecoration,
+        decorationColors: {
+            dark: decorationDarkColor,
+            light: decorationLightColor,
         }
     };
 
