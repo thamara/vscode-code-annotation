@@ -25,19 +25,23 @@
     "commands": [
       {
         "command": "code-annotation.addNote",
-        "title": "Code Annotation: Add note"
+        "category": "Code Annotation",
+        "title": "Add note"
       },
       {
         "command": "code-annotation.addPlainNote",
-        "title": "Code Annotation: Add plain note"
+        "category": "Code Annotation",
+        "title": "Add plain note"
       },
       {
         "command": "code-annotation.clearAllNotes",
-        "title": "Code Annotation: Clear all notes"
+        "category": "Code Annotation",
+        "title": "Clear all notes"
       },
       {
         "command": "code-annotation.refreshEntry",
-        "title": "Code Annotation: Refresh",
+        "category": "Code Annotation",
+        "title": "Refresh",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
@@ -45,7 +49,8 @@
       },
       {
         "command": "code-annotation.summary",
-        "title": "Code Annotation: Summary",
+        "category": "Code Annotation",
+        "title": "Summary",
         "icon": {
           "light": "resources/light/summary.svg",
           "dark": "resources/dark/summary.svg"
@@ -53,7 +58,8 @@
       },
       {
         "command": "code-annotation.removeNote",
-        "title": "Code Annotation: Remove",
+        "category": "Code Annotation",
+        "title": "Remove note",
         "icon": {
           "dark": "resources/dark/close.svg",
           "light": "resources/light/close.svg"
@@ -61,7 +67,8 @@
       },
       {
         "command": "code-annotation.checkNote",
-        "title": "Code Annotation: Check note",
+        "category": "Code Annotation",
+        "title": "Check note",
         "icon": {
           "dark": "resources/dark/check.svg",
           "light": "resources/light/check.svg"
@@ -69,7 +76,8 @@
       },
       {
         "command": "code-annotation.checkAllNotes",
-        "title": "Code Annotation: Check all notes",
+        "category": "Code Annotation",
+        "title": "Check all notes",
         "icon": {
           "dark": "resources/dark/checkall.svg",
           "light": "resources/light/checkall.svg"
@@ -77,7 +85,8 @@
       },
       {
         "command": "code-annotation.uncheckNote",
-        "title": "Code Annotation: Uncheck note",
+        "category": "Code Annotation",
+        "title": "Uncheck note",
         "icon": {
           "dark": "resources/dark/uncheck.svg",
           "light": "resources/light/uncheck.svg"
@@ -85,7 +94,8 @@
       },
       {
         "command": "code-annotation.uncheckAllNotes",
-        "title": "Code Annotation: Uncheck all notes",
+        "category": "Code Annotation",
+        "title": "Uncheck all notes",
         "icon": {
           "dark": "resources/dark/uncheckall.svg",
           "light": "resources/light/uncheckall.svg"
@@ -93,7 +103,8 @@
       },
       {
         "command": "code-annotation.removeAllNotes",
-        "title": "Code Annotation: Remove all notes",
+        "category": "Code Annotation",
+        "title": "Remove all notes",
         "icon": {
           "dark": "resources/dark/removeall.svg",
           "light": "resources/light/removeall.svg"
@@ -101,14 +112,17 @@
       },
       {
         "command": "code-annotation.openNote",
+        "category": "Code Annotation",
         "title": "Open note"
       },
       {
         "command": "code-annotation.editNote",
+        "category": "Code Annotation",
         "title": "Edit note"
       },
       {
         "command": "code-annotation.copyNote",
+        "category": "Code Annotation",
         "title": "Copy note"
       }
     ],
