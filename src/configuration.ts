@@ -41,8 +41,8 @@ export const getConfiguration = (): Configuration => {
     const showFileName = configuration.get('showFileName');
     const customTODO: string[] = configuration.get('customTODO') || [];
     const enableDecoration : boolean = configuration.get('annotationBG.enableDecoration') || false;
-    const decorationDarkColor: string = configuration.get('annotationBG.color.dark') || "";
-    const decorationLightColor: string = configuration.get('annotationBG.color.light') || "";
+    const decorationDarkColor: string = configuration.get('annotationBG.color.dark') || '';
+    const decorationLightColor: string = configuration.get('annotationBG.color.light') || '';
     const config: Configuration = {
         showFileName: typeof showFileName === 'boolean' ? showFileName : false,
         customTODO: customTODO,

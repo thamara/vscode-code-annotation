@@ -11,11 +11,11 @@ const decorationType = () : vscode.TextEditorDecorationType => {
             backgroundColor: getConfiguration().decorationColors?.light
         }
     });
-}
+};
 
 export const setDecorations = (): void => {
     if (!getConfiguration().enableDecoration)
-        return;
+    { return; }
 
     const openEditors = vscode.window.visibleTextEditors;
 
