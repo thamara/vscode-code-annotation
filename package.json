@@ -170,7 +170,7 @@
       "editor/context": [
         {
           "command": "code-annotation.addNote",
-          "title": "Add note"
+          "title": "Code Annotation: Add note"
         }
       ],
       "view/title": [
