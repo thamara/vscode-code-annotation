@@ -64,7 +64,7 @@ export const generateMarkdownReport = (): void => {
 
         return vscode.workspace.applyEdit(edit).then(success => {
             if (success) {
-                vscode.window.showTextDocument(summaryFile);
+                vscode.window.showTextDocument(summaryFile, /*column=*/undefined, /*preserveFocus=*/false);
             } else {
                 vscode.window.showInformationMessage('Error: Code Annotation could not generate a summary');
             }
