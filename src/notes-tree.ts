@@ -161,11 +161,12 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	}
 
 	editItem(id: string | undefined): void {
-	    vscode.window.showInputBox({ placeHolder: 'New text for annotation...' }).then(annotationText => {
-	        const notes = getNotes();
-	        const index = notes.findIndex((item: { id: Number }) => {
-	            return item.id.toString() === id;
-	        });
+	    const notes = getNotes();
+	    const index = notes.findIndex((item: { id: Number }) => {
+	        return item.id.toString() === id;
+	    });
+			
+	    vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
 	        if (index >= 0 && annotationText) {
 	            notes[index].text = annotationText;
 	            saveNotes(notes);
