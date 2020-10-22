@@ -198,7 +198,7 @@
         },
         {
           "command": "code-annotation.removeNote",
-          "when": "view == codeAnnotationView",
+          "when": "view == codeAnnotationView && viewItem == $PendingNote || viewItem == $CompleteNote",
           "group": "inline@2"
         },
         {
