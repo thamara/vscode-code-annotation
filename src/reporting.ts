@@ -60,7 +60,9 @@ export const generateMarkdownReport = (): void => {
         const edit = new vscode.WorkspaceEdit();
         let notesSummary = getNotesInMarkdown();
 
-        edit.insert(newFile, new vscode.Position(0, 0), notesSummary);
+        const existingContentRange = new vscode.Range(new vscode.Position(0, 0),
+                                     new vscode.Position(summaryFile.lineCount + 1, 0));
+        edit.replace(newFile, existingContentRange, notesSummary);
 
         return vscode.workspace.applyEdit(edit).then(success => {
             if (success) {
