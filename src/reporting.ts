@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
 
 import { getNotes, Note } from './note-db';
 import { getRelativePathForFileName } from './utils';
@@ -56,18 +54,22 @@ export const getNotesInMarkdown = (): string => {
 };
 
 export const generateMarkdownReport = (): void => {
-    const workspaceFolder = vscode.workspace.rootPath;
-    // TODO: What if there's no workspace?
-    if (workspaceFolder) {
-        // TODO: Remove this hardcoded string, it should be a configuration
-        const extensionDirPath = path.join(workspaceFolder, '.vscode', 'code-annotation');
-        const extensionFilePath = path.join(extensionDirPath, 'summary.md');
-        let content = getNotesInMarkdown();
-        fs.writeFileSync(extensionFilePath, content);
-        var openPath = vscode.Uri.file(extensionFilePath);
-        vscode.workspace.openTextDocument(openPath).then(doc => {
-            vscode.window.showTextDocument(doc).then(editor => {
-            });
+    const newFile = vscode.Uri.parse('untitled:summary.md');
+
+    vscode.workspace.openTextDocument(newFile).then(summaryFile => {
+        const edit = new vscode.WorkspaceEdit();
+        let notesSummary = getNotesInMarkdown();
+
+        const existingContentRange = new vscode.Range(new vscode.Position(0, 0),
+                                     new vscode.Position(summaryFile.lineCount + 1, 0));
+        edit.replace(newFile, existingContentRange, notesSummary);
+
+        return vscode.workspace.applyEdit(edit).then(success => {
+            if (success) {
+                vscode.window.showTextDocument(summaryFile, /*column=*/undefined, /*preserveFocus=*/false);
+            } else {
+                vscode.window.showInformationMessage('Error: Code Annotation could not generate a summary');
+            }
         });
-    }
+    });
 };
