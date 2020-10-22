@@ -37,6 +37,15 @@ npm run compile
 ```
 - And to run/test the extension, go the the Run pane and hit the green button on `Run Extension`. This will open a new VSCode window with the extension enabled.
 
+### Creating a VSIX file for instalation
+
+- "Compile" the extension as usual
+  - `npm install`
+- Install vsce
+  - `npm install -g vsce`
+- Create the VSIX file
+  - `vsce package`
+
 ## Requirements
 
 TODO
