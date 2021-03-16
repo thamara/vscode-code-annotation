@@ -124,6 +124,15 @@
         "command": "code-annotation.copyNote",
         "category": "Code Annotation",
         "title": "Copy note"
+      },
+      {
+        "command": "code-annotation.runPeirce",
+        "category": "Code Annotation",
+        "title": "Run Peirce",
+        "icon": {
+          "light": "resources/light/summary.svg",
+          "dark": "resources/dark/summary.svg"
+        }
       }
     ],
     "keybindings": [
@@ -181,6 +190,11 @@
         },
         {
           "command": "code-annotation.summary",
+          "when": "view == codeAnnotationView",
+          "group": "navigation"
+        },
+        {
+          "command": "code-annotation.runPeirce",
           "when": "view == codeAnnotationView",
           "group": "navigation"
         }
@@ -290,19 +304,22 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.47.0",
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.1",
     "@types/node": "^14.0.27",
-    "eslint": "^7.6.0",
-    "@typescript-eslint/parser": "^3.8.0",
+    "@types/node-fetch": "^2.5.8",
+    "@types/vscode": "^1.47.0",
     "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "eslint": "^7.6.0",
     "glob": "^7.1.6",
     "mocha": "^8.1.1",
     "typescript": "^3.9.7",
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
+    "fetch": "^1.1.0",
+    "node-fetch": "^2.6.1",
     "vscode-uri": "^2.1.2"
   }
 }

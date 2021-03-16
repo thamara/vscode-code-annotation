@@ -3,6 +3,7 @@ import * as fs from 'fs';
 
 import { addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
+import { runPeirce } from './peirce';
 import { NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
@@ -31,6 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
+    });
+
+    vscode.commands.registerCommand('code-annotation.runPeirce', async () => {
+        vscode.window.showInformationMessage("Peirce running...");
+        runPeirce();
     });
 
     vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
