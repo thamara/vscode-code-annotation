@@ -1,94 +1,56 @@
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 
-import { getNotes, Note } from './note-db';
-import { getRelativePathForFileName } from './utils';
+import { addPeirceNote, getNotes, Note } from './note-db';
 
-const getCodeSnippetString = (note: Note): string => {
-    const moreThanOneLine = note.positionEnd.line !== note.positionStart.line;
-    const firstLineOffset = moreThanOneLine ? note.positionStart.character : 0;
-    let codeSnippet = note.codeSnippet;
-    if (moreThanOneLine && firstLineOffset) {
-        const offsetSpace = Array(firstLineOffset + 1).join(' ');
-        codeSnippet = offsetSpace + codeSnippet;
+import { setDecorations } from './decoration/decoration'
+
+export const runPeirce = async (): Promise<void> => {
+    if (vscode.window.activeTextEditor) {
+        console.log("The open text file:")
+        console.log(vscode.window.activeTextEditor.document)
+        console.log(vscode.window.activeTextEditor.document.getText())
     }
-    return codeSnippet;
-};
-
-// TODO: We should use Jinja or something like this to generate these markdown files
-export const getNoteInMarkdown = (note: Note): string => {
-    let result = `### - ${note.text}\n\n`;
-    if (note.fileName.length > 0) {
-        result += `\`${getRelativePathForFileName(note.fileName)}\`\n\n`;
-        result += '```\n';
-        result += `${getCodeSnippetString(note)}\n`;
-        result += '```\n';
+    let editor = vscode.window.activeTextEditor;
+    if (editor === undefined)
+        return;
+    const fileText = vscode.window.activeTextEditor?.document.getText();
+    let notes = getNotes();
+    console.log(notes);
+    console.log(JSON.stringify(notes));
+    console.log(fileText);
+    console.log(JSON.stringify(fileText));
+    let request = {
+        file: fileText,
+        notes: notes,
     }
-    return result;
-};
-
-export const getNotesInMarkdown = (): string => {
-    const notes = getNotes();
-
-    let result = '# Code Annotator - Summary\n';
-    result += '\n---\n';
-    result += '## Pending\n';
-
-    for (let i in notes) {
-        const note = notes[i];
-        if (note.status === 'pending') {
-            result += getNoteInMarkdown(note);
-        }
-    }
-
-    result += '\n---\n';
-    result += '## Done\n';
-
-    for (let i in notes) {
-        const note = notes[i];
-        if (note.status !== 'pending') {
-            result += getNoteInMarkdown(note);
-        }
-    }
-
-    return result;
-};
-
-export const runPeirce = (): void => {
-    const newFile = vscode.Uri.parse('untitled:peirce-output.md');
-
-    vscode.workspace.openTextDocument(newFile).then(async summaryFile => {
-        const edit = new vscode.WorkspaceEdit();
-        let notesSummary = getNotesInMarkdown();
-        let notes = getNotes();
-        console.log(notes);
-        console.log(JSON.stringify(notes));
-        let login = {
-            method: "POST",
-            body: JSON.stringify(notes),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-        };
-        const apiUrl = "http://0.0.0.0:8080/api/peirce";
-        const response = await fetch(apiUrl, login);
-        console.log(response);
-        const data = await response.json();
-        console.log(data);
-        notesSummary = JSON.stringify(data); 
-
-        const existingContentRange = new vscode.Range(new vscode.Position(0, 0),
-                                     new vscode.Position(summaryFile.lineCount + 1, 0));
-        edit.replace(newFile, existingContentRange, notesSummary);
-
-        return vscode.workspace.applyEdit(edit).then(success => {
-            if (success) {
-                vscode.window.showTextDocument(summaryFile, /*column=*/undefined, /*preserveFocus=*/false);
-            } else {
-                vscode.window.showInformationMessage('Error: Code Annotation could not generate a summary');
-            }
-        });
+    console.log(JSON.stringify(request));
+    let login = {
+        method: "POST",
+        body: JSON.stringify(request),
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+    };
+    const apiUrl = "http://0.0.0.0:8080/api/peirce";
+    const response = await fetch(apiUrl, login);
+    const data = await response.json();
+    console.log(data);
+    let notesSummary = JSON.stringify(data); 
+    vscode.commands.executeCommand('code-annotation.clearAllNotesHeadless');
+    data.forEach(element => {
+        let range = new vscode.Range(
+            new vscode.Position(element.coords.begin.line, element.coords.begin.character), 
+            new vscode.Position(element.coords.end.line, element.coords.end.character), 
+        );
+        // Might be able to clean this up
+        // Set the vscode.editor.selection position,
+        // and let the prebuilt addNote functions do the rest.
+        if (editor)
+            addPeirceNote(element.interp, editor, range);
     });
+    setDecorations();
+    return;
 };

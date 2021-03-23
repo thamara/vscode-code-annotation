@@ -61,7 +61,7 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
 
     let codeSnippet = '';
     let fileName = '';
-    let selection = undefined;
+    let selection;
     let positionStart: Position = {line: 0, character: 0};
     let positionEnd: Position = {line: 0, character: 0};
 
@@ -78,6 +78,33 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
     const note: Note = {
         fileName: fileName,
         fileLine: selection ? selection.start.line : 0,
+        positionStart: positionStart,
+        positionEnd: positionEnd,
+        text: annotationText,
+        codeSnippet: codeSnippet,
+        status: 'pending',
+        id: nextId
+    };
+    return note;
+};
+
+const createPeirceNote = (annotationText: string, editor : vscode.TextEditor, range : vscode.Range) => {
+    const nextId = getNextId();
+
+    let codeSnippet = '';
+    let fileName = '';
+    let positionStart: Position = {line: 0, character: 0};
+    let positionEnd: Position = {line: 0, character: 0};
+    fileName = editor.document.uri.fsPath;
+    console.log(range);
+    console.log("Code snippet:")
+    codeSnippet = editor.document.getText(range);
+    console.log(codeSnippet);
+    positionStart = { line: range.start.line, character: range.start.character };
+    positionEnd = { line: range.end.line, character: range.end.character };
+    const note: Note = {
+        fileName: fileName,
+        fileLine: range.start.line,
         positionStart: positionStart,
         positionEnd: positionEnd,
         text: annotationText,
@@ -141,6 +168,13 @@ export const addNote = async () => {
         if (annotationText) {
             addNoteToDb(createNoteFromSelection(annotationText));
         }
+    }
+    setDecorations();
+};
+
+export const addPeirceNote = async (annotationText : string, editor : vscode.TextEditor, range : vscode.Range) => {
+    if (editor) {
+        addNoteToDb(createPeirceNote(annotationText, editor, range))
     }
     setDecorations();
 };

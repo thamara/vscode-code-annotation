@@ -54,6 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    vscode.commands.registerCommand('code-annotation.clearAllNotesHeadless', async () => {
+        vscode.commands.executeCommand('code-annotation.refreshEntry');
+    });
+
     vscode.commands.registerCommand('code-annotation.addPlainNote', async () => {
         addPlainNote();
     });
