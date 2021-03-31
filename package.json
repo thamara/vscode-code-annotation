@@ -133,6 +133,15 @@
           "light": "resources/light/summary.svg",
           "dark": "resources/dark/summary.svg"
         }
+      },
+      {
+        "command": "code-annotation.openPreview",
+        "category": "Code Annotation",
+        "title": "Open Preview",
+        "icon": {
+          "light": "resources/light/summary.svg",
+          "dark": "resources/dark/summary.svg"
+        }
       }
     ],
     "keybindings": [
@@ -146,6 +155,24 @@
         "key": "ctrl+alt+p",
         "command": "code-annotation.addPlainNote",
         "mac": "cmd+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+e",
+        "command": "code-annotation.editHoveredNotes",
+        "mac": "cmd+alt+e",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+r",
+        "command": "code-annotation.runPeirce",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+t",
+        "command": "code-annotation.openPreview",
+        "mac": "cmd+alt+t",
         "when": "editorTextFocus"
       }
     ],
@@ -195,6 +222,11 @@
         },
         {
           "command": "code-annotation.runPeirce",
+          "when": "view == codeAnnotationView",
+          "group": "navigation"
+        },
+        {
+          "command": "code-annotation.openPreview",
           "when": "view == codeAnnotationView",
           "group": "navigation"
         }

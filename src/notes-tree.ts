@@ -5,6 +5,7 @@ import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
 import { setDecorations } from './decoration/decoration';
+import { Position, TextEditor, WebviewPanel } from 'vscode';
 
 const getIconPathFromType = (type: string, theme: string): string => {
     return path.join(__filename, '..', '..', 'resources', theme, type.toLowerCase() + '.svg');
@@ -99,6 +100,126 @@ export class TreeActions {
     }
     copyNote(item: NoteItem) {
         return this.provider.copyItem(item.id);
+    }
+}
+
+export class InfoView {
+    private webviewPanel!: WebviewPanel;
+
+    private getActiveCursorLocation(): Position | null {
+        if (vscode.window.activeTextEditor)
+            return vscode.window.activeTextEditor.selection.active;
+        else
+            return null;
+    }
+
+    getHoveredNotes() : Note[] {            
+        let hovered_notes : Note[] = [];
+        let notes = getNotes();
+        notes.forEach(note => {
+            if (this.isHoveredNote(note)) 
+                hovered_notes.push(note);
+        });
+        return hovered_notes;
+    }
+
+    async editHoveredNotes() {
+        console.log("Editing hovered notes...")
+	    let notes = getNotes();
+        console.log("Got notes...");
+        console.log(notes);
+        let hover_index = 0;
+        for (let index = 0; index < notes.length; index++) {
+            let note = notes[index];
+            console.log("Trying notes["+index+"]", note);
+            if (!this.isHoveredNote(note)) continue;
+            this.updatePreviewIndex(hover_index);
+            await vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
+            if (index >= 0 && annotationText) {
+                    note.text = annotationText;
+                    console.log("Saving notes["+index+"]");
+                    saveNotes(notes);
+                    vscode.window.showInformationMessage('Annotation edited!');
+                }
+            });
+            this.updatePreview();
+            hover_index++;
+        }
+    }
+
+    private isHoveredNote(note : Note) : boolean {
+        let loc = this.getActiveCursorLocation();
+        let condition = (loc && note.fileName == vscode.window.activeTextEditor?.document.fileName 
+            && note.positionStart.line <= loc.line && note.positionEnd.line >= loc.line);
+        if (condition == null) return false;
+        return condition;
+    }
+
+    private displayNote(note : Note, editing: boolean) : string {
+        let full : string = "";
+        if (note) {
+            if (editing)
+                full += `<pre style="color: lightgreen">${JSON.stringify(note, undefined, 2)}</pre></b>`
+            else
+                full += "<pre>" + JSON.stringify(note, undefined, 2) + "</pre>"
+        }
+        return full;
+    }
+
+    // <script src="${this.getMediaPath('index.js')}"></script>
+    async updatePreview() {
+        this.updatePreviewIndex(-1);
+    }
+    async updatePreviewIndex(index : number) {
+        console.log(index);
+        let contents : string = "";
+        let notes = this.getHoveredNotes();
+        for (let i = 0; i < notes.length; i++)
+            contents += this.displayNote(notes[i], i == index);
+        contents += '<p style="color:lightblue">Key bindings:</p>';
+        contents += '<p style="color:lightblue">Ctrl+Alt+R to run Peirce, generating type information annotations</p>';
+        contents += '<p style="color:lightblue">Ctrl+Alt+E to edit existing type information annotations</p>';
+
+        let html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8" />
+                <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+                <title>Infoview</title>
+                <style></style>
+            </head>
+            <body>
+                <div id="react_root"></div>
+                ${contents}
+                <!-- script here -->
+            </body>
+            </html>`
+        this.webviewPanel.webview.html = html;
+    }
+
+    async openPreview() {
+        vscode.window.onDidChangeTextEditorSelection(() => this.updatePreview());
+        let editor = undefined;
+        if (vscode.window.activeTextEditor != undefined) {
+            editor = vscode.window.activeTextEditor;
+        }
+        else 
+            return;
+        let column = (editor && editor.viewColumn) ? editor.viewColumn + 1 : vscode.ViewColumn.Two;
+        const loc = this.getActiveCursorLocation();
+        console.log(loc);
+        if (column === 4) { column = vscode.ViewColumn.Three; }
+        this.webviewPanel = vscode.window.createWebviewPanel('Peirce', 'Peirce Infoview',
+            { viewColumn: column, preserveFocus: true },
+            {
+                enableFindWidget: true,
+                retainContextWhenHidden: true,
+                enableScripts: true,
+                enableCommandUris: true,
+            });
+        this.updatePreview();
+        //this.webviewPanel.onDidDispose(() => this.webviewPanel = null);
     }
 }
 

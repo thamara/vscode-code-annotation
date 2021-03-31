@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { addNote, addPlainNote } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { runPeirce } from './peirce';
-import { NotesTree, TreeActions } from './notes-tree';
+import { InfoView, NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
 
@@ -15,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const tree = new NotesTree();
     const treeActions = new TreeActions(tree);
+    const infoView = new InfoView();
 
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
@@ -32,6 +33,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
+    });
+
+    vscode.commands.registerCommand('code-annotation.editHoveredNotes', async () => {
+        infoView.editHoveredNotes();
     });
 
     vscode.commands.registerCommand('code-annotation.runPeirce', async () => {
@@ -56,6 +61,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.commands.registerCommand('code-annotation.clearAllNotesHeadless', async () => {
         vscode.commands.executeCommand('code-annotation.refreshEntry');
+    });
+
+    vscode.commands.registerCommand('code-annotation.openPreview', async () => {
+        infoView.openPreview();
     });
 
     vscode.commands.registerCommand('code-annotation.addPlainNote', async () => {

@@ -12,11 +12,14 @@ export const getAnnotationFilePath = (): string => {
 export const initializeStorageLocation = (location: string) => {
     if (location) {
         storageLocation = location;
+        console.log("exists? " + fs.existsSync(storageLocation))
         if (!fs.existsSync(storageLocation)) {
             fs.mkdirSync(storageLocation, { recursive: true });
         }
         const extensionFilePath = getAnnotationFilePath();
+        console.log("ext exists? " + !fs.existsSync(extensionFilePath))
         if (!fs.existsSync(extensionFilePath)) {
+            console.log("writing json to " + extensionFilePath)
             fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
         }
     } else {
