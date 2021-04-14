@@ -142,6 +142,51 @@
           "light": "resources/light/summary.svg",
           "dark": "resources/dark/summary.svg"
         }
+      },
+      {
+        "command": "code-annotation.addMeasurementSystem",
+        "category": "Code Annotation",
+        "title": "Add Measurement System",
+        "icon": {
+          "light": "resources/light/check.svg",
+          "dark": "resources/dark/check.svg"
+        }
+      },
+      {
+        "command": "code-annotation.addVector",
+        "category": "Code Annotation",
+        "title": "Add Vector",
+        "icon": {
+          "light": "resources/light/check.svg",
+          "dark": "resources/dark/check.svg"
+        }
+      },
+      {
+        "command": "code-annotation.addPoint",
+        "category": "Code Annotation",
+        "title": "Add Pointer",
+        "icon": {
+          "light": "resources/light/check.svg",
+          "dark": "resources/dark/check.svg"
+        }
+      },
+      {
+        "command": "code-annotation.addFrame",
+        "category": "Code Annotation",
+        "title": "Add Frame",
+        "icon": {
+          "light": "resources/light/check.svg",
+          "dark": "resources/dark/check.svg"
+        }
+      },
+      {
+        "command": "code-annotation.addSpace",
+        "category": "Code Annotation",
+        "title": "Add Space",
+        "icon": {
+          "light": "resources/light/check.svg",
+          "dark": "resources/dark/check.svg"
+        }
       }
     ],
     "keybindings": [
@@ -152,9 +197,33 @@
         "when": "editorTextFocus"
       },
       {
+        "key": "ctrl+alt+m",
+        "command": "code-annotation.addMeasurementSystem",
+        "mac": "cmd+alt+m",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+v",
+        "command": "code-annotation.addVector",
+        "mac": "cmd+alt+v",
+        "when": "editorTextFocus"
+      },
+      {
         "key": "ctrl+alt+p",
-        "command": "code-annotation.addPlainNote",
+        "command": "code-annotation.addPoint",
         "mac": "cmd+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+f",
+        "command": "code-annotation.addFrame",
+        "mac": "cmd+alt+f",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+s",
+        "command": "code-annotation.addSpace",
+        "mac": "cmd+alt+s",
         "when": "editorTextFocus"
       },
       {
@@ -235,6 +304,31 @@
         {
           "command": "code-annotation.checkNote",
           "when": "view == codeAnnotationView && viewItem == $PendingNote",
+          "group": "inline@1"
+        },
+        {
+          "command": "code-annotation.addMeasurementSystem",
+          "when": "view == codeAnnotationView && viewItem == $MeasurementSystem",
+          "group": "inline@1"
+        },
+        {
+          "command": "code-annotation.addVector",
+          "when": "view == codeAnnotationView && viewItem == $Vector",
+          "group": "inline@1"
+        },
+        {
+          "command": "code-annotation.addPoint",
+          "when": "view == codeAnnotationView && viewItem == $Point",
+          "group": "inline@1"
+        },
+        {
+          "command": "code-annotation.addFrame",
+          "when": "view == codeAnnotationView && viewItem == $Frame",
+          "group": "inline@1"
+        },
+        {
+          "command": "code-annotation.addSpace",
+          "when": "view == codeAnnotationView && viewItem == $Space",
           "group": "inline@1"
         },
         {

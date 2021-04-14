@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addNote, addPlainNote } from './note-db';
+import { addFrame, addMeasurementSystem, addNote, addPlainNote, addPoint, addSpace, addVector } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { runPeirce } from './peirce';
 import { InfoView, NotesTree, TreeActions } from './notes-tree';
@@ -73,6 +73,22 @@ export function activate(context: vscode.ExtensionContext) {
 
     let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
         addNote();
+    });
+
+    vscode.commands.registerCommand('code-annotation.addMeasurementSystem', async () => {
+        addMeasurementSystem();
+    });
+    vscode.commands.registerCommand('code-annotation.addVector', async () => {
+        addVector();
+    });
+    vscode.commands.registerCommand('code-annotation.addPoint', async () => {
+        addPoint();
+    });
+    vscode.commands.registerCommand('code-annotation.addFrame', async () => {
+        addFrame();
+    });
+    vscode.commands.registerCommand('code-annotation.addSpace', async () => {
+        addSpace();
     });
 
     vscode.workspace.onDidChangeConfiguration(() => updateDecorations(context) );

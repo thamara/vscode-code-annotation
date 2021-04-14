@@ -20,7 +20,7 @@ export const initializeStorageLocation = (location: string) => {
         console.log("ext exists? " + !fs.existsSync(extensionFilePath))
         if (!fs.existsSync(extensionFilePath)) {
             console.log("writing json to " + extensionFilePath)
-            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1}');
+            fs.writeFileSync(extensionFilePath, '{"notes":[], "nextId":1, "spaces":[{"label": "time_std_space", "frame": null}], "frames":[], "points":[], "vectors":[], "measurement_systems":[]}');
         }
     } else {
 	  	throw new Error('Error loading Storage for Extension');

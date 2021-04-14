@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { getNotes, saveNotes, Note } from './note-db';
+import { 
+    getNotes, saveNotes, getMeasurementSystems, getVectors, 
+    getPoints, getFrames, getSpaces, Note,
+    addSpace, addMeasurementSystem
+} from './note-db';
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
 import { setDecorations } from './decoration/decoration';
@@ -134,14 +138,55 @@ export class InfoView {
             console.log("Trying notes["+index+"]", note);
             if (!this.isHoveredNote(note)) continue;
             this.updatePreviewIndex(hover_index);
+            let spaces = getSpaces();
+            let ms = getMeasurementSystems();
+            console.log(spaces);
+            let i = 0;
+            let options : vscode.QuickPickItem[] = spaces;
+            let createNewSpace : vscode.QuickPickItem = {
+                label: "Create new Space"
+            };
+            options.push(createNewSpace);
+            const quickPick = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a space'
+            });
+            console.log("quick pick")
+            console.log(quickPick);
+            if (quickPick === undefined)
+                return;
+            if (quickPick.label == "Create new Space") {
+                console.log("creating new space")
+                await addSpace();
+                await this.editHoveredNotes();
+                return;
+            }
+            let ms_options : vscode.QuickPickItem[] = ms;
+            let createNewMS: vscode.QuickPickItem = {
+                label: "Create new Measurement System"
+            };
+            ms_options.push(createNewMS);
+            const MSquickPick = await vscode.window.showQuickPick(ms, {
+                placeHolder: 'Select a space'
+            });
+            console.log("quick pick")
+            console.log(quickPick);
+            if (MSquickPick === undefined)
+                return;
+            if (MSquickPick.label == "Create new Measurement System") {
+                console.log("creating new measurement system")
+                await addMeasurementSystem();
+                await this.editHoveredNotes();
+                return;
+            }
             await vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
-            if (index >= 0 && annotationText) {
-                    note.text = annotationText;
-                    console.log("Saving notes["+index+"]");
-                    saveNotes(notes);
-                    vscode.window.showInformationMessage('Annotation edited!');
+                if (index >= 0 && annotationText) {
+                    notes[index].text = annotationText;
+                    notes[index].space = quickPick;
+                    notes[index].measurement_system = MSquickPick;
                 }
             });
+            saveNotes(notes);
+            console.log("Saving notes["+index+"]");
             this.updatePreview();
             hover_index++;
         }
@@ -176,9 +221,14 @@ export class InfoView {
         let notes = this.getHoveredNotes();
         for (let i = 0; i < notes.length; i++)
             contents += this.displayNote(notes[i], i == index);
-        contents += '<p style="color:lightblue">Key bindings:</p>';
-        contents += '<p style="color:lightblue">Ctrl+Alt+R to run Peirce, generating type information annotations</p>';
-        contents += '<p style="color:lightblue">Ctrl+Alt+E to edit existing type information annotations</p>';
+        contents += '<p style="color:lightblue">Key bindings</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+R</b> to run Peirce, generating type information annotations</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+E</b> to edit existing type information annotations</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+M</b> to add measurement systems</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+V</b> to add vectors</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+P</b> to add points</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+F</b> to add frames</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+S</b> to add spaces</p>';
 
         let html = `
             <!DOCTYPE html>
@@ -234,24 +284,95 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	}
 
 	sourceData(): void {
-	    const annotations = getNotes();
-	    let countPeding = 0;
-	    let countDone = 0;
 	    this.data = [];
-	    this.data = [new NoteItem('Pending', undefined, undefined, '$menu-pending'), new NoteItem('Done', undefined, undefined, '$menu-done')];
+	    this.data = [new NoteItem('Annotations', undefined, undefined, '$menu-pending'), 
+            new NoteItem('Measurement Systems', undefined, undefined, '$MeasurementSystem'),
+            new NoteItem('Vectors', undefined, undefined, '$Vector'),
+            new NoteItem('Points', undefined, undefined, '$Point'),
+            new NoteItem('Frames', undefined, undefined, '$Frame'),
+            new NoteItem('Spaces', undefined, undefined, '$Space'),
+        ];
+        console.log("In notes tree")
+	    const annotations = getNotes();
+        console.log(annotations)
 	    for (let note in annotations) {
 	        const noteItem = createNoteItem(annotations[note]);
-	        const isPending = annotations[note].status === 'pending';
-	        if (isPending) {
-	            this.data[0].addChild(noteItem);
-	            countPeding++;
-	        } else {
-	            this.data[1].addChild(noteItem);
-	            countDone++;
-	        }
+            console.log(note)
+            this.data[0].addChild(noteItem);
 	    }
-	    this.data[0].label += ` (${countPeding})`;
-	    this.data[1].label += ` (${countDone})`;
+	    this.data[0].label += ` (${annotations.length})`;
+
+	    const measurement_systems = getMeasurementSystems();
+        console.log("measurement systems")
+        console.log(measurement_systems)
+	    for (let ms in measurement_systems) {
+            const measurement_system = measurement_systems[ms];
+            let noteItem = new NoteItem(measurement_system.label)
+            this.data[1].addChild(noteItem);
+	    }
+	    this.data[1].label += ` (${measurement_systems.length})`;
+
+	    const vectors = getVectors();
+        console.log("vectors")
+        console.log(vectors)
+	    for (let v in vectors) {
+	        //const noteItem = createNonNoteItem(vectors[v]);
+            const vector = vectors[v];
+            let magnitude;
+            if (vector.magnitude != null) {
+                magnitude = vector.magnitude.toString();
+            }
+            let noteItem = new NoteItem(vector.label + ": " + magnitude)
+            this.data[2].addChild(noteItem);
+	    }
+	    this.data[2].label += ` (${vectors.length})`;
+
+	    const points = getPoints();
+        console.log("points")
+        console.log(points)
+	    for (let p in points) {
+            const point = points[p];
+            let magnitude;
+            if (point.magnitude)
+                magnitude = point.magnitude.toString();
+	        const noteItem = new NoteItem(point.label + ": " + magnitude)
+            this.data[3].addChild(noteItem);
+	    }
+	    this.data[3].label += ` (${points.length})`;
+
+	    const frames = getFrames();
+        console.log("frames")
+        console.log(frames)
+	    for (let f in frames) {
+            const frame = frames[f];
+            let point;
+            if (frame.point)
+                point = new NoteItem(frame.point.label.toString());
+            else
+                return;
+            let vector;
+            if (frame.vector)
+                vector = new NoteItem(frame.vector.label.toString());
+            else
+                return;
+	        const noteItem = new NoteItem(frame.label, [point, vector])
+            this.data[4].addChild(noteItem);
+	    }
+	    this.data[4].label += ` (${frames.length})`;
+
+	    const spaces = getSpaces();
+        console.log("spaces")
+        console.log(spaces)
+	    for (let s in spaces) {
+            const space = spaces[s];
+            let noteItem = new NoteItem(space.label)
+            const frame = space.frame;
+            if (frame) {
+                noteItem.children = [new NoteItem(frame.label)];
+            }
+            this.data[5].addChild(noteItem);
+	    }
+	    this.data[5].label += ` (${spaces.length})`;
 	}
 
 	removeItem(id: string | undefined): void {
@@ -281,19 +402,64 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    saveNotes(notes);
 	}
 
-	editItem(id: string | undefined): void {
+	async editItem(id: string | undefined): Promise<void> {
+        vscode.window.showInformationMessage('Annotation edited!');
+        console.log('ADD VECTOR')
+        let spaces = getSpaces();
+        let ms = getMeasurementSystems();
+        console.log(spaces);
+        let i = 0;
+        let options : vscode.QuickPickItem[] = spaces;
+        let createNewSpace : vscode.QuickPickItem = {
+            label: "Create new Space"
+        };
+        options.push(createNewSpace);
+        const quickPick = await vscode.window.showQuickPick(spaces, {
+            placeHolder: 'Select a space'
+        });
+        console.log("quick pick")
+        console.log(quickPick);
+        if (quickPick === undefined)
+            return;
+        if (quickPick.label == "Create new Space") {
+            console.log("creating new space")
+            addSpace();
+            this.editItem(id);
+            return;
+        }
+        let ms_options : vscode.QuickPickItem[] = ms;
+        let createNewMS: vscode.QuickPickItem = {
+            label: "Create new Measurement System"
+        };
+        ms_options.push(createNewMS);
+        const MSquickPick = await vscode.window.showQuickPick(ms, {
+            placeHolder: 'Select a space'
+        });
+        console.log("quick pick")
+        console.log(quickPick);
+        if (MSquickPick === undefined)
+            return;
+        if (MSquickPick.label == "Create new Measurement System") {
+            console.log("creating new measurement system")
+            addMeasurementSystem();
+            this.editItem(id);
+            return;
+        }
+
 	    const notes = getNotes();
 	    const index = notes.findIndex((item: { id: Number }) => {
 	        return item.id.toString() === id;
 	    });
 			
-	    vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
+	    await vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
 	        if (index >= 0 && annotationText) {
 	            notes[index].text = annotationText;
-	            saveNotes(notes);
-	            vscode.window.showInformationMessage('Annotation edited!');
+                notes[index].space = quickPick;
+                notes[index].measurement_system = MSquickPick;
 	        }
 	    });
+        saveNotes(notes);
+        
 	}
 
 	openItem(id: string | undefined): void {
