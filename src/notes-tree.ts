@@ -333,8 +333,9 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    for (let p in points) {
             const point = points[p];
             let magnitude;
-            if (point.magnitude)
-                magnitude = point.magnitude.toString();
+            if (point.magnitude) {
+                magnitude = point.magnitude;
+            }
 	        const noteItem = new NoteItem(point.label + ": " + magnitude)
             this.data[3].addChild(noteItem);
 	    }
@@ -345,17 +346,17 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
         console.log(frames)
 	    for (let f in frames) {
             const frame = frames[f];
-            let point;
+            let point = null;
             if (frame.point)
                 point = new NoteItem(frame.point.label.toString());
-            else
-                return;
-            let vector;
+            let vector = null;
             if (frame.vector)
                 vector = new NoteItem(frame.vector.label.toString());
+            let noteItem;
+            if (point == null || vector == null)
+                noteItem = new NoteItem(frame.label)
             else
-                return;
-	        const noteItem = new NoteItem(frame.label, [point, vector])
+                noteItem = new NoteItem(frame.label, [point, vector])
             this.data[4].addChild(noteItem);
 	    }
 	    this.data[4].label += ` (${frames.length})`;
@@ -368,7 +369,7 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
             let noteItem = new NoteItem(space.label)
             const frame = space.frame;
             if (frame) {
-                noteItem.children = [new NoteItem(frame.label)];
+                noteItem.addChild(new NoteItem(frame.label));
             }
             this.data[5].addChild(noteItem);
 	    }

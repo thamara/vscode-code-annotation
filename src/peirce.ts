@@ -36,10 +36,13 @@ export const runPeirce = async (): Promise<void> => {
     };
     const apiUrl = "http://0.0.0.0:8080/api/peirce";
     const response = await fetch(apiUrl, login);
-    const data = await response.json();
+    const data : any = await response.json();
     console.log(data);
     let notesSummary = JSON.stringify(data); 
     vscode.commands.executeCommand('code-annotation.clearAllNotesHeadless');
+    // to fix this, we need to have a well-defined JSON response object
+    // and change data : any -> data : well-defined-object[]
+    // We don't use Note[] because the JSON returned by the API differs
     data.forEach(element => {
         let range = new vscode.Range(
             new vscode.Position(element.coords.begin.line, element.coords.begin.character), 
