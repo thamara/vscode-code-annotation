@@ -138,10 +138,18 @@ export class InfoView {
                 { label: "Time" }
             ];
             const interp = await vscode.window.showQuickPick(interpretations);
-            if (interp === undefined) return;
+            if (interp === undefined) {
+                hover_index++;
+                this.updatePreview();
+                continue;
+            }
 
             let name = await vscode.window.showInputBox({ placeHolder: 'Name of interpretation?' });
-            if (name === undefined || name == "") return;
+            if (name === undefined || name == "")  {
+                hover_index++;
+                this.updatePreview();
+                continue;
+            }
 
             let spaces = getSpaces();
             console.log(spaces);
@@ -151,11 +159,18 @@ export class InfoView {
             });
             console.log("space quick pick")
             console.log(space);
-            if (space === undefined)
-                return;
+            if (space === undefined) {
+                hover_index++;
+                this.updatePreview();
+                continue;
+            }
 
             let value = await vscode.window.showInputBox({ placeHolder: 'Value?' });
-            if (value === undefined || Number(value) == NaN) return;
+            if (value === undefined || Number(value) == NaN)  {
+                hover_index++;
+                this.updatePreview();
+                continue;
+            }
 
             let interpretation : Interpretation = {
                 label: `${name} ${interp.label}(${space.label},${value})`,
@@ -167,8 +182,8 @@ export class InfoView {
             notes[index].interpretation = interpretation;
             saveNotes(notes);
             console.log("Saving notes["+index+"]");
-            this.updatePreview();
             hover_index++;
+            this.updatePreview();
         }
     }
 
