@@ -18,39 +18,29 @@ export interface Note {
     codeSnippet: string;
     status: 'pending' | 'done';
     id: number;
-    space: Space | null;
-    measurement_system: MeasurementSystem | null;
+    interpretation: Interpretation | null;
 }
 export interface MeasurementSystem extends vscode.QuickPickItem{
     label: string;
 }
-export interface Vector extends vscode.QuickPickItem {
-    label: string;
-    magnitude: number | null;
-    space: Space | null;
+export interface CoordinateSpace extends vscode.QuickPickItem {
+    label: string; // interpX
+    space: string; // Always "Classical Time Coordinate Space"
+    parent: CoordinateSpace | null;
+    origin: number | null;
+    basis: number | null;
 }
-export interface Point extends vscode.QuickPickItem {
+export interface Interpretation extends vscode.QuickPickItem {
     label: string;
-    magnitude: number | null;
-    space: Space | null;
-}
-export interface Frame extends vscode.QuickPickItem { 
-    label: string;
-    point: Point | null;
-    vector: Vector | null;
-}
-export interface Space extends vscode.QuickPickItem {
-    label: string;
-    frame: Frame | null;
+    name: string;
+    form: string;
+    value: number;
+    space: CoordinateSpace;
 }
 
 export interface NotesDb {
     notes: Note[];
-    measurement_systems: MeasurementSystem[];
-    vectors: Vector[];
-    points: Point[];
-    frames: Frame[];
-    spaces: Space[];
+    coordinate_spaces: CoordinateSpace[];
     nextId: number;
 }
 
@@ -65,24 +55,36 @@ export const getNotes = (): Note[] => {
     return getNotesDb().notes;
 };
 
-export const getMeasurementSystems = (): MeasurementSystem[] => {
-    return getNotesDb().measurement_systems;
+export const getFileNotes = (): Note[] => {
+    let db = getNotesDb();
+    let new_notes : Note[] = [];
+    db.notes.forEach(note => {
+        // Might be able to clean this up
+        // Set the vscode.editor.selection position,
+        // and let the prebuilt addNote functions do the rest.
+        if (note.fileName == vscode.window.activeTextEditor?.document.fileName)
+            new_notes.push(note);
+    });
+    return new_notes;
 };
 
-export const getVectors = (): Vector[] => {
-    return getNotesDb().vectors;
+export const deleteFilesNotes = (): void => {
+    let db = getNotesDb();
+    let new_notes : Note[] = [];
+    db.notes.forEach(note => {
+        // Might be able to clean this up
+        // Set the vscode.editor.selection position,
+        // and let the prebuilt addNote functions do the rest.
+        if (note.fileName != vscode.window.activeTextEditor?.document.fileName)
+            new_notes.push(note);
+    });
+    db.notes = new_notes;
+    saveDb(db);
+    return;
 };
 
-export const getPoints = (): Point[] => {
-    return getNotesDb().points;
-};
-
-export const getFrames = (): Frame[] => {
-    return getNotesDb().frames;
-};
-
-export const getSpaces = (): Space[] => {
-    return getNotesDb().spaces;
+export const getSpaces = (): CoordinateSpace[] => {
+    return getNotesDb().coordinate_spaces;
 };
 
 export const getNextId = (): number => {
@@ -133,8 +135,7 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
         codeSnippet: codeSnippet,
         status: 'pending',
         id: nextId,
-        space: null,
-        measurement_system: null,
+        interpretation: null,
     };
     return note;
 };
@@ -162,8 +163,7 @@ const createPeirceNote = (annotationText: string, editor : vscode.TextEditor, ra
         codeSnippet: codeSnippet,
         status: 'pending',
         id: nextId,
-        space: null,
-        measurement_system: null,
+        interpretation: null,
     };
     return note;
 };
@@ -225,188 +225,63 @@ export const addNote = async () => {
     setDecorations();
 };
 
-export const addMeasurementSystem = async () => {
-    console.log('ADD MEASUREMENT SYSTEM')
-    let annotationText = await vscode.window.showInputBox({ placeHolder: 'Measurement System?'});
-    if (annotationText) {
-        const new_ms: MeasurementSystem = {
-            label : annotationText,
-        }
-        let db = getNotesDb();
-        db.measurement_systems.push(new_ms);
-        saveDb(db);
-        vscode.window.showInformationMessage('Annotation saved!');
-    }
-};
-
-export const addVector = async () => {
-    console.log('ADD VECTOR')
-    let spaces = getSpaces();
-    console.log(spaces);
-    let i = 0;
-    let options : Space[] = spaces;
-    let createNewFrame : Space = {
-        label: "Create new Space",
-        frame: null,
-    };
-    options.push(createNewFrame);
-    const quickPick = await vscode.window.showQuickPick(options, {
-        placeHolder: 'Select a Space for your Vector'
-    });
-    console.log("quick pick")
-    console.log(quickPick);
-    if (quickPick === undefined)
-        return;
-    if (quickPick.label == "Create new Space") {
-        console.log("creating new space")
-        await addSpace();
-        await addVector();
-        return;
-    }
-    let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of vector?'});
-    let magnitude = await vscode.window.showInputBox({ placeHolder: 'Magnitude of vector?', value: "1"});
-    if (annotationText && magnitude && quickPick != undefined) {
-        const new_vector : Vector = {
-            label : annotationText,
-            magnitude : +magnitude,
-            space : quickPick,
-        }
-        let db = getNotesDb();
-        db.vectors.push(new_vector);
-        saveDb(db);
-        vscode.window.showInformationMessage('Annotation saved!');
-    }
-};
-
-export const addPoint = async () => {
-    console.log('ADD POINT')
-    let spaces = getSpaces();
-    console.log(spaces);
-    let i = 0;
-    let options : Space[] = spaces;
-    let createNewSpace : Space = {
-        label: "Create new Space",
-        frame: null,
-    };
-    options.push(createNewSpace);
-    const quickPick = await vscode.window.showQuickPick(options, {
-        placeHolder: 'Select a Space for your Point'
-    });
-    console.log("quick pick")
-    console.log(quickPick);
-    if (quickPick === undefined)
-        return;
-    if (quickPick.label == "Create new Space") {
-        console.log("creating new space")
-        await addSpace();
-        await addPoint();
-        return;
-    }
-    let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of point?'});
-    let magnitude = await vscode.window.showInputBox({ placeHolder: 'Magnitude of point?', value: "1"});
-    if (annotationText && magnitude && quickPick != undefined) {
-        const new_point : Point = {
-            label : annotationText,
-            magnitude : +magnitude,
-            space : quickPick,
-        }
-        let db = getNotesDb();
-        db.points.push(new_point);
-        saveDb(db);
-        vscode.window.showInformationMessage('Annotation saved!');
-    }
-};
-export const addFrame = async () => {
-    console.log('ADD FRAME')
-    let vectors = getVectors();
-    console.log(vectors);
-    let points = getPoints();
-    console.log(points);
-    let i = 0;
-    let vector_options : Vector[] = vectors;
-    let createNewVector : Vector = {
-        label: "Create new Vector",
-        magnitude: null,
-        space: null,
-    };
-    vector_options.push(createNewVector);
-    const quickPickVector = await vscode.window.showQuickPick(vector_options, {
-        placeHolder: 'Select a Vector for your Frame'
-    });
-    if (quickPickVector === undefined)
-        return;
-    if (quickPickVector.label == "Create new Vector") {
-        await addVector();
-        await addFrame();
-        return;
-    }
-    let point_options : Point[] = points;
-    let createNewPoint : Point = {
-        label: "Create new Point",
-        magnitude: null,
-        space: null,
-    };
-    point_options.push(createNewPoint);
-    const quickPickPoint = await vscode.window.showQuickPick(point_options, {
-        placeHolder: 'Select a Point for your Frame'
-    });
-    console.log("quick pick")
-    console.log(quickPickPoint);
-    if (quickPickPoint === undefined)
-        return;
-    if (quickPickPoint.label == "Create new Point") {
-        await addPoint();
-        await addFrame();
-        return;
-    }
-    let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of frame?', value: "new frame"});
-    if (annotationText) {
-        const new_frame : Frame = {
-            label : annotationText,
-            vector: quickPickVector,
-            point : quickPickPoint,
-        }
-        let db = getNotesDb();
-        db.frames.push(new_frame);
-        saveDb(db);
-        vscode.window.showInformationMessage('Annotation saved!');
-    }
-};
+/*
+{"label": "time_std_space", "space": "Classical Time Coordinate Space", "parent": null, "origin": null, "basis": null }
+*/
 export const addSpace = async () => {
-    console.log('ADD SPACE')
-    let frames = getFrames();
-    console.log(frames);
-    let i = 0;
-    let options : Frame[] = frames;
-    let createNewFrame : Frame = {
-        label: "Create new Frame",
-        point: null,
-        vector: null,
+    let options : vscode.QuickPickItem[] = [];
+    let derivedFrame : vscode.QuickPickItem = {
+        label: "Space with Derived Frame",
     };
-    options.push(createNewFrame);
-    const quickPick = await vscode.window.showQuickPick(options, {
-        placeHolder: 'Select a Frame for your Space'
-    });
+    let stdFrame: vscode.QuickPickItem = {
+        label: "Space with Standard Frame",
+    };
+    options.push(stdFrame);
+    options.push(derivedFrame);
+    const quickPick = await vscode.window.showQuickPick(options);
     console.log("quick pick")
     console.log(quickPick);
     if (quickPick === undefined)
         return;
-    if (quickPick.label == "Create new Frame") {
-        console.log("creating new frame")
-        await addFrame();
-        await addSpace();
-        return;
-    }
     let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of space?', value: "new space"});
-    if (annotationText && quickPick != undefined) {
-        const new_space : Space = {
-            label : annotationText,
-            frame: quickPick,
+    if (annotationText === undefined) 
+        return;
+    if (quickPick.label == "Space with Standard Frame") {
+        const new_space : CoordinateSpace = {
+            label: annotationText,
+            space: "Classical Time Coordinate Space", 
+            parent: null, 
+            origin: null, 
+            basis: null 
         }
         let db = getNotesDb();
-        db.spaces.push(new_space);
+        db.coordinate_spaces.push(new_space);
         saveDb(db);
-        vscode.window.showInformationMessage('Annotation saved!');
+    } else {
+        const spaces = getSpaces();
+        const parent = await vscode.window.showQuickPick(spaces, {
+            placeHolder: 'Select a Parent Space'
+        });
+        console.log("quick pick")
+        console.log(parent);
+        if (parent === undefined)
+            return;
+        const vec_magnitude = await vscode.window.showInputBox({ placeHolder: 'Magnitude of vector?' });
+        if (vec_magnitude === undefined || vec_magnitude == "" || Number(vec_magnitude) == NaN)
+            return;
+        const point_magnitude = await vscode.window.showInputBox({ placeHolder: 'Magnitude of point?'});
+        if (point_magnitude === undefined || point_magnitude == "" || Number(point_magnitude) == NaN)
+            return;
+        const new_space : CoordinateSpace = {
+            label: annotationText, 
+            space: "Classical Time Coordinate Space", 
+            parent: parent, 
+            origin: +point_magnitude, 
+            basis: +vec_magnitude
+        }
+        let db = getNotesDb();
+        db.coordinate_spaces.push(new_space);
+        saveDb(db);
     }
 };
 

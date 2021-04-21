@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addFrame, addMeasurementSystem, addNote, addPlainNote, addPoint, addSpace, addVector } from './note-db';
+import { addNote, addPlainNote, addSpace } from './note-db';
 import { generateMarkdownReport } from './reporting';
-import { runPeirce } from './peirce';
+import { populate, check } from './peirce';
 import { InfoView, NotesTree, TreeActions } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
@@ -25,7 +25,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
         treeActions.openNoteFromId(id);
@@ -39,9 +38,14 @@ export function activate(context: vscode.ExtensionContext) {
         infoView.editHoveredNotes();
     });
 
-    vscode.commands.registerCommand('code-annotation.runPeirce', async () => {
-        vscode.window.showInformationMessage("Peirce running...");
-        runPeirce();
+    vscode.commands.registerCommand('code-annotation.populate', async () => {
+        vscode.window.showInformationMessage("Populating...");
+        populate();
+    });
+
+    vscode.commands.registerCommand('code-annotation.check', async () => {
+        vscode.window.showInformationMessage("Checking...");
+        check();
     });
 
     vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
@@ -75,18 +79,6 @@ export function activate(context: vscode.ExtensionContext) {
         addNote();
     });
 
-    vscode.commands.registerCommand('code-annotation.addMeasurementSystem', async () => {
-        addMeasurementSystem();
-    });
-    vscode.commands.registerCommand('code-annotation.addVector', async () => {
-        addVector();
-    });
-    vscode.commands.registerCommand('code-annotation.addPoint', async () => {
-        addPoint();
-    });
-    vscode.commands.registerCommand('code-annotation.addFrame', async () => {
-        addFrame();
-    });
     vscode.commands.registerCommand('code-annotation.addSpace', async () => {
         addSpace();
     });
