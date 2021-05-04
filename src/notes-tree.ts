@@ -30,9 +30,12 @@ const createNoteItem = (note: Note): NoteItem => {
 
     let details : NoteItem[] = [];
     if (note.interpretation != null)
-        details = [new NoteItem(`Current interpretation: ${note.interpretation.label}`), new NoteItem(`Checked interpretation: ${note.text}`)];
+        details = [new NoteItem(`Current interpretation: ${note.interpretation.label}`)]; 
     else
-        details = [new NoteItem(`Current interpretation: No interpretation provided`), new NoteItem(`Checked interpretation: ${note.text}`)];
+        details = [new NoteItem(`Current interpretation: No interpretation provided`)];
+    details.push(new NoteItem(`Checked interpretation: ${note.text}`));
+    details.push(new NoteItem(`Type: ${note.type}`));
+    details.push(new NoteItem(`Error Message: ${note.error}`));
     let noteItem = new NoteItem(`${note.codeSnippet}`, details, note.id.toString());
     if (noteItem.id) {
         noteItem.command = new OpenNoteCommand(noteItem.id);
@@ -132,6 +135,8 @@ export class InfoView {
             if (!this.isHoveredNote(note)) continue;
             this.updatePreviewIndex(hover_index);
 
+            let noteIsIdentifier : boolean = note.type.includes("IDENT");
+
 
             let interpretations : vscode.QuickPickItem[] = [
                 { label: "Duration" },
@@ -144,11 +149,18 @@ export class InfoView {
                 continue;
             }
 
-            let name = await vscode.window.showInputBox({ placeHolder: 'Name of interpretation?' });
-            if (name === undefined || name == "")  {
-                hover_index++;
-                this.updatePreview();
-                continue;
+            let name = "<identifier>";
+
+            // If the following is true (the AST node is an identifier)
+            // Peirce will not prompt for a name, so we won't ask for one.
+            if (!noteIsIdentifier) {
+                let pickedName = await vscode.window.showInputBox({ placeHolder: 'Name of interpretation?' });
+                if (pickedName === undefined || pickedName == "")  {
+                    hover_index++;
+                    this.updatePreview();
+                    continue;
+                }
+                name = pickedName;
             }
 
             let spaces = getSpaces();
@@ -172,12 +184,18 @@ export class InfoView {
                 continue;
             }
 
+            let label = `${name} ${interp.label}(${space.label},${value})`
+            if (noteIsIdentifier) {
+                label = `${interp.label}(${space.label},${value})`
+            }
+
             let interpretation : Interpretation = {
-                label: `${name} ${interp.label}(${space.label},${value})`,
+                label: label,
                 name: name,
                 form: interp.label,
                 space: space,
-                value: +value
+                value: +value,
+                type: note.type,
             }
             notes[index].interpretation = interpretation;
             saveNotes(notes);

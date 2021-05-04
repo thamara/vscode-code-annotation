@@ -19,6 +19,8 @@ export interface Note {
     status: 'pending' | 'done';
     id: number;
     interpretation: Interpretation | null;
+    error : string;
+    type: string;
 }
 export interface MeasurementSystem extends vscode.QuickPickItem{
     label: string;
@@ -36,6 +38,7 @@ export interface Interpretation extends vscode.QuickPickItem {
     form: string;
     value: number;
     space: CoordinateSpace;
+    type: string;
 }
 
 export interface NotesDb {
@@ -136,11 +139,13 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
         status: 'pending',
         id: nextId,
         interpretation: null,
+        error: "Not checked",
+        type: "Unknown"
     };
     return note;
 };
 
-const createPeirceNote = (annotationText: string, editor : vscode.TextEditor, range : vscode.Range) => {
+const createPeirceNote = (annotationText: string, type: string, editor : vscode.TextEditor, range : vscode.Range) => {
     const nextId = getNextId();
 
     let codeSnippet = '';
@@ -164,6 +169,8 @@ const createPeirceNote = (annotationText: string, editor : vscode.TextEditor, ra
         status: 'pending',
         id: nextId,
         interpretation: null,
+        error: "Not checked",
+        type: type,
     };
     return note;
 };
@@ -285,9 +292,9 @@ export const addSpace = async () => {
     }
 };
 
-export const addPeirceNote = async (annotationText : string, editor : vscode.TextEditor, range : vscode.Range) => {
+export const addPeirceNote = async (annotationText : string, type : string, editor : vscode.TextEditor, range : vscode.Range) => {
     if (editor) {
-        addNoteToDb(createPeirceNote(annotationText, editor, range))
+        addNoteToDb(createPeirceNote(annotationText, type, editor, range))
     }
     setDecorations();
 };

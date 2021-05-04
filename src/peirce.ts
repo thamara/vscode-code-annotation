@@ -52,7 +52,7 @@ export const populate = async (): Promise<void> => {
         // Set the vscode.editor.selection position,
         // and let the prebuilt addNote functions do the rest.
         if (editor)
-            addPeirceNote(element.interp, editor, range);
+            addPeirceNote(element.interp, element.type, editor, range);
     });
     setDecorations();
     return;
@@ -107,6 +107,7 @@ export const check = async (): Promise<void> => {
         if (all_notes[j].fileName != notes[i].fileName)
             continue;
         all_notes[j].text = notes[i].text;
+        all_notes[j].error = notes[i].error;
         i++;
     }
     saveNotes(all_notes);
