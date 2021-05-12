@@ -236,7 +236,7 @@ export class InfoView {
             contents += this.displayNote(notes[i], i == index);
         contents += '<p style="color:lightblue">Key bindings</p>';
         contents += '<p style="color:lightblue"><b>Ctrl+Alt+R</b> to generate unfilled type information annotations</p>';
-        contents += '<p style="color:lightblue"><b>Ctrl+Alt+R</b> to check for annotation correctness</p>';
+        contents += '<p style="color:lightblue"><b>Ctrl+Alt+C</b> to check for annotation correctness and infer interpretations</p>';
         contents += '<p style="color:lightblue"><b>Ctrl+Alt+E</b> to edit existing type information annotations</p>';
         contents += '<p style="color:lightblue"><b>Ctrl+Alt+S</b> to add spaces</p>';
 

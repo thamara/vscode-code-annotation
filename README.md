@@ -1,30 +1,15 @@
 # Code Annotation - Visual Studio Code Extension
 
-Create and track annotations from your source code without actually committing comments on your code.
-
-![](https://github.com/thamara/vscode-code-annotation/blob/main/demo/Code%20Annotation.png)
-
-### Attention
-
-This is still a **work in progress**. You are welcome to test and give feedback on the extension, but we cannot guarantee compatibility with upcoming releases.
-
-To test the extension download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/master/code-annotation-0.0.1.vsix) and follow the steps on your VSCode:
-
-1. Go to the "Extensions" pane
-2. Click on the ... on the top right of the "Extensions" pane
-3. Select "Install from VSIX"
-4. Select the VSIX file you downloaded and click install
-
-The "Code Annotation" can be found in the Activity pane.
-Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/issues) and suggest [new features](https://github.com/thamara/vscode-code-annotation/projects/1) for the extension.
+Annotate and check physically relevant C++ ROS code segments.
 
 ## Features
 
-- Create an annotation from the source code, selecting the portion of code, right-clicking and adding a note
-- Keybinds for creating a new note from selection (`Ctrl/Cmd + alt + n)`, or without selection, aka Plain note (`Ctrl/Cmd + alt + p`)
-- Track annotations on its own pane
-- Check/Uncheck items as you complete them
-- Generate a report in Markdown with a summary of the pending and completed items
+- Highlight physically relevant code segments (`Ctrl/Cmd + alt + p`)
+- Annotate identified code segments with extra physical type information (`Ctrl/Cmd + alt + e`)
+- Create new spaces derived from the standard frame or from other spaces (`Ctrl/Cmd + alt + s`)
+- Check annotations for type errors and infer interpretations for other code segments (`Ctrl/Cmd + alt + c`)
+- Open the Peirce Infoview with annotation information for the code segments on the current line (`Ctrl/Cmd + alt + t`)
+- All interpretations and code segments are saved to a JSON file and wiil persist if VSCode is closed.
 
 ## Development
 
@@ -35,7 +20,13 @@ Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/iss
 npm install
 npm run compile
 ```
-- And to run/test the extension, go the the Run pane and hit the green button on `Run Extension`. This will open a new VSCode window with the extension enabled.
+- And to run/test the extension, open VSCode on this directory. Go the the Run pane and hit the green button on `Run Extension` or press F5. This will open a new VSCode window with the extension enabled.
+
+## API Setup
+
+- This extension uses the API interacts with Peirce VSCode API repository.
+- If the API must be running somewhere in order to use most of the extension's features.
+- Currently, the API is only set to run locally on 0.0.0.0. This will work for development. When deploying, host the API on a node with a globally resolvable IP address and change the IP in this extension to point to the node hosting the API in the file src/peirce.ts.
 
 ### Creating a VSIX file for instalation
 
@@ -46,13 +37,11 @@ npm run compile
 - Create the VSIX file
   - `vsce package`
 
-## Requirements
+### To Install a Compiled VSIX file
 
-TODO
+1. Go to the "Extensions" pane
+2. Click on the ... on the top right of the "Extensions" pane
+3. Select "Install from VSIX"
+4. Select the VSIX file you downloaded and click install
 
-## Extension Settings
-
-TODO
-
------------------------------------------------------------------------------------------------------------
-
+The "Code Annotation" can be found in the Activity pane.
