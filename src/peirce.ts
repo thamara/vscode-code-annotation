@@ -1,9 +1,24 @@
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 
-import { addPeirceNote, getNotes, deleteFilesNotes, getFileNotes, getNotesDb, saveNotes } from './note-db';
+import { addPeirceNote, getNotes, deleteFilesNotes, getFileNotes, getNotesDb, saveNotes, Note } from './note-db';
 
-import { setDecorations } from './decoration/decoration'
+import { setDecorations } from
+ './decoration/decoration'
+
+interface APIPosition {
+    line: number;
+    character: number;
+}
+interface APICoordinates {
+    begin: APIPosition;
+    end: APIPosition;
+}
+export interface PopulateAPIReponse {
+    coords : APICoordinates;
+    interp: string;
+    type: string;
+}
 
 export const populate = async (): Promise<void> => {
     if (vscode.window.activeTextEditor) {
@@ -36,7 +51,7 @@ export const populate = async (): Promise<void> => {
     };
     const apiUrl = "http://0.0.0.0:8080/api/populate";
     const response = await fetch(apiUrl, login);
-    const data : any = await response.json();
+    const data : PopulateAPIReponse[] = await response.json();
     console.log(data);
     let notesSummary = JSON.stringify(data); 
     deleteFilesNotes();
@@ -90,13 +105,7 @@ export const check = async (): Promise<void> => {
     };
     const apiUrl = "http://0.0.0.0:8080/api/check";
     const response = await fetch(apiUrl, login);
-    const data : any = await response.json();
-    console.log(data);
-    let notesSummary = JSON.stringify(data); 
-    // to fix this, we need to have a well-defined JSON response object
-    // and change data : any -> data : well-defined-object[]
-    // We don't use Note[] because the JSON returned by the API differs
-    console.log("received data from check:")
+    const data : Note[] = await response.json();
     console.log(data);
     for (let i = 0; i < data.length; i++) {
         notes[i] = data[i];
