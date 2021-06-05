@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addNote, addPlainNote, addSpace } from './note-db';
+import { addNote, addPlainNote, addSpace, getNoteFromId } from './note-db';
 import { generateMarkdownReport } from './reporting';
 import { populate, check } from './peirce';
-import { InfoView, NotesTree, TreeActions } from './notes-tree';
+import { InfoView, NotesTree, TreeActions, NoteItem } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
 
@@ -14,8 +14,8 @@ export function activate(context: vscode.ExtensionContext) {
     initializeStorageLocation(context.globalStoragePath);
 
     const tree = new NotesTree();
-    const treeActions = new TreeActions(tree);
     const infoView = new InfoView();
+    const treeActions = new TreeActions(tree, infoView);
 
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
@@ -33,19 +33,20 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
     });
-
+    /*
+    vscode.commands.registerCommand('code-annotation.editNote', () => {
+        console.log("edit note!");
+       // let note = getNoteFromId();
+    });*/
+    vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
     vscode.commands.registerCommand('code-annotation.editHoveredNotes', async () => {
+        console.log("EDIT HOVERED NOTES??");
         infoView.editHoveredNotes();
     });
 
     vscode.commands.registerCommand('code-annotation.populate', async () => {
         vscode.window.showInformationMessage("Populating...");
         populate();
-    });
-
-    vscode.commands.registerCommand('code-annotation.check', async () => {
-        vscode.window.showInformationMessage("Checking...");
-        check();
     });
 
     vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {

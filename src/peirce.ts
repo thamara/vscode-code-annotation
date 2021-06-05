@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 
-import { addPeirceNote, getNotes, deleteFilesNotes, getFileNotes, getNotesDb, saveNotes, Note } from './note-db';
+import { addPeirceNote, getNotes, deleteFilesNotes, getFileNotes, 
+    getNotesDb, saveNotes, Note, addPeirceConstructor } from './note-db';
 
 import { setDecorations } from
  './decoration/decoration'
@@ -14,10 +15,20 @@ interface APICoordinates {
     begin: APIPosition;
     end: APIPosition;
 }
-export interface PopulateAPIReponse {
+export interface PopulateAPIData{
     coords : APICoordinates;
     interp: string;
     type: string;
+}
+
+export interface PopulateAPIConstructorData{
+    interp: string;
+    type: string;
+    name: string;
+}
+export interface PopulateAPIReponse {
+    data:PopulateAPIData[];
+    cdata:PopulateAPIConstructorData[];
 }
 
 export const populate = async (): Promise<void> => {
@@ -30,12 +41,16 @@ export const populate = async (): Promise<void> => {
     if (editor === undefined)
         return;
     const fileText = vscode.window.activeTextEditor?.document.getText();
+    for(let i = 0;i<10;i++)
+        console.log('PRINT FILE NAME')
+        console.log(vscode.window.activeTextEditor?.document.fileName);
     let notes = getNotes();
-    console.log(notes);
-    console.log(JSON.stringify(notes));
-    console.log(fileText);
-    console.log(JSON.stringify(fileText));
+    //console.log(notes);
+    //console.log(JSON.stringify(notes));
+    //console.log(fileText);
+    //console.log(JSON.stringify(fileText));
     let request = {
+        fileName: vscode.window.activeTextEditor?.document.fileName,
         file: fileText,
         notes: notes,
     }
@@ -51,8 +66,13 @@ export const populate = async (): Promise<void> => {
     };
     const apiUrl = "http://0.0.0.0:8080/api/populate";
     const response = await fetch(apiUrl, login);
-    const data : PopulateAPIReponse[] = await response.json();
+    const respdata : PopulateAPIReponse = await response.json();
+    let data = respdata.data;
+    let cdata = respdata.cdata;
+    console.log('ptingint data')
     console.log(data);
+    console.log('printing cdata')
+    console.log(cdata)
     let notesSummary = JSON.stringify(data); 
     deleteFilesNotes();
     // to fix this, we need to have a well-defined JSON response object
@@ -69,6 +89,12 @@ export const populate = async (): Promise<void> => {
         if (editor)
             addPeirceNote(element.interp, element.type, editor, range);
     });
+
+    cdata.forEach(element => {
+        if (editor)
+            addPeirceConstructor(element.interp, element.type, element.name, editor);
+    });
+
     setDecorations();
     return;
 };
@@ -91,7 +117,7 @@ export const check = async (): Promise<void> => {
     let request = {
         file: fileText,
         notes: notes,
-        spaces: getNotesDb().coordinate_spaces
+        spaces: getNotesDb().time_coordinate_spaces
     }
     console.log(JSON.stringify(request));
     let login = {

@@ -126,15 +126,6 @@
         }
       },
       {
-        "command": "code-annotation.check",
-        "category": "Code Annotation",
-        "title": "Check Code Annotations",
-        "icon": {
-          "light": "resources/light/summary.svg",
-          "dark": "resources/dark/summary.svg"
-        }
-      },
-      {
         "command": "code-annotation.openPreview",
         "category": "Code Annotation",
         "title": "Open Preview",
@@ -176,12 +167,6 @@
         "key": "ctrl+alt+r",
         "command": "code-annotation.populate",
         "mac": "cmd+alt+r",
-        "when": "editorTextFocus"
-      },
-      {
-        "key": "ctrl+alt+c",
-        "command": "code-annotation.check",
-        "mac": "cmd+alt+c",
         "when": "editorTextFocus"
       },
       {
@@ -232,11 +217,6 @@
         },
         {
           "command": "code-annotation.populate",
-          "when": "view == codeAnnotationView",
-          "group": "navigation"
-        },
-        {
-          "command": "code-annotation.check",
           "when": "view == codeAnnotationView",
           "group": "navigation"
         },
@@ -333,6 +313,12 @@
           "description": "Color for the background for the annotation on the source code in a Light theme",
           "type": "string",
           "default": "#0000000C"
+        },
+        "code-annotation.annotationBG.color.error": {
+          "description": "Color for the background for the annotation on the source code with an error",
+          "type": "string",
+          "default": "#FF9900"
+          
         }
       }
     }

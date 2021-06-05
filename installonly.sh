@@ -12,8 +12,3 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 cd /peirce
-
-pip3 install trio
-pip3 install dataclasses
-
-#nohup python3 src/api.py &
