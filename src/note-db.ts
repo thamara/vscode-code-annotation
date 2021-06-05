@@ -128,20 +128,15 @@ export const getNoteFromId = (noteId : string) : Note | null => {
 
 export const getConstructorFromId = (noteId : string) : Constructor | null => {
     let cons = getConstructors();
-    console.log("CONS LENGTH?")
-    console.log(cons.length)
     let cons_ret : Constructor | null = null
     cons.forEach(cons_ => {
         if (cons_.id.toString() == noteId){
-            console.log("FOUND THE CONS")
-            console.log(cons_)
             cons_ret = cons_
         }
         else {
             console.log(cons_.id.toString() + " IS NOT " + noteId)
         }
     });
-    console.log("WAIT im out here?")
     return cons_ret;
 };
 
@@ -160,11 +155,9 @@ export const getFileNotes = (): Note[] => {
 };
 
 export const deleteFilesNotes = (): void => {
-    console.log('hey, deleting these file notes')
     let db = getNotesDb();
     let new_notes : Note[] = [];
     db.notes.forEach(note => {
-        console.log('trying to delete')
         console.log(note)
         // Might be able to clean this up
         // Set the vscode.editor.selection position,
@@ -172,10 +165,8 @@ export const deleteFilesNotes = (): void => {
         if (note.fileName != vscode.window.activeTextEditor?.document.fileName)
             new_notes.push(note);
     });
-    console.log('did i do it?')
     db.notes = new_notes;
     saveDb(db);
-    console.log('save?')
     return;
 };
 
@@ -201,7 +192,6 @@ export const getNoteIndex = (note : Note) :number => {
     for(let i = 0;i<notes.length;i++)
         if(notes[i].id == note.id)
             return i
-    console.log('DID NOT FIND ID')
     return -1
 };
 
@@ -210,20 +200,14 @@ export const getConstructorIndex = (cons : Constructor) :number => {
     for(let i = 0;i<constructors.length;i++)
         if(constructors[i].id == cons.id)
             return i
-    console.log('DID NOT FIND ID')
     return -1
 };
 
 
 export const saveDb = (db: NotesDb) => {
-    console.log('trying to save!')
     const data = JSON.stringify(db);
-    //console.log("DB!!!");
-    //console.log(db);
     fs.writeFileSync(getAnnotationFilePath(), data);
-    console.log("refreshing?")
     vscode.commands.executeCommand('code-annotation.refreshEntry');
-    console.log('refresh failed?')
 };
 
 export const saveNotes = (notes: Note[]) => {
@@ -323,7 +307,6 @@ const createPeirceNote = (annotationText: string, type: string, editor : vscode.
 
 const createPeirceConstructor = (annotationText: string, type: string, name: string, editor : vscode.TextEditor) => {
     
-    console.log('IN CREATE')
     const nextId = getNextId();
 
     let fileName = '';
@@ -338,7 +321,6 @@ const createPeirceConstructor = (annotationText: string, type: string, name: str
         //error: "Not checked",
         type: type,
     };
-    console.log('CREATED')
     return cons;
 };
 
