@@ -2,3 +2,5 @@ out
 node_modules
 .vscode-test/
 .vscode/
+code-annotation-0.0.1.vsix
+nohup.out

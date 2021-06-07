@@ -99,6 +99,9 @@ export const getNotesDb = (): NotesDb => {
     const annotationFile = getAnnotationFilePath();
     const rawdata = fs.readFileSync(annotationFile, 'utf8');
     let annotations = JSON.parse(rawdata);
+    annotations.notes = annotations.notes || [];
+    annotations.constructors = annotations.constructors || [];
+    annotations.spaces = annotations.spaces || [];
     //console.log('notes db: ')
     //console.log(annotations)
     return annotations;

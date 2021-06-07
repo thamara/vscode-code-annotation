@@ -425,6 +425,8 @@ export class InfoView {
             spaces: getNotesDb().time_coordinate_spaces.concat(getNotesDb().geom1d_coordinate_spaces),
             constructors: constructors
         }
+        console.log('SENDING REQUEST')
+        console.log(request)
         console.log(JSON.stringify(request));
         let login = {
             method: "POST",
