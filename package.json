@@ -319,6 +319,11 @@
           "type": "string",
           "default": "#FF9900"
           
+        },
+        "code-annotation.annotationUL.color.completeAnnotation": {
+          "description": "Color for the underline for annotations in the source code which are completed",
+          "type": "string",
+          "default": "#33AB6F"
         }
       }
     }

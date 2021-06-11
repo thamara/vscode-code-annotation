@@ -1,60 +1,49 @@
 #include "ros/ros.h"
-//#include "geometry_msgs/Vector3Stamped.h"
-//#include "geometry_msgs/Vector3.h"
-//#include "geometry_msgs/Transform.h"
-//#include "geometry_msgs/TransformStamped.h"
-#include <tf/transform_datatypes.h>
-//#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-//#include <tf/transform_listener.h>
-//#include <tf/transform_broadcaster.h>
-//#include <tf2/buffer_core.h>
-#include "../geometry2/tf2/include/tf2/time.h"
+#include "geometry_msgs/Vector3Stamped.h"
+#include "geometry_msgs/Vector3.h"
+#include "geometry_msgs/Transform.h"
+#include "geometry_msgs/TransformStamped.h"
+//#include <tf/transform_datatypes.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <cmath>
-/*
-When echoing the coordinates of a transform, tf2 first checks if the transform is available. 
-The timeout to check the transform is intended to be 1 second, but due to a 
-constructor misunderstanding, the user supplies a value of 1 nanosecond.
-*/
+
+
 int main(int argc, char **argv){
-    ros::init(argc, argv, " ");
-    ros::NodeHandle node;  
-    //tf::Vector3 v3(3,2,1);
+    ros::init(argc, argv, "new lang tests");
+    ros::NodeHandle node;
+
     /*
-    636
-    durations.push_back(tf2::Duration(1.0));
-    */
-    /*
-    974
-    durations.push_back(tf2::Duration(1.0));
+    Instantiate a time (COORDINATE) space - call it "world_time_in_seconds"
 
-    (and so on)
+    Instantiate a derived frame, with origin 0 and appropriate basis value, 
+        and then a (COORDINATE) space from that frame ??or a derived space directly?? 
+        - called "world time in years"t
     */
 
-    //Two ways:
-    //1
-    //Declare a Global Time Space (and bind a standard frame)
-    //Declare measurement systems: an SI system and an SI system with nanoseconds
+    //Annotate this as a Time in the "world_time_in_seconds" Space with value 0
+    //ros::Time launch_time_in_seconds(0);
+    //Annotate this as a Time in the "world_time_in_years" Space with value 0
+    //ros::Time launch_time_in_years(0);
+    //Annotate this as a Duration in the "world_time_in_seconds" Space with value 1
+    //ros::Duration one_second(1);
+    //Annotate this as a Duration in the "world_time_in_years" Space with value 1
+    //ros::Duration one_year(1);
+    //ros::Time adding_launches = launch_time_in_seconds + launch_time_in_years; //ros doesn't support this
 
-    /*Annotate this list with a type constraint stating that all values emplaced or used must
-    be in the global time space/standard frame and have units in seconds
-    */
-    std::vector<tf2::Duration> durations;
-    //Annotate the duration as having an interpretation in nanoseconds
-    //A constraint is generated in Lean, which enforces the unit of measurement
-    //This assertion fails, as the units do not match and the constraint is unsatisfied. 
-    durations.push_back(tf2::Duration(1.0));
+    //Annotate as a Duration in the "world_time_in_seconds" Space with no value provided
+    //ros::Duration two_seconds = one_second + one_second;
+    //Annotate as a Time in the "world_time_in_seconds" Space with no value provided
+    //ros::Time one_second_after_launch = launch_time_in_seconds + one_second;
 
-    //2
-    //Declare a Global Time Space (and bind a standard frame)
-    //Declare measurement systems: an SI system and an SI system with nanoseconds
+    //Regardless of annotation, this will not type check, as the Spaces/Measurement Systems/Frames differ between operands
+    //ros::Time what_after_what = launch_time_in_years + one_second;
+    //ros::Duration five_seconds = 5*one_second;
 
-    /*Annotate this list with a type constraint stating that all values emplaced or used must
-    be in the global time space/standard frame and have units in seconds
-    */
-    //std::vector<tf2::Duration> durations;
-    //Annotate the duration as having an interpretation in nanoseconds
-    //A constraint is generated in Lean, which enforces the unit of measurement
-    //This assertion fails, as the units do not match and the constraint is unsatisfied. 
-    //durations.push_back(tf2::Duration(1.0));
+    //Annotate as a Time in the "world_time_in_years" Space to demonstrate a failed type check
+    //ros::Duration two_years = one_second + one_second;
+
+    float seconds_to_years = .001;
+    float five_seconds = 5;
+    float five_secs_in_years = seconds_to_years*five_seconds;
 
 }
