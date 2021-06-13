@@ -1,14 +1,14 @@
 {
-  "name": "code-annotation",
-  "displayName": "Code Annotation",
-  "description": "Create and track notes on your source code.",
+  "name": "peirce-plugin",
+  "displayName": "Peirce Plugin",
+  "description": "Your personal frontend to Peirce!",
   "icon": "resources/code-annotation.png",
-  "publisher": "thamara",
-  "author": "Thamara Andrade",
-  "homepage": "https://github.com/thamara/vscode-code-annotation#readme",
+  "publisher": "peirceproject",
+  "author": "Charlie Houghton, Andrew Elsey, Peirce Team (original plugin: Thamara Andrade)",
+  "homepage": "https://github.com/PeirceProject/Peirce-vscode.git",
   "repository": {
     "type": "git",
-    "url": "github:thamara/vscode-code-annotation.git"
+    "url": "github:PeirceProject/Peirce-vscode.git"
   },
   "version": "0.0.1",
   "engines": {
@@ -317,8 +317,7 @@
         "code-annotation.annotationBG.color.error": {
           "description": "Color for the background for the annotation on the source code with an error",
           "type": "string",
-          "default": "#FF9900"
-          
+          "default": "#A83E32"
         }
       }
     }
