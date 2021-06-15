@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addNote, addPlainNote, addSpace, getNoteFromId } from './note-db';
+import { addNote, addPlainNote,  getNoteFromId } from './note-db';
 import { generateMarkdownReport } from './reporting';
-import { populate, check } from './peirce';
+import { populate } from './peirce';
 import { InfoView, NotesTree, TreeActions, NoteItem } from './notes-tree';
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
@@ -80,9 +80,9 @@ export function activate(context: vscode.ExtensionContext) {
         addNote();
     });
 
-    vscode.commands.registerCommand('code-annotation.addSpace', async () => {
-        addSpace();
-    });
+    vscode.commands.registerCommand('code-annotation.addSpace', treeActions.addSpace.bind(treeActions));//async () => {
+    //    addSpace();
+    //});
 
     vscode.workspace.onDidChangeConfiguration(() => updateDecorations(context) );
 

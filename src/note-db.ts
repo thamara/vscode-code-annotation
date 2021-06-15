@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import fetch from 'node-fetch';
 
 import { getAnnotationFilePath, getConfiguration } from './configuration';
 import { setDecorations } from './decoration/decoration';
@@ -8,6 +9,10 @@ import { CustomInspectFunction } from 'util';
 export interface Position {
     line: number;
     character: number;
+}
+
+export interface SuccessResponse {
+    success: boolean
 }
 
 export interface Note {
@@ -35,7 +40,12 @@ export interface Constructor {
 export interface MeasurementSystem extends vscode.QuickPickItem{
     label: string;
 }
-export interface TimeCoordinateSpace extends vscode.QuickPickItem {
+
+export interface Space extends vscode.QuickPickItem {
+
+}
+
+export interface TimeCoordinateSpace extends Space {
     label: string; // interpX
     space: string; // Always "Classical Time Coordinate Space"
     parent: TimeCoordinateSpace | null;
@@ -43,7 +53,7 @@ export interface TimeCoordinateSpace extends vscode.QuickPickItem {
     basis: number | null;
 }
 
-export interface Geom1DCoordinateSpace extends vscode.QuickPickItem {
+export interface Geom1DCoordinateSpace extends Space {
     label: string; // interpX
     space: string; // Always "Classical Time Coordinate Space"
     parent: TimeCoordinateSpace | null;
@@ -210,6 +220,7 @@ export const getConstructorIndex = (cons : Constructor) :number => {
 export const saveDb = (db: NotesDb) => {
     const data = JSON.stringify(db);
     fs.writeFileSync(getAnnotationFilePath(), data);
+    console.log('refreshing...')
     vscode.commands.executeCommand('code-annotation.refreshEntry');
 };
 
@@ -376,7 +387,7 @@ export const addNote = async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
         const todoText = getTODOFromSelectedText();
-        let annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...', value: todoText });
+        let annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...', value: todoText === undefined? "" : todoText });
         if (annotationText) {
             addNoteToDb(createNoteFromSelection(annotationText));
         }
@@ -387,7 +398,9 @@ export const addNote = async () => {
 /*
 {"label": "time_std_space", "space": "Classical Time Coordinate Space", "parent": null, "origin": null, "basis": null }
 */
+/*
 export const addSpace = async () => {
+    let space_ : Space | undefined = undefined
     let spaceOptions : vscode.QuickPickItem[] = [];
     let time_space : vscode.QuickPickItem = {
         label: "Time Coordinate Space",
@@ -418,11 +431,9 @@ export const addSpace = async () => {
         const stdderPick = await vscode.window.showQuickPick(stdder);
         console.log(stdderPick);
         if(stdderPick === undefined){
-            console.log('not here!');
             return;
         }
         else if(stdderPick.label == "Standard Time Coordinate Space"){
-            console.log('here!');
             const new_space : TimeCoordinateSpace = {
                 label: annotationText,
                 space: "Classical Time Coordinate Space", 
@@ -430,13 +441,10 @@ export const addSpace = async () => {
                 origin: null, 
                 basis: null 
             }
-            console.log('saving!!')
             let db = getNotesDb();
-            console.log('please!!!')
             db.time_coordinate_spaces.push(new_space);
-            console.log('saved??')
             saveDb(db);
-            console.log('saved!!!!')
+            space_ = new_space
         }
         else if(stdderPick.label == "Derived Time Coordinate Space"){
             const spaces = getTimeSpaces();
@@ -464,6 +472,7 @@ export const addSpace = async () => {
             let db = getNotesDb();
             db.time_coordinate_spaces.push(new_space);
             saveDb(db);
+            space_ = new_space
         }
         else 
             console.log(stdderPick.label)
@@ -495,6 +504,7 @@ export const addSpace = async () => {
             let db = getNotesDb();
             db.geom1d_coordinate_spaces.push(new_space);
             saveDb(db);
+            space_ = new_space
             
         }
         else if(stdderPick.label == "Derived Geom1D Coordinate Space"){
@@ -523,9 +533,36 @@ export const addSpace = async () => {
             let db = getNotesDb();
             db.geom1d_coordinate_spaces.push(new_space);
             saveDb(db);
+            space_ = new_space
         }
     }
-};
+    console.log('should send sp request...')
+    console.log(space_)
+    if(space_ !== undefined){
+        console.log('sending space')
+        let request = {
+            space:space_
+        }
+        console.log('SENDING CREATE SPACE REQUEST')
+        console.log(request)
+        console.log(JSON.stringify(request));
+        let login = {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        };
+        const apiUrl = "http://0.0.0.0:8080/api/createSpace";
+        const response = await fetch(apiUrl, login);
+        console.log(response)
+        const data : Note[] = await response.json();
+        console.log(data);
+        console.log('AT THE END NOW?')
+    }
+};*/
 
 const addConstructorToDb = (cons : Constructor) => {
     let db = getNotesDb();

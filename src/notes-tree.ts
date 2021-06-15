@@ -2,11 +2,16 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import fetch from 'node-fetch';
 import { 
-    getNotesDb, getNotes, saveNotes, getTimeSpaces, getGeom1DSpaces, addSpace, Note, Interpretation, 
+    getNotesDb, getNotes, saveNotes, getTimeSpaces, getGeom1DSpaces, 
+    Note, Interpretation, Space, 
     Duration, Time, Scalar, TimeTransform, Position1D, Displacement1D, Geom1DTransform,
     TimeCoordinateSpace, Geom1DCoordinateSpace, getConstructors, Constructor,
-    getConstructorFromId, getNoteFromId, saveConstructor, saveNote
+    getConstructorFromId, getNoteFromId, saveConstructor, saveNote, SuccessResponse,
+    saveDb
 } from './note-db';
+import {
+    PopulateAPIReponse
+} from './peirce'
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
 import { setDecorations } from './decoration/decoration';
@@ -385,7 +390,15 @@ export class InfoView {
                     else{
                         interpretation.type = cons_.type
                         cons_.interpretation = interpretation
-                        saveConstructor(cons_)
+                        console.log('attempting api cons save...')
+                        let result : boolean = await this.addConstructorInterpretationRequest(cons_)
+                        if(result){
+                            saveConstructor(cons_)
+                            console.log("success cons")
+                        }
+                        else{
+                            console.log("fail cons")
+                        }
                     }
                 }
             }
@@ -396,15 +409,24 @@ export class InfoView {
                 else{
                     interpretation.type = note_.type
                     note_.interpretation = interpretation
-                    saveNote(note_)
+                    //saveNote(note_)
+                    console.log('attempting api term save...')
+                    let result : boolean = await this.addTermInterpretationRequest(note_)
+                    if(result){
+                        saveNote(note_)
+                        console.log("success term")
+                    }
+                    else{
+                        console.log("fail term")
+                    }
                 }
             }
         }
 
-        this.check()
+        await this.check()
 
     }
-
+    
     async check() {
         let notes = getNotes()
         let constructors = getConstructors()
@@ -414,10 +436,10 @@ export class InfoView {
             return;
         const fileText = vscode.window.activeTextEditor?.document.getText();
 
-        console.log(notes);
-        console.log(JSON.stringify(notes));
-        console.log(fileText);
-        console.log(JSON.stringify(fileText));
+        //console.log(notes);
+        //console.log(JSON.stringify(notes));
+        //console.log(fileText);
+        //console.log(JSON.stringify(fileText));
         let request = {
             file: fileText,
             fileName: vscode.window.activeTextEditor?.document.fileName,
@@ -425,7 +447,45 @@ export class InfoView {
             spaces: getNotesDb().time_coordinate_spaces.concat(getNotesDb().geom1d_coordinate_spaces),
             constructors: constructors
         }
-        console.log('SENDING REQUEST')
+       // console.log('SENDING REQUEST')
+        //console.log(request)
+        //console.log(JSON.stringify(request));
+        let login = {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        };
+        const apiUrl = "http://0.0.0.0:8080/api/check2";
+        const response = await fetch(apiUrl, login);
+        const data : Note[] = await response.json();
+        //let data = resp.data
+        for (let i = 0; i < data.length; i++) {
+            notes[i] = data[i]
+        }
+        let i = 0;
+        let all_notes = getNotes();
+        for (let j = 0; j < all_notes.length; j++) {
+            if (all_notes[j].fileName != notes[i].fileName){
+                continue;
+            }
+            all_notes[j].text = notes[i].text;
+            all_notes[j].error = notes[i].error;
+            i++;
+        }
+        saveNotes(all_notes);
+        setDecorations();
+    }
+
+    async addSpaceRequest(space_:Space) : Promise<boolean> {
+        console.log('sending space')
+        let request = {
+            space:space_
+        }
+        console.log('SENDING CREATE SPACE REQUEST')
         console.log(request)
         console.log(JSON.stringify(request));
         let login = {
@@ -437,24 +497,221 @@ export class InfoView {
             },
             credentials: "include",
         };
-        const apiUrl = "http://0.0.0.0:8080/api/check";
+        const apiUrl = "http://0.0.0.0:8080/api/createSpace";
         const response = await fetch(apiUrl, login);
-        const data : Note[] = await response.json();
-        console.log(data);
-        for (let i = 0; i < data.length; i++) {
-            notes[i] = data[i];
+        console.log(response)
+        const data : SuccessResponse = await response.json();
+        return data.success
+        
+    }
+    
+    async addTermInterpretationRequest(note: Note) : Promise <boolean> {
+        console.log('sending term')
+        let request = {
+            term:note
         }
-        let i = 0;
-        let all_notes = getNotes();
-        for (let j = 0; j < all_notes.length; j++) {
-            if (all_notes[j].fileName != notes[i].fileName)
-                continue;
-            all_notes[j].text = notes[i].text;
-            all_notes[j].error = notes[i].error;
-            i++;
+        console.log('SENDING TERM INTERP REQUEST')
+        console.log(request)
+        console.log(JSON.stringify(request));
+        let login = {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        };
+        const apiUrl = "http://0.0.0.0:8080/api/createTermInterpretation";
+        const response = await fetch(apiUrl, login);
+        console.log(response)
+        const data : SuccessResponse = await response.json();
+        return data.success
+
+    };
+    
+    async addConstructorInterpretationRequest(cons: Constructor) : Promise <boolean> {
+        console.log('sending cons')
+        let request = {
+            constructor:cons
         }
-        saveNotes(all_notes);
-        setDecorations();
+        console.log('SENDING CONS INTERP REQUEST')
+        console.log(request)
+        console.log(JSON.stringify(request));
+        let login = {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+        };
+        const apiUrl = "http://0.0.0.0:8080/api/createConstructorInterpretation";
+        const response = await fetch(apiUrl, login);
+        console.log(response)
+        const data : SuccessResponse = await response.json();
+        return data.success
+
+    };
+    
+    async addSpace(){
+        let space_ : Space | undefined = undefined
+        let spaceOptions : vscode.QuickPickItem[] = [];
+        let time_space : vscode.QuickPickItem = {
+            label: "Time Coordinate Space",
+        };
+        let geom1d_space : vscode.QuickPickItem = {
+            label: "Geom1D Coordinate Space",
+        };
+        spaceOptions.push(time_space);
+        spaceOptions.push(geom1d_space);
+        const spaceTypePick = await vscode.window.showQuickPick(spaceOptions);
+        console.log("quick pick")
+        console.log(spaceTypePick);
+        if (spaceTypePick === undefined)
+            return;
+        else if(spaceTypePick.label == "Time Coordinate Space"){
+            let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of Time Coordinate Space?', value: "new space"});
+            if (annotationText === undefined) 
+                return;
+            let stdder : vscode.QuickPickItem[] = [];
+            let std : vscode.QuickPickItem = {
+                label: "Standard Time Coordinate Space",
+            };
+            let der : vscode.QuickPickItem = {
+                label: "Derived Time Coordinate Space",
+            };
+            stdder.push(std);
+            stdder.push(der);
+            const stdderPick = await vscode.window.showQuickPick(stdder);
+            console.log(stdderPick);
+            if(stdderPick === undefined){
+                return;
+            }
+            else if(stdderPick.label == "Standard Time Coordinate Space"){
+                const new_space : TimeCoordinateSpace = {
+                    label: annotationText,
+                    space: "Classical Time Coordinate Space", 
+                    parent: null, 
+                    origin: null, 
+                    basis: null 
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                let db = getNotesDb();
+                db.time_coordinate_spaces.push(new_space);
+                saveDb(db);
+                space_ = new_space
+            }
+            else if(stdderPick.label == "Derived Time Coordinate Space"){
+                const spaces = getTimeSpaces();
+                const parent = await vscode.window.showQuickPick(spaces, {
+                    placeHolder: 'Select a Parent Space'
+                });
+                console.log("quick pick")
+                console.log(parent);
+                if (parent === undefined)
+                    return;
+
+                const vec_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Basis?' });
+                if (vec_magnitude === undefined || vec_magnitude == "" || Number(vec_magnitude) == NaN)
+                    return;
+                const point_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Origin?'});
+                if (point_magnitude === undefined || point_magnitude == "" || Number(point_magnitude) == NaN)
+                    return;
+                const new_space : TimeCoordinateSpace = {
+                    label: annotationText, 
+                    space: "Classical Time Coordinate Space", 
+                    parent: parent, 
+                    origin: +point_magnitude, 
+                    basis: +vec_magnitude
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                let db = getNotesDb();
+                db.time_coordinate_spaces.push(new_space);
+                saveDb(db);
+                space_ = new_space
+            }
+            else 
+                console.log(stdderPick.label)
+        }
+        else if(spaceTypePick.label == "Geom1D Coordinate Space"){
+            let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of Geom1D Coordinate Space?', value: "new space"});
+            if (annotationText === undefined) 
+                return;
+            let stdder : vscode.QuickPickItem[] = [];
+            let std : vscode.QuickPickItem = {
+                label: "Standard Geom1D Coordinate Space",
+            };
+            let der : vscode.QuickPickItem = {
+                label: "Derived Geom1D Coordinate Space",
+            };
+            stdder.push(std);
+            stdder.push(der);
+            const stdderPick = await vscode.window.showQuickPick(stdder);
+            if(stdderPick === undefined)
+                return;
+            else if(stdderPick.label == "Standard Geom1D Coordinate Space"){
+                const new_space : Geom1DCoordinateSpace = {
+                    label: annotationText,
+                    space: "Classical Geom1D Coordinate Space", 
+                    parent: null, 
+                    origin: null, 
+                    basis: null 
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                let db = getNotesDb();
+                db.geom1d_coordinate_spaces.push(new_space);
+                saveDb(db);
+                space_ = new_space
+                
+            }
+            else if(stdderPick.label == "Derived Geom1D Coordinate Space"){
+                const spaces = getGeom1DSpaces();
+                const parent = await vscode.window.showQuickPick(spaces, {
+                    placeHolder: 'Select a Parent Space'
+                });
+                console.log("quick pick")
+                console.log(parent);
+                if (parent === undefined)
+                    return;
+
+                const vec_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Basis?' });
+                if (vec_magnitude === undefined || vec_magnitude == "" || Number(vec_magnitude) == NaN)
+                    return;
+                const point_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Origin?'});
+                if (point_magnitude === undefined || point_magnitude == "" || Number(point_magnitude) == NaN)
+                    return;
+                const new_space : Geom1DCoordinateSpace = {
+                    label: annotationText, 
+                    space: "Classical Geom1D Coordinate Space", 
+                    parent: parent, 
+                    origin: +point_magnitude, 
+                    basis: +vec_magnitude
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                let db = getNotesDb();
+                db.geom1d_coordinate_spaces.push(new_space);
+                saveDb(db);
+                space_ = new_space
+            }
+        }
     }
 
     async editHoveredNotes() {
@@ -794,7 +1051,7 @@ export class InfoView {
             }
         }
 
-        this.check()
+        await this.check()
     }
 
     private isHoveredNote(note : Note) : boolean {
@@ -929,6 +1186,11 @@ export class TreeActions {
         console.log(item.id);
         this.iv.editSelectedNoteItem(item)
     }
+    addSpace():void{
+        console.log('RUNNING IV ADD SPACE')
+        this.iv.addSpace()
+    }
+
 }
 export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 
@@ -936,7 +1198,9 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	readonly onDidChangeTreeData: vscode.Event<NoteItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 	refresh(): void {
+        console.log('calling source data')
 	    this.sourceData();
+        console.log('finished source data?')
 	    this._onDidChangeTreeData.fire(null);
 	}
 
@@ -948,15 +1212,15 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
             new NoteItem('Spaces', undefined, undefined, '$Space')
         ];
         console.log("In notes tree")
+        console.log('SOURCING DATA')
+        console.log('SOURCE THAT DATA')
 	    const annotations = getNotes();
+        console.log('')
         console.log(annotations)
 	    for (let note in annotations) {
-            console.log(annotations[note].fileName);
-            console.log(vscode.window.activeTextEditor?.document.fileName);
             if (annotations[note].fileName != vscode.window.activeTextEditor?.document.fileName)
                 continue;
 	        const noteItem = createNoteItem(annotations[note]);
-            console.log(note)
             this.data[0].addChild(noteItem);
 	    }
 	    this.data[0].label += ` (${annotations.length})`;
@@ -965,12 +1229,9 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    const constructors = getConstructors() || ([]);
         console.log(constructors)
 	    for (let note in constructors) {
-            console.log(constructors[note].name);
-            console.log(vscode.window.activeTextEditor?.document.fileName);
             //if (constructors[note].fileName != vscode.window.activeTextEditor?.document.fileName)
             //    continue;
 	        const noteItem = createConsNoteItem(constructors[note]);
-            console.log(note)
             this.data[1].addChild(noteItem);
 	    }
 	    this.data[1].label += ` (${constructors.length})`;
@@ -1092,6 +1353,10 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
 	        this.refresh()
 	    );
+        /*
+        vscode.commands.registerCommand('code-annotation.addSpace', () => 
+            this.addSpace()
+        );*/
 
 	    this.data = [];
 	    this.sourceData();

@@ -19,6 +19,7 @@ export interface PopulateAPIData{
     coords : APICoordinates;
     interp: string;
     type: string;
+    error: string;
 }
 
 export interface PopulateAPIConstructorData{
@@ -35,7 +36,7 @@ export const populate = async (): Promise<void> => {
     if (vscode.window.activeTextEditor) {
         console.log("The open text file:")
         console.log(vscode.window.activeTextEditor.document)
-        console.log(vscode.window.activeTextEditor.document.getText())
+        //console.log(vscode.window.activeTextEditor.document.getText())
     }
     let editor = vscode.window.activeTextEditor;
     if (editor === undefined)
@@ -64,7 +65,7 @@ export const populate = async (): Promise<void> => {
         },
         credentials: "include",
     };
-    const apiUrl = "http://0.0.0.0:8080/api/populate";
+    const apiUrl = "http://0.0.0.0:8080/api/getState";
     const response = await fetch(apiUrl, login);
     const respdata : PopulateAPIReponse = await response.json();
     let data = respdata.data;
@@ -78,6 +79,7 @@ export const populate = async (): Promise<void> => {
     // to fix this, we need to have a well-defined JSON response object
     // and change data : any -> data : well-defined-object[]
     // We don't use Note[] because the JSON returned by the API differs
+    
     data.forEach(element => {
         let range = new vscode.Range(
             new vscode.Position(element.coords.begin.line, element.coords.begin.character), 
@@ -98,7 +100,7 @@ export const populate = async (): Promise<void> => {
     setDecorations();
     return;
 };
-
+/*
 export const check = async (): Promise<void> => {
     if (vscode.window.activeTextEditor) {
         console.log("The open text file:")
@@ -148,4 +150,4 @@ export const check = async (): Promise<void> => {
     saveNotes(all_notes);
     setDecorations();
     return;
-};
+};*/
