@@ -26,14 +26,14 @@ const decorationOption = (has_error : boolean, has_annotation : boolean) : vscod
             backgroundColor: 
                 has_error ? getConfiguration().decorationColors?.error :
                 getConfiguration().decorationColors?.dark,
-            textDecoration: has_annotation ? '#E303FC wavy underline' : ''
+            textDecoration: has_annotation ? '#EE59FF wavy underline' : ''
         },
         // decoration options for light mode
         light: {
             backgroundColor: 
                 has_error ? getConfiguration().decorationColors?.light :
                 getConfiguration().decorationColors?.dark,
-            textDecoration: has_annotation ? '#E303FC wavy underline' : ''
+            textDecoration: has_annotation ? '#EE59FF wavy underline' : ''
         }
     });
 };
