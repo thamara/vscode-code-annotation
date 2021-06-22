@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { addNote, addPlainNote,  getNoteFromId } from './note-db';
-import { generateMarkdownReport } from './reporting';
-import { populate } from './peirce';
-import { InfoView, NotesTree, TreeActions, NoteItem } from './notes-tree';
+//import { addTerm, addPlainTerm,  getTermFromId } from './peircedb';
+import peircedb = require('./peircedb')
+import { generateMarkdownReport } from './unused/reporting';
+import peirce = require("./peirce_api_calls") //from './peirce';
+//import { InfoView, TermsTree, TreeActions, TermItem } from './terms-tree';
+import peircetree = require("./peirce-tree")
+
 import { initializeStorageLocation, getAnnotationFilePath } from './configuration';
 import { updateDecorations } from './decoration/decoration';
 
@@ -13,58 +16,58 @@ export function activate(context: vscode.ExtensionContext) {
 
     initializeStorageLocation(context.globalStoragePath);
 
-    const tree = new NotesTree();
-    const infoView = new InfoView();
-    const treeActions = new TreeActions(tree, infoView);
+    const tree = new peircetree.PeirceTree();
+    const infoView = new peircetree.InfoView();
+    const treeActions = new peircetree.TreeActions(tree, infoView);
 
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
-    vscode.commands.registerCommand('code-annotation.removeNote', treeActions.removeNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.checkAllNotes', treeActions.checkAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.uncheckAllNotes', treeActions.uncheckAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.removeAllNotes', treeActions.removeAllNotes.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.checkNote', treeActions.checkNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.uncheckNote', treeActions.uncheckNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.openNote', treeActions.openNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.copyNote', treeActions.copyNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.openNoteFromId', (id: string) => {
-        treeActions.openNoteFromId(id);
+    vscode.commands.registerCommand('code-annotation.removeTerm', treeActions.removeTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.checkAllTerms', treeActions.checkAllTerms.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.uncheckAllTerms', treeActions.uncheckAllTerms.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.removeAllTerms', treeActions.removeAllTerms.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.checkTerm', treeActions.checkTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.uncheckTerm', treeActions.uncheckTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.openTerm', treeActions.openTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.copyTerm', treeActions.copyTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.openTermFromId', (id: string) => {
+        treeActions.openTermFromId(id);
     });
 
     vscode.commands.registerCommand('code-annotation.summary', () => {
         generateMarkdownReport();
     });
     /*
-    vscode.commands.registerCommand('code-annotation.editNote', () => {
-        console.log("edit note!");
-       // let note = getNoteFromId();
+    vscode.commands.registerCommand('code-annotation.editTerm', () => {
+        console.log("edit term!");
+       // let term = getTermFromId();
     });*/
-    vscode.commands.registerCommand('code-annotation.editNote', treeActions.editNote.bind(treeActions));
-    vscode.commands.registerCommand('code-annotation.editHoveredNotes', async () => {
+    vscode.commands.registerCommand('code-annotation.editTerm', treeActions.editTerm.bind(treeActions));
+    vscode.commands.registerCommand('code-annotation.editHoveredTerms', async () => {
         console.log("EDIT HOVERED NOTES??");
-        infoView.editHoveredNotes();
+        infoView.editHoveredTerms();
     });
 
     vscode.commands.registerCommand('code-annotation.populate', async () => {
         vscode.window.showInformationMessage("Populating...");
-        populate();
+        peirce.populate();
     });
 
-    vscode.commands.registerCommand('code-annotation.clearAllNotes', async () => {
-        const message = 'Are you sure you want to clear all notes? This cannot be reverted.';
+    vscode.commands.registerCommand('code-annotation.clearAllTerms', async () => {
+        const message = 'Are you sure you want to clear all terms? This cannot be reverted.';
         const enableAction = 'I\'m sure';
         const cancelAction = 'Cancel';
         const userResponse = await vscode.window.showInformationMessage(message, enableAction, cancelAction);
-        const clearAllNotes = userResponse === enableAction ? true : false;
+        const clearAllTerms = userResponse === enableAction ? true : false;
 
-        if (clearAllNotes) {
+        if (clearAllTerms) {
             const annotationFile = getAnnotationFilePath();
             fs.unlinkSync(annotationFile);
             vscode.commands.executeCommand('code-annotation.refreshEntry');
-            vscode.window.showInformationMessage('All notes cleared!');
+            vscode.window.showInformationMessage('All terms cleared!');
         }
     });
 
-    vscode.commands.registerCommand('code-annotation.clearAllNotesHeadless', async () => {
+    vscode.commands.registerCommand('code-annotation.clearAllTermsHeadless', async () => {
         vscode.commands.executeCommand('code-annotation.refreshEntry');
     });
 
@@ -72,12 +75,12 @@ export function activate(context: vscode.ExtensionContext) {
         infoView.openPreview();
     });
 
-    vscode.commands.registerCommand('code-annotation.addPlainNote', async () => {
-        addPlainNote();
+    vscode.commands.registerCommand('code-annotation.addPlainTerm', async () => {
+        //addPlainTerm();
     });
 
-    let disposable = vscode.commands.registerCommand('code-annotation.addNote', async () => {
-        addNote();
+    let disposable = vscode.commands.registerCommand('code-annotation.addTerm', async () => {
+        //addTerm();
     });
 
     vscode.commands.registerCommand('code-annotation.addSpace', treeActions.addSpace.bind(treeActions));//async () => {

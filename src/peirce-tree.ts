@@ -1,17 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import fetch from 'node-fetch';
-import { 
-    getNotesDb, getNotes, saveNotes, getTimeSpaces, getGeom1DSpaces, 
-    Note, Interpretation, Space, 
-    Duration, Time, Scalar, TimeTransform, Position1D, Displacement1D, Geom1DTransform,
-    TimeCoordinateSpace, Geom1DCoordinateSpace, getConstructors, Constructor,
-    getConstructorFromId, getNoteFromId, saveConstructor, saveNote, SuccessResponse,
-    saveDb
-} from './note-db';
+import peircedb = require("./peircedb")
+import models = require("./models")
+
+
 import {
     PopulateAPIReponse
-} from './peirce'
+} from './peirce_api_calls'
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
 import { setDecorations } from './decoration/decoration';
@@ -23,65 +19,65 @@ const getIconPathFromType = (type: string, theme: string): string => {
 };
 
 const getIconPath = (status: string): any => {
-    const noteType = (status === 'pending') ? 'todo' : 'check';
+    const termType = (status === 'pending') ? 'todo' : 'check';
     return {
-        light: getIconPathFromType(noteType, 'light'),
-        dark: getIconPathFromType(noteType, 'dark')
+        light: getIconPathFromType(termType, 'light'),
+        dark: getIconPathFromType(termType, 'dark')
     };
 };
 
 const getContextValue = (status: string): string => {
-    return (status === 'pending') ? '$PendingNote' : '$CompleteNote';
+    return (status === 'pending') ? '$PendingTerm' : '$CompleteTerm';
 };
 
-const createNoteItem = (note: Note): NoteItem => {
+const createTermItem = (term: models.Term): TermItem => {
 
-    let details : NoteItem[] = [];
-    if (note.interpretation != null)
-        details = [new NoteItem(`Current interpretation: ${note.interpretation.label}`)]; 
+    let details : TermItem[] = [];
+    if (term.interpretation != null)
+        details = [new TermItem(`Current interpretation: ${term.interpretation.label}`)]; 
     else
-        details = [new NoteItem(`Current interpretation: No interpretation provided`)];
-    details.push(new NoteItem(`Checked interpretation: ${note.text}`));
-    details.push(new NoteItem(`Type: ${note.type}`));
-    details.push(new NoteItem(`Error Message: ${note.error}`));
-    let noteItem = new NoteItem(`${note.codeSnippet}`, details, note.id.toString());
-    console.log('NOTE ITEM ID : ' + note.id.toString())
-    if (noteItem.id) {
-        noteItem.command = new OpenNoteCommand(noteItem.id);
+        details = [new TermItem(`Current interpretation: No interpretation provided`)];
+    details.push(new TermItem(`Checked interpretation: ${term.text}`));
+    details.push(new TermItem(`Type: ${term.node_type}`));
+    details.push(new TermItem(`Error Message: ${term.error}`));
+    let termItem = new TermItem(`${term.codeSnippet}`, details, term.id.toString());
+    console.log('NOTE ITEM ID : ' + term.id.toString())
+    if (termItem.id) {
+        termItem.command = new OpenTermCommand(termItem.id);
     }
     if (details) {
         // If details isn't undefined, set the command to the same as the parent
-        details[0].command = noteItem.command;
+        details[0].command = termItem.command;
     }
-    noteItem.tooltip = note.text;
-    noteItem.contextValue = getContextValue(note.status);
-    noteItem.iconPath = getIconPath(note.status);
+    termItem.tooltip = term.text;
+    termItem.contextValue = getContextValue(term.status);
+    termItem.iconPath = getIconPath(term.status);
 
-    return noteItem;
+    return termItem;
 };
 
-const createConsNoteItem = (cons: Constructor): NoteItem => {
+const createConsTermItem = (cons: models.Constructor): TermItem => {
     console.log(cons.interpretation)
-    let details : NoteItem[] = [];
+    let details : TermItem[] = [];
     if (cons.interpretation != null)
-        details = [new NoteItem(`Current interpretation: ${cons.interpretation.label}`)]; 
+        details = [new TermItem(`Current interpretation: ${cons.interpretation.label}`)]; 
     else
-        details = [new NoteItem(`Current interpretation: No interpretation provided`)];
-    details.push(new NoteItem(`Type: ${cons.type}`));
-    details.push(new NoteItem(`Name: ${cons.name}`));
-    let noteItem = new NoteItem(`${cons.name}`, details, cons.id.toString());
-    if (noteItem.id) {
-        noteItem.command = new OpenNoteCommand(noteItem.id);
+        details = [new TermItem(`Current interpretation: No interpretation provided`)];
+    details.push(new TermItem(`Type: ${cons.node_type}`));
+    details.push(new TermItem(`Name: ${cons.name}`));
+    let termItem = new TermItem(`${cons.name}`, details, cons.id.toString());
+    if (termItem.id) {
+        termItem.command = new OpenTermCommand(termItem.id);
     }
     if (details) {
         // If details isn't undefined, set the command to the same as the parent
-        details[0].command = noteItem.command;
+        details[0].command = termItem.command;
     }
-    noteItem.tooltip = cons.name;
-    noteItem.contextValue = getContextValue(cons.status);
-    noteItem.iconPath = getIconPath(cons.status);
+    termItem.tooltip = cons.name;
+    termItem.contextValue = getContextValue(cons.status);
+    termItem.iconPath = getIconPath(cons.status);
 
-    return noteItem;
+    return termItem;
 };
 
 export class InfoView {
@@ -94,20 +90,20 @@ export class InfoView {
             return null;
     }
 
-    getHoveredNotes() : Note[] {            
-        let hovered_notes : Note[] = [];
-        let notes = getNotes();
-        notes.forEach(note => {
-            if (this.isHoveredNote(note)) 
-                hovered_notes.push(note);
+    getHoveredTerms() : models.Term[] {            
+        let hovered_terms : models.Term[] = [];
+        let terms = peircedb.getTerms();
+        terms.forEach(term => {
+            if (this.isHoveredTerm(term)) 
+                hovered_terms.push(term);
         });
-        return hovered_notes;
+        return hovered_terms;
     }
 
     
-    async createInterpretation(noteIsIdentifier : boolean) : Promise<Interpretation | null> {
+    async createInterpretation(termIsIdentifier : boolean) : Promise<models.Interpretation | null> {
 
-
+        console.log('going?')
         let interpretations : vscode.QuickPickItem[] = [
             { label: "Duration" },
             { label: "Time" },
@@ -115,7 +111,10 @@ export class InfoView {
             { label: "Time Transform"},
             { label: "Displacement1D"},
             { label: "Position1D"},
-            { label: "Geom1D Transform"}
+            { label: "Geom1D Transform"},
+            { label: "Displacement3D"},
+            { label: "Position3D"},
+            { label: "Geom3D Transform"}
         ];
         const interp = await vscode.window.showQuickPick(interpretations);
         if (interp === undefined) {
@@ -125,7 +124,7 @@ export class InfoView {
 
         // If the following is true (the AST node is an identifier)
         // Peirce will not prompt for a name, so we won't ask for one.
-        if (!noteIsIdentifier) {
+        if (!termIsIdentifier) {
             let pickedName = await vscode.window.showInputBox({ placeHolder: 'Name of interpretation?' });
             if (pickedName === undefined || pickedName == "")  {
                 return null
@@ -135,7 +134,7 @@ export class InfoView {
 
         if(interp.label == "Duration"){
 
-            let spaces = getTimeSpaces();
+            let spaces = peircedb.getTimeSpaces();
             console.log(spaces);
             let i = 0;
             const space = await vscode.window.showQuickPick(spaces, {
@@ -153,24 +152,24 @@ export class InfoView {
             }
 
             let label = `${name} ${interp.label}(${space.label},${value})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${space.label},${value})`
             }
 
-            let interpretation : Duration = {
+            let interpretation : models.Duration = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 space: space,
-                value: +value,
-                type: "undefined"//note.type,
+                value: [+value],
+                node_type: "undefined"//term.node_type,
             }
             return interpretation
             
         }
         else if(interp.label == "Time"){
 
-            let spaces = getTimeSpaces();
+            let spaces = peircedb.getTimeSpaces();
             console.log(spaces);
             let i = 0;
             const space = await vscode.window.showQuickPick(spaces, {
@@ -188,17 +187,17 @@ export class InfoView {
             }
 
             let label = `${name} ${interp.label}(${space.label},${value})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${space.label},${value})`
             }
 
-            let interpretation : Time = {
+            let interpretation : models.Time = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 space: space,
-                value: +value,
-                type: "note.type",
+                value: [+value],
+                node_type: "term.node_type",
             }
             return interpretation
         }
@@ -210,22 +209,22 @@ export class InfoView {
             }
 
             let label = `${name} ${interp.label}(${value})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${value})`
             }
 
-            let interpretation : Scalar = {
+            let interpretation : models.Scalar = {
                 label: label,
                 name: name,
-                form: interp.label,
-                value: +value,
-                type: "note.type",
+                interp_type: interp.label,
+                value: [+value],
+                node_type: "term.node_type",
             }
             return interpretation
         }
         else if(interp.label == "Time Transform"){
 
-            let spaces = getTimeSpaces();
+            let spaces = peircedb.getTimeSpaces();
             console.log(spaces);
             let i = 0;
             const domain = await vscode.window.showQuickPick(spaces, {
@@ -246,24 +245,24 @@ export class InfoView {
                 return null;
             }
             let label = `${name} ${interp.label}(${domain.label},${codomain.label})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${domain.label},${codomain.label})`
             }
 
 
-            let interpretation : TimeTransform = {
+            let interpretation : models.TimeTransform = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 domain: domain,
                 codomain: codomain,
-                type: "note.type",
+                node_type: "term.node_type",
             }
             return interpretation
         }
         else if(interp.label == "Displacement1D"){
 
-            let spaces = getGeom1DSpaces();
+            let spaces = peircedb.getGeom1DSpaces();
             console.log(spaces);
             let i = 0;
             const space = await vscode.window.showQuickPick(spaces, {
@@ -281,23 +280,23 @@ export class InfoView {
             }
 
             let label = `${name} ${interp.label}(${space.label},${value})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${space.label},${value})`
             }
 
-            let interpretation : Displacement1D = {
+            let interpretation : models.Displacement1D = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 space: space,
-                value: +value,
-                type: "note.type",
+                value: [+value],
+                node_type: "term.node_type",
             }
             return interpretation
         }
         else if(interp.label == "Position1D"){
 
-            let spaces = getGeom1DSpaces();
+            let spaces = peircedb.getGeom1DSpaces();
             console.log(spaces);
             let i = 0;
             const space = await vscode.window.showQuickPick(spaces, {
@@ -315,23 +314,23 @@ export class InfoView {
             }
 
             let label = `${name} ${interp.label}(${space.label},${value})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${space.label},${value})`
             }
 
-            let interpretation : Position1D = {
+            let interpretation : models.Position1D = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 space: space,
-                value: +value,
-                type: "note.type",
+                value: [+value],
+                node_type: "term.node_type",
             }
             return interpretation
         }
         else if(interp.label == "Geom1D Transform"){
             
-            let spaces = getGeom1DSpaces();
+            let spaces = peircedb.getGeom1DSpaces();
             console.log(spaces);
             let i = 0;
             const domain = await vscode.window.showQuickPick(spaces, {
@@ -352,18 +351,141 @@ export class InfoView {
                 return null;
             }
             let label = `${name} ${interp.label}(${domain.label},${codomain.label})`
-            if (noteIsIdentifier) {
+            if (termIsIdentifier) {
                 label = `${interp.label}(${domain.label},${codomain.label})`
             }
 
 
-            let interpretation : Geom1DTransform = {
+            let interpretation : models.Geom1DTransform = {
                 label: label,
                 name: name,
-                form: interp.label,
+                interp_type: interp.label,
                 domain: domain,
                 codomain: codomain,
-                type: "note.type",
+                node_type: "term.node_type",
+            }
+            return interpretation
+        }
+        else if(interp.label == "Displacement3D"){
+
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const space = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(space);
+            if (space === undefined) {
+                return null;
+            }
+
+            let value0 = await vscode.window.showInputBox({ placeHolder: 'Value at index 0?' });
+            if (value0 === undefined || Number(value0) == NaN)  {
+                return null;
+            }
+            let value1 = await vscode.window.showInputBox({ placeHolder: 'Value at index 1?' });
+            if (value1 === undefined || Number(value1) == NaN)  {
+                return null;
+            }
+            let value2 = await vscode.window.showInputBox({ placeHolder: 'Value at index 2?' });
+            if (value2 === undefined || Number(value2) == NaN)  {
+                return null;
+            }
+
+            let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+            if (termIsIdentifier) {
+                label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+            }
+
+            let interpretation : models.Displacement3D = {
+                label: label,
+                name: name,
+                interp_type: interp.label,
+                space: space,
+                value: [+value0,+value1,+value2],
+                node_type: "term.node_type",
+            }
+            return interpretation
+        }
+        else if(interp.label == "Position3D"){
+
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const space = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(space);
+            if (space === undefined) {
+                return null;
+            }
+
+
+            let value0 = await vscode.window.showInputBox({ placeHolder: 'Value at index 0?' });
+            if (value0 === undefined || Number(value0) == NaN)  {
+                return null;
+            }
+            let value1 = await vscode.window.showInputBox({ placeHolder: 'Value at index 1?' });
+            if (value1 === undefined || Number(value1) == NaN)  {
+                return null;
+            }
+            let value2 = await vscode.window.showInputBox({ placeHolder: 'Value at index 2?' });
+            if (value2 === undefined || Number(value2) == NaN)  {
+                return null;
+            }
+
+            let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+            if (termIsIdentifier) {
+                label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+            }
+
+            let interpretation : models.Position3D = {
+                label: label,
+                name: name,
+                interp_type: interp.label,
+                space: space,
+                value: [+value0,+value1,+value2],
+                node_type: "term.node_type",
+            }
+            return interpretation
+        }
+        else if(interp.label == "Geom3D Transform"){
+            
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const domain = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a time coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(domain);
+            if (domain === undefined) {
+                return null;
+            }
+            console.log(spaces);
+            const codomain = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a time coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(codomain);
+            if (codomain === undefined) {
+                return null;
+            }
+            let label = `${name} ${interp.label}(${domain.label},${codomain.label})`
+            if (termIsIdentifier) {
+                label = `${interp.label}(${domain.label},${codomain.label})`
+            }
+
+
+            let interpretation : models.Geom3DTransform = {
+                label: label,
+                name: name,
+                interp_type: interp.label,
+                domain: domain,
+                codomain: codomain,
+                node_type: "term.node_type",
             }
             return interpretation
         }
@@ -371,14 +493,16 @@ export class InfoView {
         
     }
 
-    async editSelectedNoteItem(noteItem:NoteItem)  {
-        if(noteItem.id === undefined){
+    async editSelectedTermItem(termItem:TermItem)  {
+        console.log('editing TERM ITEM')
+        console.log(termItem)
+        if(termItem.id === undefined){
         }
         else {
-            const note_ : Note | null = getNoteFromId(noteItem.id)
-            console.log(note_)
-            if(note_ === null){
-                const cons_ : Constructor | null = getConstructorFromId(noteItem.id)
+            const term_ : models.Term | null = peircedb.getTermFromId(termItem.id)
+            console.log(term_)
+            if(term_ === null){
+                const cons_ : models.Constructor | null = peircedb.getConstructorFromId(termItem.id)
 
                 console.log(cons_)
                 if(cons_ === null){
@@ -388,12 +512,12 @@ export class InfoView {
                     let interpretation = await this.createInterpretation(true)
                     if(interpretation === null){}
                     else{
-                        interpretation.type = cons_.type
+                        interpretation.node_type = cons_.node_type
                         cons_.interpretation = interpretation
                         console.log('attempting api cons save...')
                         let result : boolean = await this.addConstructorInterpretationRequest(cons_)
                         if(result){
-                            saveConstructor(cons_)
+                            peircedb.saveConstructor(cons_)
                             console.log("success cons")
                         }
                         else{
@@ -403,17 +527,20 @@ export class InfoView {
                 }
             }
             else{
-                let noteIsIdentifier : boolean = note_.type.includes("IDENT");
-                let interpretation = await this.createInterpretation(noteIsIdentifier)
+                console.log("creating!")
+                console.log(term_)
+                let termIsIdentifier : boolean = term_.node_type.includes("IDENT");
+                console.log("creating2!")
+                let interpretation = await this.createInterpretation(termIsIdentifier)
                 if(interpretation === null){}
                 else{
-                    interpretation.type = note_.type
-                    note_.interpretation = interpretation
-                    //saveNote(note_)
+                    interpretation.node_type = term_.node_type
+                    term_.interpretation = interpretation
+                    //saveTerm(term_)
                     console.log('attempting api term save...')
-                    let result : boolean = await this.addTermInterpretationRequest(note_)
+                    let result : boolean = await this.addTermInterpretationRequest(term_)
                     if(result){
-                        saveNote(note_)
+                        peircedb.saveTerm(term_)
                         console.log("success term")
                     }
                     else{
@@ -428,23 +555,23 @@ export class InfoView {
     }
     
     async check() {
-        let notes = getNotes()
-        let constructors = getConstructors()
+        let terms = peircedb.getTerms()
+        let constructors = peircedb.getConstructors()
 
         let editor = vscode.window.activeTextEditor;
         if (editor === undefined)
             return;
         const fileText = vscode.window.activeTextEditor?.document.getText();
 
-        //console.log(notes);
-        //console.log(JSON.stringify(notes));
+        //console.log(terms);
+        //console.log(JSON.stringify(terms));
         //console.log(fileText);
         //console.log(JSON.stringify(fileText));
         let request = {
             file: fileText,
             fileName: vscode.window.activeTextEditor?.document.fileName,
-            notes: notes,
-            spaces: getNotesDb().time_coordinate_spaces.concat(getNotesDb().geom1d_coordinate_spaces),
+            terms: terms,
+            spaces: peircedb.getPeirceDb().time_coordinate_spaces.concat(peircedb.getPeirceDb().geom1d_coordinate_spaces),
             constructors: constructors
         }
        // console.log('SENDING REQUEST')
@@ -461,26 +588,26 @@ export class InfoView {
         };
         const apiUrl = "http://0.0.0.0:8080/api/check2";
         const response = await fetch(apiUrl, login);
-        const data : Note[] = await response.json();
+        const data : models.Term[] = await response.json();
         //let data = resp.data
         for (let i = 0; i < data.length; i++) {
-            notes[i] = data[i]
+            terms[i] = data[i]
         }
         let i = 0;
-        let all_notes = getNotes();
-        for (let j = 0; j < all_notes.length; j++) {
-            if (all_notes[j].fileName != notes[i].fileName){
+        let all_terms = peircedb.getTerms();
+        for (let j = 0; j < all_terms.length; j++) {
+            if (all_terms[j].fileName != terms[i].fileName){
                 continue;
             }
-            all_notes[j].text = notes[i].text;
-            all_notes[j].error = notes[i].error;
+            all_terms[j].text = terms[i].text;
+            all_terms[j].error = terms[i].error;
             i++;
         }
-        saveNotes(all_notes);
+        peircedb.saveTerms(all_terms);
         setDecorations();
     }
 
-    async addSpaceRequest(space_:Space) : Promise<boolean> {
+    async addSpaceRequest(space_:models.Space) : Promise<boolean> {
         console.log('sending space')
         let request = {
             space:space_
@@ -499,16 +626,18 @@ export class InfoView {
         };
         const apiUrl = "http://0.0.0.0:8080/api/createSpace";
         const response = await fetch(apiUrl, login);
+        console.log('response??')
         console.log(response)
-        const data : SuccessResponse = await response.json();
+        const data : models.SuccessResponse = await response.json();
+        console.log('returning...')
         return data.success
         
     }
     
-    async addTermInterpretationRequest(note: Note) : Promise <boolean> {
+    async addTermInterpretationRequest(term: models.Term) : Promise <boolean> {
         console.log('sending term')
         let request = {
-            term:note
+            term:term
         }
         console.log('SENDING TERM INTERP REQUEST')
         console.log(request)
@@ -525,12 +654,12 @@ export class InfoView {
         const apiUrl = "http://0.0.0.0:8080/api/createTermInterpretation";
         const response = await fetch(apiUrl, login);
         console.log(response)
-        const data : SuccessResponse = await response.json();
+        const data : models.SuccessResponse = await response.json();
         return data.success
 
     };
     
-    async addConstructorInterpretationRequest(cons: Constructor) : Promise <boolean> {
+    async addConstructorInterpretationRequest(cons: models.Constructor) : Promise <boolean> {
         console.log('sending cons')
         let request = {
             constructor:cons
@@ -550,13 +679,13 @@ export class InfoView {
         const apiUrl = "http://0.0.0.0:8080/api/createConstructorInterpretation";
         const response = await fetch(apiUrl, login);
         console.log(response)
-        const data : SuccessResponse = await response.json();
+        const data : models.SuccessResponse = await response.json();
         return data.success
 
     };
     
     async addSpace(){
-        let space_ : Space | undefined = undefined
+        let space_ : models.Space | undefined = undefined
         let spaceOptions : vscode.QuickPickItem[] = [];
         let time_space : vscode.QuickPickItem = {
             label: "Time Coordinate Space",
@@ -564,8 +693,12 @@ export class InfoView {
         let geom1d_space : vscode.QuickPickItem = {
             label: "Geom1D Coordinate Space",
         };
+        let geom3d_space : vscode.QuickPickItem = {
+            label: "Geom3D Coordinate Space",
+        };
         spaceOptions.push(time_space);
         spaceOptions.push(geom1d_space);
+        spaceOptions.push(geom3d_space);
         const spaceTypePick = await vscode.window.showQuickPick(spaceOptions);
         console.log("quick pick")
         console.log(spaceTypePick);
@@ -590,7 +723,7 @@ export class InfoView {
                 return;
             }
             else if(stdderPick.label == "Standard Time Coordinate Space"){
-                const new_space : TimeCoordinateSpace = {
+                const new_space : models.TimeCoordinateSpace = {
                     label: annotationText,
                     space: "Classical Time Coordinate Space", 
                     parent: null, 
@@ -602,13 +735,13 @@ export class InfoView {
                     console.log("FAILED TO SAVE SPACE TO PEIRCE")
                     return
                 }
-                let db = getNotesDb();
+                let db = peircedb.getPeirceDb();
                 db.time_coordinate_spaces.push(new_space);
-                saveDb(db);
+                peircedb.saveDb(db);
                 space_ = new_space
             }
             else if(stdderPick.label == "Derived Time Coordinate Space"){
-                const spaces = getTimeSpaces();
+                const spaces = peircedb.getTimeSpaces();
                 const parent = await vscode.window.showQuickPick(spaces, {
                     placeHolder: 'Select a Parent Space'
                 });
@@ -623,21 +756,21 @@ export class InfoView {
                 const point_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Origin?'});
                 if (point_magnitude === undefined || point_magnitude == "" || Number(point_magnitude) == NaN)
                     return;
-                const new_space : TimeCoordinateSpace = {
+                const new_space : models.TimeCoordinateSpace = {
                     label: annotationText, 
                     space: "Classical Time Coordinate Space", 
                     parent: parent, 
-                    origin: +point_magnitude, 
-                    basis: +vec_magnitude
+                    origin: [+point_magnitude], 
+                    basis: [+vec_magnitude]
                 }
                 let resp : boolean = await this.addSpaceRequest(new_space)
                 if(!resp){
                     console.log("FAILED TO SAVE SPACE TO PEIRCE")
                     return
                 }
-                let db = getNotesDb();
+                let db = peircedb.getPeirceDb();
                 db.time_coordinate_spaces.push(new_space);
-                saveDb(db);
+                peircedb.saveDb(db);
                 space_ = new_space
             }
             else 
@@ -660,7 +793,7 @@ export class InfoView {
             if(stdderPick === undefined)
                 return;
             else if(stdderPick.label == "Standard Geom1D Coordinate Space"){
-                const new_space : Geom1DCoordinateSpace = {
+                const new_space : models.Geom1DCoordinateSpace = {
                     label: annotationText,
                     space: "Classical Geom1D Coordinate Space", 
                     parent: null, 
@@ -672,14 +805,14 @@ export class InfoView {
                     console.log("FAILED TO SAVE SPACE TO PEIRCE")
                     return
                 }
-                let db = getNotesDb();
+                let db = peircedb.getPeirceDb();
                 db.geom1d_coordinate_spaces.push(new_space);
-                saveDb(db);
+                peircedb.saveDb(db);
                 space_ = new_space
                 
             }
             else if(stdderPick.label == "Derived Geom1D Coordinate Space"){
-                const spaces = getGeom1DSpaces();
+                const spaces = peircedb.getGeom1DSpaces();
                 const parent = await vscode.window.showQuickPick(spaces, {
                     placeHolder: 'Select a Parent Space'
                 });
@@ -694,40 +827,132 @@ export class InfoView {
                 const point_magnitude = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Origin?'});
                 if (point_magnitude === undefined || point_magnitude == "" || Number(point_magnitude) == NaN)
                     return;
-                const new_space : Geom1DCoordinateSpace = {
+                const new_space : models.Geom1DCoordinateSpace = {
                     label: annotationText, 
                     space: "Classical Geom1D Coordinate Space", 
                     parent: parent, 
-                    origin: +point_magnitude, 
-                    basis: +vec_magnitude
+                    origin: [+point_magnitude], 
+                    basis: [+vec_magnitude]
                 }
                 let resp : boolean = await this.addSpaceRequest(new_space)
                 if(!resp){
                     console.log("FAILED TO SAVE SPACE TO PEIRCE")
                     return
                 }
-                let db = getNotesDb();
+                let db = peircedb.getPeirceDb();
                 db.geom1d_coordinate_spaces.push(new_space);
-                saveDb(db);
+                peircedb.saveDb(db);
+                space_ = new_space
+            }
+        }
+        else if(spaceTypePick.label == "Geom3D Coordinate Space"){
+            let annotationText = await vscode.window.showInputBox({ placeHolder: 'Name of Geom3D Coordinate Space?', value: "new space"});
+            if (annotationText === undefined) 
+                return;
+            let stdder : vscode.QuickPickItem[] = [];
+            let std : vscode.QuickPickItem = {
+                label: "Standard Geom3D Coordinate Space",
+            };
+            let der : vscode.QuickPickItem = {
+                label: "Derived Geom3D Coordinate Space",
+            };
+            stdder.push(std);
+            stdder.push(der);
+            const stdderPick = await vscode.window.showQuickPick(stdder);
+            if(stdderPick === undefined)
+                return;
+            else if(stdderPick.label == "Standard Geom3D Coordinate Space"){
+                const new_space : models.Geom3DCoordinateSpace = {
+                    label: annotationText,
+                    space: "Classical Geom3D Coordinate Space", 
+                    parent: null, 
+                    origin: null, 
+                    basis: null 
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                console.log('returned from save space request?')
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                else
+                    console.log("SAVED")
+                let db = peircedb.getPeirceDb();
+                console.log('SAVE IT???')
+                console.log(new_space)
+                db.geom3d_coordinate_spaces.push(new_space);
+                peircedb.saveDb(db);
+                console.log('SAVED???')
+                space_ = new_space
+                
+            }
+            else if(stdderPick.label == "Derived Geom3D Coordinate Space"){
+                const spaces = peircedb.getGeom3DSpaces();
+                const parent = await vscode.window.showQuickPick(spaces, {
+                    placeHolder: 'Select a Parent Space'
+                });
+                console.log("quick pick")
+                console.log(parent);
+                if (parent === undefined)
+                    return;
+
+                let basis_values : number[] = []
+                let origin_values : number[] = []
+
+                for(const i of [0,1,2]){
+                    //let basisij : string | undefined = ""
+                    for(const j of [0,1,2]){
+
+                        let basisij = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Basis Vector '+i+ ", Column "+j+"?" });
+                        
+                        if (basisij === undefined || basisij == "" || Number(basisij) == NaN)
+                            return;
+                        basis_values.push(+basisij)
+                    }
+                }
+
+                for(const i of [0, 1, 2]){
+                    let originij = await vscode.window.showInputBox({ placeHolder: 'Coordinate of Origin at Index '+i+"?" });
+                        
+                    if (originij === undefined || originij == "" || Number(originij) == NaN)
+                        return;
+                    origin_values.push(+originij)    
+                }
+
+                const new_space : models.Geom3DCoordinateSpace = {
+                    label: annotationText, 
+                    space: "Classical Geom3D Coordinate Space", 
+                    parent: parent, 
+                    origin: origin_values, 
+                    basis: basis_values
+                }
+                let resp : boolean = await this.addSpaceRequest(new_space)
+                if(!resp){
+                    console.log("FAILED TO SAVE SPACE TO PEIRCE")
+                    return
+                }
+                let db = peircedb.getPeirceDb();
+                db.geom3d_coordinate_spaces.push(new_space);
+                peircedb.saveDb(db);
                 space_ = new_space
             }
         }
     }
 
-    async editHoveredNotes() {
-        console.log("Editing hovered notes...")
-	    let notes = getNotes();
-        console.log("Got notes...");
-        console.log(notes);
+    async editHoveredTerms() {
+        console.log("Editing hovered terms...")
+	    let terms = peircedb.getTerms();
+        console.log("Got terms...");
+        console.log(terms);
         let hover_index = 0;
-        for (let index = 0; index < notes.length; index++) {
-            let note = notes[index];
-            console.log("Trying notes["+index+"]", note);
-            if (!this.isHoveredNote(note)) continue;
+        for (let index = 0; index < terms.length; index++) {
+            let term = terms[index];
+            console.log("Trying terms["+index+"]", term);
+            if (!this.isHoveredTerm(term)) continue;
             this.updatePreviewIndex(hover_index);
-            console.log("GOT IT!["+index+"]", note);
+            console.log("GOT IT!["+index+"]", term);
 
-            let noteIsIdentifier : boolean = note.type.includes("IDENT");
+            let termIsIdentifier : boolean = term.node_type.includes("IDENT");
 
 
             let interpretations : vscode.QuickPickItem[] = [
@@ -737,7 +962,10 @@ export class InfoView {
                 { label: "Time Transform"},
                 { label: "Displacement1D"},
                 { label: "Position1D"},
-                { label: "Geom1D Transform"}
+                { label: "Geom1D Transform"},
+                { label: "Displacement3D"},
+                { label: "Position3D"},
+                { label: "Geom3D Transform"}
             ];
             const interp = await vscode.window.showQuickPick(interpretations);
             if (interp === undefined) {
@@ -750,7 +978,7 @@ export class InfoView {
 
             // If the following is true (the AST node is an identifier)
             // Peirce will not prompt for a name, so we won't ask for one.
-            if (!noteIsIdentifier) {
+            if (!termIsIdentifier) {
                 let pickedName = await vscode.window.showInputBox({ placeHolder: 'Name of interpretation?' });
                 if (pickedName === undefined || pickedName == "")  {
                     hover_index++;
@@ -762,7 +990,7 @@ export class InfoView {
 
             if(interp.label == "Duration"){
 
-                let spaces = getTimeSpaces();
+                let spaces = peircedb.getTimeSpaces();
                 console.log(spaces);
                 let i = 0;
                 const space = await vscode.window.showQuickPick(spaces, {
@@ -784,28 +1012,28 @@ export class InfoView {
                 }
     
                 let label = `${name} ${interp.label}(${space.label},${value})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${space.label},${value})`
                 }
     
-                let interpretation : Duration = {
+                let interpretation : models.Duration = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     space: space,
-                    value: +value,
-                    type: note.type,
+                    value: [+value],
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
                 
             }
             else if(interp.label == "Time"){
 
-                let spaces = getTimeSpaces();
+                let spaces = peircedb.getTimeSpaces();
                 console.log(spaces);
                 let i = 0;
                 const space = await vscode.window.showQuickPick(spaces, {
@@ -827,21 +1055,21 @@ export class InfoView {
                 }
     
                 let label = `${name} ${interp.label}(${space.label},${value})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${space.label},${value})`
                 }
     
-                let interpretation : Time = {
+                let interpretation : models.Time = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     space: space,
-                    value: +value,
-                    type: note.type,
+                    value: [+value],
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
             }
@@ -855,27 +1083,27 @@ export class InfoView {
                 }
     
                 let label = `${name} ${interp.label}(${value})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${value})`
                 }
     
-                let interpretation : Scalar = {
+                let interpretation : models.Scalar = {
                     label: label,
                     name: name,
-                    form: interp.label,
-                    value: +value,
-                    type: note.type,
+                    interp_type: interp.label,
+                    value: [+value],
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
 
             }
             else if(interp.label == "Time Transform"){
 
-                let spaces = getTimeSpaces();
+                let spaces = peircedb.getTimeSpaces();
                 console.log(spaces);
                 let i = 0;
                 const domain = await vscode.window.showQuickPick(spaces, {
@@ -900,28 +1128,28 @@ export class InfoView {
                     continue;
                 }
                 let label = `${name} ${interp.label}(${domain.label},${codomain.label})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${domain.label},${codomain.label})`
                 }
     
     
-                let interpretation : TimeTransform = {
+                let interpretation : models.TimeTransform = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     domain: domain,
                     codomain: codomain,
-                    type: note.type,
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
             }
             else if(interp.label == "Displacement1D"){
 
-                let spaces = getGeom1DSpaces();
+                let spaces = peircedb.getGeom1DSpaces();
                 console.log(spaces);
                 let i = 0;
                 const space = await vscode.window.showQuickPick(spaces, {
@@ -943,27 +1171,27 @@ export class InfoView {
                 }
     
                 let label = `${name} ${interp.label}(${space.label},${value})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${space.label},${value})`
                 }
     
-                let interpretation : Displacement1D = {
+                let interpretation : models.Displacement1D = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     space: space,
-                    value: +value,
-                    type: note.type,
+                    value: [+value],
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
             }
             else if(interp.label == "Position1D"){
 
-                let spaces = getGeom1DSpaces();
+                let spaces = peircedb.getGeom1DSpaces();
                 console.log(spaces);
                 let i = 0;
                 const space = await vscode.window.showQuickPick(spaces, {
@@ -985,27 +1213,27 @@ export class InfoView {
                 }
     
                 let label = `${name} ${interp.label}(${space.label},${value})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${space.label},${value})`
                 }
     
-                let interpretation : Position1D = {
+                let interpretation : models.Position1D = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     space: space,
-                    value: +value,
-                    type: note.type,
+                    value: [+value],
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
             }
             else if(interp.label == "Geom1D Transform"){
                 
-                let spaces = getGeom1DSpaces();
+                let spaces = peircedb.getGeom1DSpaces();
                 console.log(spaces);
                 let i = 0;
                 const domain = await vscode.window.showQuickPick(spaces, {
@@ -1030,22 +1258,22 @@ export class InfoView {
                     continue;
                 }
                 let label = `${name} ${interp.label}(${domain.label},${codomain.label})`
-                if (noteIsIdentifier) {
+                if (termIsIdentifier) {
                     label = `${interp.label}(${domain.label},${codomain.label})`
                 }
     
     
-                let interpretation : Geom1DTransform = {
+                let interpretation : models.Geom1DTransform = {
                     label: label,
                     name: name,
-                    form: interp.label,
+                    interp_type: interp.label,
                     domain: domain,
                     codomain: codomain,
-                    type: note.type,
+                    node_type: term.node_type,
                 }
-                notes[index].interpretation = interpretation;
-                saveNotes(notes);
-                console.log("Saving notes["+index+"]");
+                terms[index].interpretation = interpretation;
+                peircedb.saveTerms(terms);
+                console.log("Saving terms["+index+"]");
                 hover_index++;
                 this.updatePreview();
             }
@@ -1054,21 +1282,21 @@ export class InfoView {
         await this.check()
     }
 
-    private isHoveredNote(note : Note) : boolean {
+    private isHoveredTerm(term : models.Term) : boolean {
         let loc = this.getActiveCursorLocation();
-        let condition = (loc && note.fileName == vscode.window.activeTextEditor?.document.fileName 
-            && note.positionStart.line <= loc.line && note.positionEnd.line >= loc.line);
+        let condition = (loc && term.fileName == vscode.window.activeTextEditor?.document.fileName 
+            && term.positionStart.line <= loc.line && term.positionEnd.line >= loc.line);
         if (condition == null) return false;
         return condition;
     }
 
-    private displayNote(note : Note, editing: boolean) : string {
+    private displayTerm(term : models.Term, editing: boolean) : string {
         let full : string = "";
-        if (note) {
+        if (term) {
             if (editing)
-                full += `<pre style="color: lightgreen">${JSON.stringify(note, undefined, 2)}</pre></b>`
+                full += `<pre style="color: lightgreen">${JSON.stringify(term, undefined, 2)}</pre></b>`
             else
-                full += "<pre>" + JSON.stringify(note, undefined, 2) + "</pre>"
+                full += "<pre>" + JSON.stringify(term, undefined, 2) + "</pre>"
         }
         return full;
     }
@@ -1080,9 +1308,9 @@ export class InfoView {
     async updatePreviewIndex(index : number) {
         console.log(index);
         let contents : string = "";
-        let notes = this.getHoveredNotes();
-        for (let i = 0; i < notes.length; i++)
-            contents += this.displayNote(notes[i], i == index);
+        let terms = this.getHoveredTerms();
+        for (let i = 0; i < terms.length; i++)
+            contents += this.displayTerm(terms[i], i == index);
         contents += '<p style="color:lightblue">Key bindings</p>';
         contents += '<p style="color:lightblue"><b>Ctrl+Alt+R</b> to generate unfilled type information annotations</p>';
         contents += '<p style="color:lightblue"><b>Ctrl+Alt+E</b> to edit existing type information annotations</p>';
@@ -1132,59 +1360,59 @@ export class InfoView {
 }
 
 export class TreeActions {
-    //constructor(private provider: NotesTree) { }
-    constructor(private provider: NotesTree, private iv : InfoView) { }
+    //constructor(private provider: TermsTree) { }
+    constructor(private provider: PeirceTree, private iv : InfoView) { }
 
-    removeNote(item: NoteItem) {
+    removeTerm(item: TermItem) {
         return this.provider.removeItem(item.id);
     }
-    checkNote(item: NoteItem) {
+    checkTerm(item: TermItem) {
         return this.provider.checkItem(item.id, 'done');
     }
-    uncheckNote(item: NoteItem) {
+    uncheckTerm(item: TermItem) {
         return this.provider.checkItem(item.id, 'pending');
     }
-    checkAllNotes(data: any): void {
+    checkAllTerms(data: any): void {
         const children = data.children;
         if (!children) { return; }
 
         for (let index = 0; index < children.length; index++) {
             const current = children[index];
-            this.checkNote(current);
+            this.checkTerm(current);
         }
     }
-    uncheckAllNotes(data: any): void {
-        const children = data.children;
-		
-        if (!children) { return; }
-
-        for (let index = 0; index < children.length; index++) {
-            const current = children[index];
-            this.uncheckNote(current);
-        }
-    }
-    removeAllNotes(data: any): void {
+    uncheckAllTerms(data: any): void {
         const children = data.children;
 		
         if (!children) { return; }
 
         for (let index = 0; index < children.length; index++) {
             const current = children[index];
-            this.removeNote(current);
+            this.uncheckTerm(current);
         }
     }
-    openNote(item: NoteItem) {
+    removeAllTerms(data: any): void {
+        const children = data.children;
+		
+        if (!children) { return; }
+
+        for (let index = 0; index < children.length; index++) {
+            const current = children[index];
+            this.removeTerm(current);
+        }
+    }
+    openTerm(item: TermItem) {
         return this.provider.openItem(item.id);
     }
-    openNoteFromId(id: string) {
+    openTermFromId(id: string) {
         return this.provider.openItem(id);
     }
-    copyNote(item: NoteItem) {
+    copyTerm(item: TermItem) {
         return this.provider.copyItem(item.id);
     }
-    editNote(item: NoteItem):void {
+    editTerm(item: TermItem):void {
         console.log(item.id);
-        this.iv.editSelectedNoteItem(item)
+        this.iv.editSelectedTermItem(item)
     }
     addSpace():void{
         console.log('RUNNING IV ADD SPACE')
@@ -1192,10 +1420,10 @@ export class TreeActions {
     }
 
 }
-export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
+export class PeirceTree implements vscode.TreeDataProvider<TermItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<NoteItem | undefined | null | void> = new vscode.EventEmitter<NoteItem | undefined | null | void>();
-	readonly onDidChangeTreeData: vscode.Event<NoteItem | undefined | null | void> = this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData: vscode.EventEmitter<TermItem | undefined | null | void> = new vscode.EventEmitter<TermItem | undefined | null | void>();
+	readonly onDidChangeTreeData: vscode.Event<TermItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 	refresh(): void {
         console.log('calling source data')
@@ -1207,108 +1435,128 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	sourceData(): void {
 	    this.data = [];
 	    this.data = [
-            new NoteItem('Table of Terms', undefined, undefined, '$menu-pending'),
-            new NoteItem('Constructors', undefined, undefined, '$menu-pending'),
-            new NoteItem('Spaces', undefined, undefined, '$Space')
+            new TermItem('Table of Terms', undefined, undefined, '$menu-pending'),
+            new TermItem('Constructors', undefined, undefined, '$menu-pending'),
+            new TermItem('Spaces', undefined, undefined, '$Space')
         ];
-        console.log("In notes tree")
+        console.log("In terms tree")
         console.log('SOURCING DATA')
         console.log('SOURCE THAT DATA')
-	    const annotations = getNotes();
+	    const annotations = peircedb.getTerms();
         console.log('')
         console.log(annotations)
-	    for (let note in annotations) {
-            if (annotations[note].fileName != vscode.window.activeTextEditor?.document.fileName)
+	    for (let term in annotations) {
+            if (annotations[term].fileName != vscode.window.activeTextEditor?.document.fileName)
                 continue;
-	        const noteItem = createNoteItem(annotations[note]);
-            this.data[0].addChild(noteItem);
+	        const termItem = createTermItem(annotations[term]);
+            this.data[0].addChild(termItem);
 	    }
 	    this.data[0].label += ` (${annotations.length})`;
 
 
-	    const constructors = getConstructors() || ([]);
+	    const constructors = peircedb.getConstructors() || ([]);
         console.log(constructors)
-	    for (let note in constructors) {
-            //if (constructors[note].fileName != vscode.window.activeTextEditor?.document.fileName)
+	    for (let term in constructors) {
+            //if (constructors[term].fileName != vscode.window.activeTextEditor?.document.fileName)
             //    continue;
-	        const noteItem = createConsNoteItem(constructors[note]);
-            this.data[1].addChild(noteItem);
+	        const termItem = createConsTermItem(constructors[term]);
+            this.data[1].addChild(termItem);
 	    }
 	    this.data[1].label += ` (${constructors.length})`;
 
-	    const spaces = (getTimeSpaces() || []).concat(getGeom1DSpaces() || []);
+        const db = peircedb.getPeirceDb()
+
+        console.log('heres my db?')
+        console.log(db)
+
+	    const spaces = 
+            (peircedb.getTimeSpaces() || [])
+            .concat(peircedb.getGeom1DSpaces() || [])
+            .concat(peircedb.getGeom3DSpaces() || []);
         console.log("spaces")
         console.log(spaces)
 	    for (let s in spaces) {
             const space = spaces[s];
-            let noteItem : NoteItem;
+            let termItem : TermItem;
             if (space.space == "Classical Time Coordinate Space"){
                 if (space.parent != null){
-                    noteItem = new NoteItem(`${space.label} (Derived from ${space.parent.label}): Origin: ${space.origin} Basis: ${space.basis}`)
-                    this.data[2].addChild(noteItem);
+                    termItem = new TermItem(`${space.label} (Derived from ${space.parent.label}): Origin: ${space.origin} Basis: ${space.basis}`)
+                    this.data[2].addChild(termItem);
                 }
                 else {
-                    noteItem = new NoteItem(`${space.label} : Standard Time Space`);
-                    this.data[2].addChild(noteItem);
+                    termItem = new TermItem(`${space.label} : Standard Time Space`);
+                    this.data[2].addChild(termItem);
                 }
             }
             else if (space.space == "Classical Geom1D Coordinate Space") {
                 if (space.parent != null){
-                    noteItem = new NoteItem(`${space.label} (Derived from ${space.parent.label}): Origin: ${space.origin} Basis: ${space.basis}`)
+                    termItem = new TermItem(`${space.label} (Derived from ${space.parent.label}): Origin: ${space.origin} Basis: ${space.basis}`)
                     const origin = space.origin;
-                    this.data[2].addChild(noteItem);
+                    this.data[2].addChild(termItem);
                 }
                 else{
-                    noteItem = new NoteItem(`${space.label} : Standard Geom1D Space`);
+                    termItem = new TermItem(`${space.label} : Standard Geom1D Space`);
                     const origin = space.origin;
-                    this.data[2].addChild(noteItem);
+                    this.data[2].addChild(termItem);
+                }
+            }
+            else if (space.space == "Classical Geom3D Coordinate Space") {
+                if (space.parent != null){
+                    termItem = new TermItem(`${space.label} (Derived from ${space.parent.label}): Origin: ${space.origin} Basis: ${space.basis}`)
+                    const origin = space.origin;
+                    this.data[2].addChild(termItem);
+                }
+                else{
+                    termItem = new TermItem(`${space.label} : Standard Geom3D Space`);
+                    const origin = space.origin;
+                    this.data[2].addChild(termItem);
                 }
             }
             else {
             }
             //const origin = space.origin;
-            //this.data[1].addChild(noteItem);
+            //this.data[1].addChild(termItem);
 	    }
 	    this.data[2].label += ` (${spaces.length})`;
 	}
 
 	removeItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const indexToRemove = notes.findIndex((item: { id: Number }) => {
+	    const terms = peircedb.getTerms();
+	    const indexToRemove = terms.findIndex((item: { id: Number }) => {
 	        return item.id.toString() === id;
 	    });
 
 	    if (indexToRemove >= 0) {
-	        notes.splice(indexToRemove, 1);
+	        terms.splice(indexToRemove, 1);
 	    }
 
-	    saveNotes(notes);
+	    peircedb.saveTerms(terms);
 	    setDecorations();
 	}
 
 	checkItem(id: string | undefined, status: 'pending' | 'done'): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
+	    const terms = peircedb.getTerms();
+	    const index = terms.findIndex((item: { id: Number }) => {
 	        return item.id.toString() === id;
 	    });
 
 	    if (index >= 0) {
-	        notes[index].status = status;
+	        terms[index].status = status;
 	    }
 
-	    saveNotes(notes);
+	    peircedb.saveTerms(terms);
 	}
 
 	openItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
+	    const terms = peircedb.getTerms();
+	    const index = terms.findIndex((item: { id: Number }) => {
 	        return item.id.toString() === id;
 	    });
 
 	    if (index >= 0) {
-	        const note = notes[index];
-	        const fileName = note.fileName;
-	        const fileLine = note.fileLine;
+	        const term = terms[index];
+	        const fileName = term.fileName;
+	        const fileLine = term.fileLine;
 
 	        if (fileName.length <= 0) {
 	            return;
@@ -1320,8 +1568,8 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	                var range = new vscode.Range(fileLine, 0, fileLine, 0);
 	                editor.revealRange(range);
 
-	                var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
-	                var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
+	                var start = new vscode.Position(term.positionStart.line, term.positionStart.character);
+	                var end = new vscode.Position(term.positionEnd.line, term.positionEnd.character);
 	                editor.selection = new vscode.Selection(start, end);
 
 	                var range = new vscode.Range(start, start);
@@ -1332,8 +1580,8 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	}
 
 	copyItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
+	    const terms = peircedb.getTerms();
+	    const index = terms.findIndex((item: { id: Number }) => {
 	        return item.id.toString() === id;
 	    });
 
@@ -1341,13 +1589,13 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	        return;
 	    }
 
-	    const content = notes[index].text;
+	    const content = terms[index].text;
 	    vscode.env.clipboard.writeText(content).then(() => {
-	        vscode.window.showInformationMessage('Note copied successfully');
+	        vscode.window.showInformationMessage('Term copied successfully');
 	    });
 	}
 
-	data: NoteItem[];
+	data: TermItem[];
 
 	constructor() {
 	    vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
@@ -1362,11 +1610,11 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    this.sourceData();
 	}
 
-	getTreeItem(element: NoteItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
+	getTreeItem(element: TermItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
 	    return element;
 	}
 
-	getChildren(element?: NoteItem | undefined): vscode.ProviderResult<NoteItem[]> {
+	getChildren(element?: TermItem | undefined): vscode.ProviderResult<TermItem[]> {
 	    if (element === undefined) {
 	        return this.data;
 	    }
@@ -1374,8 +1622,8 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	}
 }
 
-class OpenNoteCommand implements vscode.Command {
-	command = 'code-annotation.openNoteFromId';
+class OpenTermCommand implements vscode.Command {
+	command = 'code-annotation.openTermFromId';
 	title = 'Open File';
 	arguments?: any[];
 
@@ -1384,24 +1632,24 @@ class OpenNoteCommand implements vscode.Command {
 	}
 }
 
-export class NoteItem extends vscode.TreeItem {
-	children: NoteItem[] | undefined;
+export class TermItem extends vscode.TreeItem {
+	children: TermItem[] | undefined;
 
-	constructor(label: string, children?: NoteItem[] | undefined, noteId?: string | undefined, context?: string | undefined) {
+	constructor(label: string, children?: TermItem[] | undefined, termId?: string | undefined, context?: string | undefined) {
 	    super(
 	        label,
 	        children === undefined ? vscode.TreeItemCollapsibleState.None :
 	            vscode.TreeItemCollapsibleState.Expanded);
 	    this.children = children;
-	    if (noteId) {
-	        this.id = noteId;
+	    if (termId) {
+	        this.id = termId;
 	    }
 	    if (context) {
 	        this.contextValue = context;
 	    }
 	}
 
-	addChild(element: NoteItem) {
+	addChild(element: TermItem) {
 	    if (this.children === undefined) {
 	        this.children = [];
 	        this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;

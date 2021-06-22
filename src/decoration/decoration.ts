@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { getConfiguration } from '../configuration';
-import { getNotes } from '../note-db';
+import { getTerms } from '../peircedb';
 
 const decorationType = () : vscode.TextEditorDecorationType => {
     return vscode.window.createTextEditorDecorationType({
@@ -13,6 +13,8 @@ const decorationType = () : vscode.TextEditorDecorationType => {
     });
 };
 const decorationOption = (has_error : boolean) : vscode.TextEditorDecorationType => {
+    //print
+    
     return vscode.window.createTextEditorDecorationType({
         dark: {
             backgroundColor: 
@@ -28,6 +30,7 @@ const decorationOption = (has_error : boolean) : vscode.TextEditorDecorationType
 };
 
 export const setDecorations = (): void => {
+    console.log("SET DECORATIONS EVENT FIRING OFF")
     if (!getConfiguration().enableDecoration)
     { return; }
 
@@ -36,15 +39,15 @@ export const setDecorations = (): void => {
     openEditors.forEach( editor => {
         const ranges: vscode.Range[] = [];
         const has_error: boolean[] = [];
-        getNotes().forEach( note => {
+        getTerms().forEach( term => {
             const temprange : vscode.Range[] = [];
             const temp_error : boolean[] = [];
             let temp_error_ : boolean = false;
-            if (note.fileName === editor.document.fileName) {
-                const positionStart = new vscode.Position(note.positionStart.line, note.positionStart.character);
-                const positionEnd = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
+            if (term.fileName === editor.document.fileName) {
+                const positionStart = new vscode.Position(term.positionStart.line, term.positionStart.character);
+                const positionEnd = new vscode.Position(term.positionEnd.line, term.positionEnd.character);
                 ranges.push(new vscode.Range(positionStart, positionEnd));
-                if(note.error == "Not checked" || note.error == "No Error Detected"){
+                if(term.error == "Not checked" || term.error == "No Error Detected"){
                     has_error.push(false);
                     temp_error.push(false);
                     temp_error_ = false;
@@ -54,7 +57,7 @@ export const setDecorations = (): void => {
                     temp_error.push(true);
                     temp_error_ = true;
                 }
-                console.log(note.error)
+                console.log(term.error)
                 console.log(temp_error_)
                 temprange.push(new vscode.Range(positionStart, positionEnd));
                 editor.setDecorations(decorationOption(temp_error_), temprange);
