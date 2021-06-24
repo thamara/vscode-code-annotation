@@ -38,6 +38,9 @@ const decorationOption = (has_error : boolean, has_annotation : boolean) : vscod
     });
 };
 
+/**
+ * Sets the decorations for all active vscode text editors
+ */
 export const setDecorations = (): void => {
     // if decoration is not enabled, do nothing
     if (!getConfiguration().enableDecoration)
@@ -83,10 +86,12 @@ export const setDecorations = (): void => {
         //editor.setDecorations(decorationType(), ranges);
     });
 };
-
+/**
+ * Updates the decorations of the active vscode window
+ * @param context Extension context
+ */
 export function updateDecorations (context: vscode.ExtensionContext) {
     setDecorations();
-
     vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {
             setDecorations();
