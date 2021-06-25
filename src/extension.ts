@@ -97,10 +97,8 @@ export function activate(context: vscode.ExtensionContext) {
             Right now, this is an imperfect way to do this. We have a couple of options for fixing:
             1. Fix the issue of note snippets overlapping (this is probably very hard, but if you're already working on it,
             more power to you)
-            2. Completely rework this, this may end up being the only way to do this if fixing overlapping notes is diff.
+            2. Completely rework this, this may end up being the only way to do this if fixing overlapping notes is difficult.
             */
-            // another note: this appears to overwrite other extension which produce hovers
-            // for the same file extension, we should come up with some alternatives
             const notesList = getNotes();
 
             // check to see if the hovered word is within the range of each note
