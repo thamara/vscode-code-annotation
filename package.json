@@ -24,19 +24,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "code-annotation.addNote",
+        "command": "code-annotation.addTerm",
         "category": "Code Annotation",
-        "title": "Add note"
+        "title": "Add term"
       },
       {
-        "command": "code-annotation.addPlainNote",
+        "command": "code-annotation.addPlainTerm",
         "category": "Code Annotation",
-        "title": "Add plain note"
+        "title": "Add plain term"
       },
       {
-        "command": "code-annotation.clearAllNotes",
+        "command": "code-annotation.clearAllTerms",
         "category": "Code Annotation",
-        "title": "Clear all notes"
+        "title": "Clear all terms"
       },
       {
         "command": "code-annotation.refreshEntry",
@@ -48,73 +48,73 @@
         }
       },
       {
-        "command": "code-annotation.removeNote",
+        "command": "code-annotation.removeTerm",
         "category": "Code Annotation",
-        "title": "Remove note",
+        "title": "Remove term",
         "icon": {
           "dark": "resources/dark/close.svg",
           "light": "resources/light/close.svg"
         }
       },
       {
-        "command": "code-annotation.checkNote",
+        "command": "code-annotation.checkTerm",
         "category": "Code Annotation",
-        "title": "Check note",
+        "title": "Check term",
         "icon": {
           "dark": "resources/dark/check.svg",
           "light": "resources/light/check.svg"
         }
       },
       {
-        "command": "code-annotation.checkAllNotes",
+        "command": "code-annotation.checkAllTerms",
         "category": "Code Annotation",
-        "title": "Check all notes",
+        "title": "Check all terms",
         "icon": {
           "dark": "resources/dark/checkall.svg",
           "light": "resources/light/checkall.svg"
         }
       },
       {
-        "command": "code-annotation.uncheckNote",
+        "command": "code-annotation.uncheckTerm",
         "category": "Code Annotation",
-        "title": "Uncheck note",
+        "title": "Uncheck term",
         "icon": {
           "dark": "resources/dark/uncheck.svg",
           "light": "resources/light/uncheck.svg"
         }
       },
       {
-        "command": "code-annotation.uncheckAllNotes",
+        "command": "code-annotation.uncheckAllTerms",
         "category": "Code Annotation",
-        "title": "Uncheck all notes",
+        "title": "Uncheck all terms",
         "icon": {
           "dark": "resources/dark/uncheckall.svg",
           "light": "resources/light/uncheckall.svg"
         }
       },
       {
-        "command": "code-annotation.removeAllNotes",
+        "command": "code-annotation.removeAllTerms",
         "category": "Code Annotation",
-        "title": "Remove all notes",
+        "title": "Remove all terms",
         "icon": {
           "dark": "resources/dark/removeall.svg",
           "light": "resources/light/removeall.svg"
         }
       },
       {
-        "command": "code-annotation.openNote",
+        "command": "code-annotation.openTerm",
         "category": "Code Annotation",
-        "title": "Open note"
+        "title": "Open term"
       },
       {
-        "command": "code-annotation.editNote",
+        "command": "code-annotation.editTerm",
         "category": "Code Annotation",
-        "title": "Edit note"
+        "title": "Edit term"
       },
       {
-        "command": "code-annotation.copyNote",
+        "command": "code-annotation.copyTerm",
         "category": "Code Annotation",
-        "title": "Copy note"
+        "title": "Copy term"
       },
       {
         "command": "code-annotation.populate",
@@ -147,7 +147,7 @@
     "keybindings": [
       {
         "key": "ctrl+alt+n",
-        "command": "code-annotation.addNote",
+        "command": "code-annotation.addTerm",
         "mac": "cmd+alt+n",
         "when": "editorTextFocus"
       },
@@ -159,7 +159,7 @@
       },
       {
         "key": "ctrl+alt+e",
-        "command": "code-annotation.editHoveredNotes",
+        "command": "code-annotation.editHoveredTerms",
         "mac": "cmd+alt+e",
         "when": "editorTextFocus"
       },
@@ -179,34 +179,34 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "code-annotation.removeNote",
+          "command": "code-annotation.removeTerm",
           "when": "false"
         },
         {
-          "command": "code-annotation.checkNote",
+          "command": "code-annotation.checkTerm",
           "when": "false"
         },
         {
-          "command": "code-annotation.uncheckNote",
+          "command": "code-annotation.uncheckTerm",
           "when": "false"
         },
         {
-          "command": "code-annotation.openNote",
+          "command": "code-annotation.openTerm",
           "when": "false"
         },
         {
-          "command": "code-annotation.editNote",
+          "command": "code-annotation.editTerm",
           "when": "false"
         },
         {
-          "command": "code-annotation.copyNote",
+          "command": "code-annotation.copyTerm",
           "when": "false"
         }
       ],
       "editor/context": [
         {
-          "command": "code-annotation.addNote",
-          "title": "Code Annotation: Add note"
+          "command": "code-annotation.addTerm",
+          "title": "Code Annotation: Add term"
         }
       ],
       "view/title": [
@@ -233,38 +233,38 @@
           "group": "inline@1"
         },
         {
-          "command": "code-annotation.uncheckNote",
-          "when": "view == codeAnnotationView && viewItem == $CompleteNote",
+          "command": "code-annotation.uncheckTerm",
+          "when": "view == codeAnnotationView && viewItem == $CompleteTerm",
           "group": "inline@1"
         },
         {
-          "command": "code-annotation.checkAllNotes",
+          "command": "code-annotation.checkAllTerms",
           "when": "view == codeAnnotationView && viewItem == $menu-pending",
           "group": "inline"
         },
         {
-          "command": "code-annotation.uncheckAllNotes",
+          "command": "code-annotation.uncheckAllTerms",
           "when": "view == codeAnnotationView && viewItem == $menu-done",
           "group": "inline"
         },
         {
-          "command": "code-annotation.removeAllNotes",
+          "command": "code-annotation.removeAllTerms",
           "when": "view == codeAnnotationView && viewItem == $menu-done || view == codeAnnotationView && viewItem == $menu-pending",
           "group": "inline@3"
         },
         {
-          "command": "code-annotation.openNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
+          "command": "code-annotation.openTerm",
+          "when": "view == codeAnnotationView && viewItem == $PendingTerm || view == codeAnnotationView && viewItem == $CompleteTerm",
           "group": "3_open@1"
         },
         {
-          "command": "code-annotation.editNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
+          "command": "code-annotation.editTerm",
+          "when": "view == codeAnnotationView && viewItem == $PendingTerm || view == codeAnnotationView && viewItem == $CompleteTerm",
           "group": "3_open@2"
         },
         {
-          "command": "code-annotation.copyNote",
-          "when": "view == codeAnnotationView && viewItem == $PendingNote || view == codeAnnotationView && viewItem == $CompleteNote",
+          "command": "code-annotation.copyTerm",
+          "when": "view == codeAnnotationView && viewItem == $PendingTerm || view == codeAnnotationView && viewItem == $CompleteTerm",
           "group": "3_open@3"
         }
       ]
@@ -297,7 +297,7 @@
         "code-annotation.customTODO": {
           "type": "array",
           "default": [],
-          "description": "An array of RegExps to use as TODO for note suggestions"
+          "description": "An array of RegExps to use as TODO for term suggestions"
         },
         "code-annotation.annotationBG.enableDecoration": {
           "description": "Enable color for the background for the annotation on the source code",

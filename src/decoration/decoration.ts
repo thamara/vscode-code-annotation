@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { getConfiguration } from '../configuration';
-import { getNotes } from '../note-db';
+import { getTerms } from '../peircedb';
 
 // Should we get rid of this? Only referenced in the commented code on line 82 (my thoughts say yes, but would like another opinion)
 const decorationType = () : vscode.TextEditorDecorationType => {
@@ -20,6 +20,8 @@ const decorationType = () : vscode.TextEditorDecorationType => {
  * @returns The DecorationType to apply to a specific annotation
  */
 const decorationOption = (has_error : boolean, has_annotation : boolean) : vscode.TextEditorDecorationType => {
+    //print
+    
     return vscode.window.createTextEditorDecorationType({
         // decoration options for dark mode
         dark: {
@@ -43,6 +45,7 @@ const decorationOption = (has_error : boolean, has_annotation : boolean) : vscod
  */
 export const setDecorations = (): void => {
     // if decoration is not enabled, do nothing
+    console.log("SET DECORATIONS EVENT FIRING OFF")
     if (!getConfiguration().enableDecoration)
     { return; }
     // iterate through open text editors and go through all Notes in each editor
@@ -50,16 +53,15 @@ export const setDecorations = (): void => {
     openEditors.forEach( editor => {
         const ranges: vscode.Range[] = [];
         const has_error: boolean[] = [];
-        getNotes().forEach( note => {
+        getTerms().forEach( term => {
             const temprange : vscode.Range[] = [];
             const temp_error : boolean[] = [];
             let temp_error_ : boolean = false;
-            if (note.fileName === editor.document.fileName) {
-                const positionStart = new vscode.Position(note.positionStart.line, note.positionStart.character);
-                const positionEnd = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
-                // check if note has error and update temp_error_
+            if (term.fileName === editor.document.fileName) {
+                const positionStart = new vscode.Position(term.positionStart.line, term.positionStart.character);
+                const positionEnd = new vscode.Position(term.positionEnd.line, term.positionEnd.character);
                 ranges.push(new vscode.Range(positionStart, positionEnd));
-                if(note.error == "Not checked" || note.error == "No Error Detected"){
+                if(term.error == "Not checked" || term.error == "No Error Detected"){
                     has_error.push(false);
                     temp_error.push(false);
                     temp_error_ = false;
@@ -71,13 +73,13 @@ export const setDecorations = (): void => {
                 }
                 // check to see if note is annotated, setting temp_annotated as necessary
                 let temp_annotated : boolean;
-                if (note.interpretation) {
+                if (term.interpretation) {
                     temp_annotated = true;
                 }else{
                     temp_annotated = false;
                 }
-                console.log(note.error);
-                console.log(temp_error_);
+                console.log(term.error)
+                console.log(temp_error_)
                 temprange.push(new vscode.Range(positionStart, positionEnd));
                 // set the decorations using the decorationOption decoration type over the range indicated by this note
                 editor.setDecorations(decorationOption(temp_error_, temp_annotated), temprange);
