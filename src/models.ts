@@ -107,6 +107,25 @@ export interface Position3D extends Interpretation {
     value: number[];
     space: Geom3DCoordinateSpace;
 }
+
+export interface Orientation3D extends Interpretation {
+    value: number[];
+    space: Geom3DCoordinateSpace;
+}
+
+export interface Rotation3D extends Interpretation {
+    value: number[];
+    space: Geom3DCoordinateSpace;
+}
+
+
+export interface Pose3D extends Interpretation {
+    value: number[];
+    space: Geom3DCoordinateSpace;
+}
+
+
+
 export interface Geom3DTransform extends Interpretation {
     domain: Geom3DCoordinateSpace;
     codomain: Geom3DCoordinateSpace;

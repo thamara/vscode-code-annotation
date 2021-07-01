@@ -101,7 +101,7 @@ export class InfoView {
     }
 
     
-    async createInterpretation(termIsIdentifier : boolean) : Promise<models.Interpretation | null> {
+    async createInterpretation(termIsIdentifier : boolean, node_type : string) : Promise<models.Interpretation | null> {
 
         console.log('going?')
         let interpretations : vscode.QuickPickItem[] = [
@@ -114,6 +114,9 @@ export class InfoView {
             { label: "Geom1D Transform"},
             { label: "Displacement3D"},
             { label: "Position3D"},
+            { label: "Orientation3D"},
+            { label: "Rotation3D"},
+            { label: "Pose3D"},
             { label: "Geom3D Transform"}
         ];
         const interp = await vscode.window.showQuickPick(interpretations);
@@ -451,6 +454,263 @@ export class InfoView {
             }
             return interpretation
         }
+        else if(interp.label == "Orientation3D"){
+
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const space = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(space);
+            if (space === undefined) {
+                return null;
+            }
+
+
+            let value0 = await vscode.window.showInputBox({ placeHolder: 'Value at index 0?' });
+            if (value0 === undefined || Number(value0) == NaN)  {
+                return null;
+            }
+            let value1 = await vscode.window.showInputBox({ placeHolder: 'Value at index 1?' });
+            if (value1 === undefined || Number(value1) == NaN)  {
+                return null;
+            }
+            let value2 = await vscode.window.showInputBox({ placeHolder: 'Value at index 2?' });
+            if (value2 === undefined || Number(value2) == NaN)  {
+                return null;
+            }
+            let value3 = await vscode.window.showInputBox({ placeHolder: 'Value at index 3?' });
+            if (value3 === undefined || Number(value3) == NaN)  {
+                return null;
+            }
+            if (!node_type.includes("R4")){
+                let value4 = await vscode.window.showInputBox({ placeHolder: 'Value at index 4?' });
+                if (value4 === undefined || Number(value4) == NaN)  {
+                    return null;
+                }
+                let value5 = await vscode.window.showInputBox({ placeHolder: 'Value at index 5?' });
+                if (value5 === undefined || Number(value5) == NaN)  {
+                    return null;
+                }
+
+                let value6 = await vscode.window.showInputBox({ placeHolder: 'Value at index 6?' });
+                if (value6 === undefined || Number(value6) == NaN)  {
+                    return null;
+                }
+                let value7 = await vscode.window.showInputBox({ placeHolder: 'Value at index 7?' });
+                if (value7 === undefined || Number(value7) == NaN)  {
+                    return null;
+                }
+                let value8 = await vscode.window.showInputBox({ placeHolder: 'Value at index 8?' });
+                if (value8 === undefined || Number(value8) == NaN)  {
+                    return null;
+                }
+
+                let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+                if (termIsIdentifier) {
+                    label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+                }
+
+                let interpretation : models.Orientation3D = {
+                    label: label,
+                    name: name,
+                    interp_type: interp.label,
+                    space: space,
+                    value: [+value0,+value1,+value2,+value3,+value4,+value5,+value6,+value7,+value8],
+                    node_type: "term.node_type",
+                }
+                return interpretation
+            }
+            else{
+
+                let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+                if (termIsIdentifier) {
+                    label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+                }
+
+                let interpretation : models.Orientation3D = {
+                    label: label,
+                    name: name,
+                    interp_type: interp.label,
+                    space: space,
+                    value: [+value0,+value1,+value2,+value3],
+                    node_type: "term.node_type",
+                }
+                return interpretation
+            }
+        }
+        else if(interp.label == "Rotation3D"){
+
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const space = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(space);
+            if (space === undefined) {
+                return null;
+            }
+
+
+            let value0 = await vscode.window.showInputBox({ placeHolder: 'Value at index 0?' });
+            if (value0 === undefined || Number(value0) == NaN)  {
+                return null;
+            }
+            let value1 = await vscode.window.showInputBox({ placeHolder: 'Value at index 1?' });
+            if (value1 === undefined || Number(value1) == NaN)  {
+                return null;
+            }
+            let value2 = await vscode.window.showInputBox({ placeHolder: 'Value at index 2?' });
+            if (value2 === undefined || Number(value2) == NaN)  {
+                return null;
+            }
+
+            let value3 = await vscode.window.showInputBox({ placeHolder: 'Value at index 3?' });
+            if (value3 === undefined || Number(value3) == NaN)  {
+                return null;
+            }
+            if (!node_type.includes("R4")){
+                let value4 = await vscode.window.showInputBox({ placeHolder: 'Value at index 4?' });
+                if (value4 === undefined || Number(value4) == NaN)  {
+                    return null;
+                }
+                let value5 = await vscode.window.showInputBox({ placeHolder: 'Value at index 5?' });
+                if (value5 === undefined || Number(value5) == NaN)  {
+                    return null;
+                }
+
+                let value6 = await vscode.window.showInputBox({ placeHolder: 'Value at index 6?' });
+                if (value6 === undefined || Number(value6) == NaN)  {
+                    return null;
+                }
+                let value7 = await vscode.window.showInputBox({ placeHolder: 'Value at index 7?' });
+                if (value7 === undefined || Number(value7) == NaN)  {
+                    return null;
+                }
+                let value8 = await vscode.window.showInputBox({ placeHolder: 'Value at index 8?' });
+                if (value8 === undefined || Number(value8) == NaN)  {
+                    return null;
+                }
+
+                let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+                if (termIsIdentifier) {
+                    label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+                }
+
+                let interpretation : models.Rotation3D = {
+                    label: label,
+                    name: name,
+                    interp_type: interp.label,
+                    space: space,
+                    value: [+value0,+value1,+value2,+value3,+value4,+value5,+value6,+value7,+value8],
+                    node_type: "term.node_type",
+                }
+                return interpretation
+            }
+            else{
+
+                let label = `${name} ${interp.label}(${space.label},${value0},${value1},${value2})`
+                if (termIsIdentifier) {
+                    label = `${interp.label}(${space.label},${value0},${value1},${value2})`
+                }
+
+                let interpretation : models.Rotation3D = {
+                    label: label,
+                    name: name,
+                    interp_type: interp.label,
+                    space: space,
+                    value: [+value0,+value1,+value2,+value3],
+                    node_type: "term.node_type",
+                }
+                return interpretation
+            }
+        }
+        else if(interp.label == "Pose3D"){
+
+            let spaces = peircedb.getGeom3DSpaces();
+            console.log(spaces);
+            let i = 0;
+            const space = await vscode.window.showQuickPick(spaces, {
+                placeHolder: 'Select a coordinate space'
+            });
+            console.log("space quick pick")
+            console.log(space);
+            if (space === undefined) {
+                return null;
+            }
+
+
+            let ortvalue0 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 0?' });
+            if (ortvalue0 === undefined || Number(ortvalue0) == NaN)  {
+                return null;
+            }
+            let ortvalue1 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 1?' });
+            if (ortvalue1 === undefined || Number(ortvalue1) == NaN)  {
+                return null;
+            }
+            let ortvalue2 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 2?' });
+            if (ortvalue2 === undefined || Number(ortvalue2) == NaN)  {
+                return null;
+            }
+
+            let ortvalue3 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 3?' });
+            if (ortvalue3 === undefined || Number(ortvalue3) == NaN)  {
+                return null;
+            }
+            let ortvalue4 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 4?' });
+            if (ortvalue4 === undefined || Number(ortvalue4) == NaN)  {
+                return null;
+            }
+            let ortvalue5 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 5?' });
+            if (ortvalue5 === undefined || Number(ortvalue5) == NaN)  {
+                return null;
+            }
+
+            let ortvalue6 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 6?' });
+            if (ortvalue6 === undefined || Number(ortvalue6) == NaN)  {
+                return null;
+            }
+            let ortvalue7 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 7?' });
+            if (ortvalue7 === undefined || Number(ortvalue7) == NaN)  {
+                return null;
+            }
+            let ortvalue8 = await vscode.window.showInputBox({ placeHolder: 'Orientation Value at index 8?' });
+            if (ortvalue8 === undefined || Number(ortvalue8) == NaN)  {
+                return null;
+            }
+
+            let posvalue0 = await vscode.window.showInputBox({ placeHolder: 'Position Value at index 0?' });
+            if (posvalue0 === undefined || Number(posvalue0) == NaN)  {
+                return null;
+            }
+            let posvalue1 = await vscode.window.showInputBox({ placeHolder: 'Position Value at index 1?' });
+            if (posvalue1 === undefined || Number(posvalue1) == NaN)  {
+                return null;
+            }
+            let posvalue2 = await vscode.window.showInputBox({ placeHolder: 'Position Value at index 2?' });
+            if (posvalue2 === undefined || Number(posvalue2) == NaN)  {
+                return null;
+            }
+
+            let label = `${name} ${interp.label}(${space.label},orientation,position)`
+            if (termIsIdentifier) {
+                label = `${interp.label}(${space.label},orientation,position)`
+            }
+
+            let interpretation : models.Pose3D = {
+                label: label,
+                name: name,
+                interp_type: interp.label,
+                space: space,
+                value: [+ortvalue0,+ortvalue1,+ortvalue2,+ortvalue3,+ortvalue4,+ortvalue5,+ortvalue6,+ortvalue7,+ortvalue8,+posvalue0,+posvalue1,+posvalue2],
+                node_type: "term.node_type",
+            }
+            return interpretation
+        }
         else if(interp.label == "Geom3D Transform"){
             
             let spaces = peircedb.getGeom3DSpaces();
@@ -509,7 +769,7 @@ export class InfoView {
                 }
                 else {
                     console.log("CREATING INTEPRRETATION")
-                    let interpretation = await this.createInterpretation(true)
+                    let interpretation = await this.createInterpretation(true, "")
                     if(interpretation === null){}
                     else{
                         interpretation.node_type = cons_.node_type
@@ -531,7 +791,7 @@ export class InfoView {
                 console.log(term_)
                 let termIsIdentifier : boolean = term_.node_type.includes("IDENT");
                 console.log("creating2!")
-                let interpretation = await this.createInterpretation(termIsIdentifier)
+                let interpretation = await this.createInterpretation(termIsIdentifier, term_.node_type)
                 if(interpretation === null){}
                 else{
                     interpretation.node_type = term_.node_type
