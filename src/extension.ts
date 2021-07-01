@@ -124,9 +124,7 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             }
             // if the above yielded nothing, return a null hover, as we don't want anything to appear
-            return {
-                contents: ["Test"]
-            };
+            return null;
         }
     })
 
@@ -137,6 +135,21 @@ export function activate(context: vscode.ExtensionContext) {
     updateDecorations(context);
 
     context.subscriptions.push(disposable);
+
+    // refresh the window on text editor change
+
+    /* turns out, this can cause some issues with the API :) would need to make another
+    API call every time that we refresh the active text editor
+    */
+    vscode.window.onDidChangeActiveTextEditor( () => {
+        // vscode.commands.executeCommand('code-annotation.refreshEntry');
+        // make an info window here and prompt user to populate if they want to change file
+        vscode.window.showInformationMessage(
+            "You've changed windows! If you want to annotate this file, please populate it!",
+            'Dismiss'
+        );
+    })
+
 }
 
 // this method is called when your extension is deactivated

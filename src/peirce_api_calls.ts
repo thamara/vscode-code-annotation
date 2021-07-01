@@ -42,16 +42,17 @@ export const populate = async (): Promise<void> => {
     if (editor === undefined)
         return;
     const fileText = vscode.window.activeTextEditor?.document.getText();
+    const fileName = vscode.window.activeTextEditor?.document.fileName;
     for(let i = 0;i<10;i++)
         console.log('PRINT FILE NAME')
-        console.log(vscode.window.activeTextEditor?.document.fileName);
+        console.log(fileName);
     let terms = peircedb.getTerms();
     //console.log(terms);
     //console.log(JSON.stringify(terms));
     //console.log(fileText);
     //console.log(JSON.stringify(fileText));
     let request = {
-        fileName: vscode.window.activeTextEditor?.document.fileName,
+        fileName: fileName,
         file: fileText,
         terms: terms,
     }
@@ -75,7 +76,7 @@ export const populate = async (): Promise<void> => {
     console.log('printing cdata')
     console.log(cdata)
     let termsSummary = JSON.stringify(data); 
-    peircedb.deleteFilesTerms();
+    peircedb.deleteFilesTerms(fileName);
     // to fix this, we need to have a well-defined JSON response object
     // and change data : any -> data : well-defined-object[]
     
