@@ -95,6 +95,11 @@ export const deleteFilesTerms = (fileName : string | undefined): void => {
             new_terms.push(term);
     });
     db.terms = new_terms;
+    // delete all constructors and spaces in a very hacky way
+    db.constructors = [];
+    db.geom1d_coordinate_spaces = [];
+    db.geom3d_coordinate_spaces = [];
+    db.time_coordinate_spaces = [];
     saveDb(db);
     return;
 };

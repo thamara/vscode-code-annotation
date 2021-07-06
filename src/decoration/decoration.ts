@@ -24,6 +24,7 @@ const decorationOption = (has_error : boolean, has_annotation : boolean) : vscod
     
     return vscode.window.createTextEditorDecorationType({
         // decoration options for dark mode
+        // ---- NOTE: THE TEXT UNDERLINES FOR ANNOTATED NOTES WILL BE MADE BETTER IN FUTURE VERSIONS. FOR NOW, THEY WILL EXIST AS PROOF OF CONCEPT ----
         dark: {
             backgroundColor: 
                 has_error ? getConfiguration().decorationColors?.error :
