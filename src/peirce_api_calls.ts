@@ -11,6 +11,16 @@ interface APIPosition {
     line: number;
     character: number;
 }
+// attempting to manage global state lol
+let activePeirceFile : string | undefined = '';
+
+export const getActivePeirceFile = () : string | undefined => {
+    return activePeirceFile;
+}
+
+export const setActivePeircefile = ( newFile : string | undefined) : void => {
+    activePeirceFile = newFile;
+}
 interface APICoordinates {
     begin: APIPosition;
     end: APIPosition;

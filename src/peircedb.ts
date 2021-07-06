@@ -6,6 +6,7 @@ import { getAnnotationFilePath, getConfiguration } from './configuration';
 import { setDecorations } from './decoration/decoration';
 import { CustomInspectFunction } from 'util';
 import models = require("./models")
+import peirce = require("./peirce_api_calls");
 
 
 export interface PeirceDb {
@@ -71,7 +72,7 @@ export const getConstructorFromId = (termId : string) : models.Constructor | nul
 export const getFileTerms = (): models.Term[] => {
     let db = getPeirceDb();
     let new_terms : models.Term[] = [];
-    const fileName = vscode.window.activeTextEditor?.document.fileName;
+    const fileName = peirce.getActivePeirceFile();
     db.terms.forEach(term => {
         // Might be able to clean this up
         // Set the vscode.editor.selection position,

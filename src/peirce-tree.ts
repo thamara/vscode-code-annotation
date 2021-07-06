@@ -6,7 +6,8 @@ import models = require("./models")
 
 
 import {
-    PopulateAPIReponse
+    PopulateAPIReponse,
+    getActivePeirceFile
 } from './peirce_api_calls'
 import { getConfiguration } from './configuration';
 import { getRelativePathForFileName } from './utils';
@@ -1705,7 +1706,7 @@ export class PeirceTree implements vscode.TreeDataProvider<TermItem> {
 	    const annotations = peircedb.getTerms();
         console.log('')
         console.log(annotations)
-        const fileName = vscode.window.activeTextEditor?.document.fileName;
+        const fileName = getActivePeirceFile();
         let numFileAnnotations = 0;
 	    for (let term in annotations) {
             if (annotations[term].fileName != fileName)

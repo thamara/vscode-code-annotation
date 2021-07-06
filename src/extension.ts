@@ -19,6 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
     const tree = new peircetree.PeirceTree();
     const infoView = new peircetree.InfoView();
     const treeActions = new peircetree.TreeActions(tree, infoView);
+    // testing this lol
+    let activePeirceFile : string | undefined = '';
 
     vscode.window.registerTreeDataProvider('codeAnnotationView', tree);
     vscode.commands.registerCommand('code-annotation.removeTerm', treeActions.removeTerm.bind(treeActions));
@@ -48,7 +50,9 @@ export function activate(context: vscode.ExtensionContext) {
     });
     // registers the populate command
     vscode.commands.registerCommand('code-annotation.populate', async () => {
-        vscode.window.showInformationMessage("Populating...");
+        // delete below line if break-y
+        peirce.setActivePeircefile(vscode.window.activeTextEditor?.document.fileName);
+        vscode.window.showInformationMessage("Populating...")
         peirce.populate();
     });
 
@@ -136,18 +140,21 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(disposable);
 
-    // refresh the window on text editor change
-
-    /* turns out, this can cause some issues with the API :) would need to make another
-    API call every time that we refresh the active text editor
-    */
     vscode.window.onDidChangeActiveTextEditor( () => {
         // vscode.commands.executeCommand('code-annotation.refreshEntry');
-        // make an info window here and prompt user to populate if they want to change file
-        vscode.window.showInformationMessage(
-            "You've changed windows! If you want to annotate this file, please populate it!",
-            'Dismiss'
-        );
+        // use regex to determine if the activeTextEditor is a valid Peirce File (.cpp)
+        let re = new RegExp('...*.cpp');
+        let fileName = vscode.window.activeTextEditor?.document.fileName;
+        if (fileName != undefined){
+            console.log(fileName.match(re));
+            if (fileName.match(re)){
+                // make an info window here and prompt user to populate if they want to change file
+                vscode.window.showInformationMessage(
+                    `You've changed windows! If you want to annotate this file, please populate it! The current file is ${peirce.getActivePeirceFile()}`,
+                    'Dismiss'
+                );
+            }
+        }
     })
 
 }
