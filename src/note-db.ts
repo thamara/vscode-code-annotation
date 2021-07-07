@@ -133,10 +133,21 @@ const getTODOFromSelectedText = (): string | undefined => {
     return undefined;
 };
 
+const getPlaceHolderLineFromText = (): string | undefined => {
+    const todoText = getTODOFromSelectedText();
+    if (todoText)
+        return todoText;
+
+    // If there's no todo, use the first line from the text
+    const editor = vscode.window.activeTextEditor;
+    let selectedText = editor?.selection ? editor.document.getText(editor.selection) : '';
+    return selectedText.split(/\r?\n/)[0].trim();
+};
+
 export const addNote = async () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) {
-        const todoText = getTODOFromSelectedText();
+        const todoText = getPlaceHolderLineFromText();
         let annotationText = await vscode.window.showInputBox({ placeHolder: 'Give the annotation some text...', value: todoText });
         if (annotationText) {
             addNoteToDb(createNoteFromSelection(annotationText));
