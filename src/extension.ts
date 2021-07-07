@@ -146,12 +146,17 @@ export function activate(context: vscode.ExtensionContext) {
         let re = new RegExp('...*.cpp');
         let fileName = vscode.window.activeTextEditor?.document.fileName;
         if (fileName != undefined){
-            console.log(fileName.match(re));
-            if (fileName.match(re)){
+            if (fileName.match(re) && peirce.getActivePeirceFile() != ""){
                 // make an info window here and prompt user to populate if they want to change file
                 vscode.window.showInformationMessage(
                     `You've changed windows! If you want to annotate this file, please populate it! The current file is ${peirce.getActivePeirceFile()}`,
                     'Dismiss'
+                );
+            }else if (fileName.match(re)){
+                // prompt user to populate if they switch to valid peirce file and want to annotate
+                vscode.window.showInformationMessage(
+                    "There is currently no active Peirce file. If you would like to annotate this file, please populate it!",
+                    "Dismiss"
                 );
             }
         }
