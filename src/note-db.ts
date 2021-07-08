@@ -18,6 +18,8 @@ export interface Note {
     codeSnippet: string;
     status: 'pending' | 'done';
     id: number;
+    createdAt: Date;
+    resolvedAt: Date | undefined;
 }
 
 export interface NotesDb {
@@ -83,7 +85,9 @@ const createNote = (annotationText: string, fromSelection: boolean) => {
         text: annotationText,
         codeSnippet: codeSnippet,
         status: 'pending',
-        id: nextId
+        id: nextId,
+        createdAt: new Date(),
+        resolvedAt: undefined
     };
     return note;
 };

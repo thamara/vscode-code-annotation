@@ -3,7 +3,8 @@ import * as path from 'path';
 
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
-import { getRelativePathForFileName } from './utils';
+import { getRelativePathForFileName,
+         getTimeStampsString } from './utils';
 import { setDecorations } from './decoration/decoration';
 
 const getIconPathFromType = (type: string, theme: string): string => {
@@ -30,6 +31,10 @@ const createNoteItem = (note: Note): NoteItem => {
         // Creates an item under the main note with the File name (if existing)
         const relativePath = getRelativePathForFileName(note.fileName);
         details = [new NoteItem(`File: ${relativePath}`)];
+		if (note.createdAt)
+			details.push(new NoteItem(`Created at: ${getTimeStampsString(note.createdAt)}`));
+		if (note.resolvedAt)
+			details.push(new NoteItem(`Resolved at: ${getTimeStampsString(note.resolvedAt)}`));
     }
 
     let noteItem = new NoteItem(note.text, details, note.id.toString());
@@ -155,6 +160,8 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 
 	    if (index >= 0) {
 	        notes[index].status = status;
+			const fromDoneToPending = notes[index].resolvedAt && status == 'done';
+			notes[index].resolvedAt =  fromDoneToPending ? undefined : new Date();
 	    }
 
 	    saveNotes(notes);

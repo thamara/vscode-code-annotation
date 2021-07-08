@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 
 import { getNotes, Note } from './note-db';
-import { getRelativePathForFileName } from './utils';
+import { getRelativePathForFileName,
+         getTimeStampsString } from './utils';
 
 const getCodeSnippetString = (note: Note): string => {
     const moreThanOneLine = note.positionEnd.line !== note.positionStart.line;
@@ -17,6 +18,12 @@ const getCodeSnippetString = (note: Note): string => {
 // TODO: We should use Jinja or something like this to generate these markdown files
 export const getNoteInMarkdown = (note: Note): string => {
     let result = `### - ${note.text}\n\n`;
+    if (note.createdAt)
+        result += `Created at ${getTimeStampsString(note.createdAt)}\n`;
+    if (note.resolvedAt)
+        result += `Resolved at ${getTimeStampsString(note.resolvedAt)}\n`;
+
+    result += '```\n';
     if (note.fileName.length > 0) {
         result += `\`${getRelativePathForFileName(note.fileName)}\`\n\n`;
         result += '```\n';

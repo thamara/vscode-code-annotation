@@ -12,3 +12,7 @@ export const getRelativePathForFileName = (fullPathFileName: string): string => 
     }
     return fullPathFileName;
 };
+
+export const getTimeStampsString = (date: Date): string => {
+    return date.toLocaleString().substr(0, 16).replace('T', ' ');
+}
