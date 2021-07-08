@@ -1,7 +1,5 @@
-# Code Annotation - Visual Studio Code Extension
-
 <div align="center">
-  <img src="resources/code-annotation.png" alt="Code Annotation Logo">
+  <img src="resources/code-annotation.png" alt="Code Annotation Logo" height="100"> <h1>Code Annotation</h1>
 </div>
 
 Create and track annotations from your source code without actually committing comments on your code.
