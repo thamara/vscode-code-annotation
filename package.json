@@ -61,8 +61,8 @@
         "category": "Code Annotation",
         "title": "Remove note",
         "icon": {
-          "dark": "resources/dark/close.svg",
-          "light": "resources/light/close.svg"
+          "dark": "resources/dark/remove.svg",
+          "light": "resources/light/remove.svg"
         }
       },
       {

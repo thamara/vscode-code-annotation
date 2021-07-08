@@ -11,7 +11,7 @@ const getIconPathFromType = (type: string, theme: string): string => {
 };
 
 const getIconPath = (status: string): any => {
-    const noteType = (status === 'pending') ? 'todo' : 'check';
+    const noteType = (status === 'pending') ? 'note' : 'notedone';
     return {
         light: getIconPathFromType(noteType, 'light'),
         dark: getIconPathFromType(noteType, 'dark')

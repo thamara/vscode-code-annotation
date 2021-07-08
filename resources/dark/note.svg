@@ -8,7 +8,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="close.svg"
+   sodipodi:docname="note.svg"
    id="svg844"
    version="1.1"
    enable-background="new 3 3 16 16"
@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -32,17 +32,17 @@
   <sodipodi:namedview
      inkscape:current-layer="svg844"
      inkscape:window-maximized="1"
-     inkscape:window-y="1072"
-     inkscape:window-x="-4"
-     inkscape:cy="11.350961"
-     inkscape:cx="18.092832"
-     inkscape:zoom="30.797043"
+     inkscape:window-y="-8"
+     inkscape:window-x="-8"
+     inkscape:cy="12.534204"
+     inkscape:cx="14.182923"
+     inkscape:zoom="32"
      inkscape:guide-bbox="true"
      showguides="true"
      showgrid="false"
      id="namedview846"
-     inkscape:window-height="801"
-     inkscape:window-width="1536"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      guidetolerance="10"
@@ -69,14 +69,10 @@
        orientation="0,-1"
        position="9.7340667,3.6034424" />
   </sodipodi:namedview>
-  <path
-     style="fill:#800080;stroke:#424242;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 7.1449937,7.2261705 14.855006,14.77383"
-     id="path981"
-     sodipodi:nodetypes="cc" />
-  <path
-     style="fill:#800080;stroke:#424242;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 14.773829,7.1449936 7.2261706,14.855006"
-     id="path983"
-     sodipodi:nodetypes="cc" />
+  <circle
+     style="opacity:0.999;fill:none;fill-opacity:1;stroke:#f5f5f5;stroke-width:1.147;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path834"
+     cx="11"
+     cy="11"
+     r="4.2412133" />
 </svg>

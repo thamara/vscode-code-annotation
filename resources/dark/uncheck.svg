@@ -7,7 +7,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.0rc1 (09960d6, 2020-04-09)"
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
    sodipodi:docname="uncheck.svg"
    id="svg844"
    version="1.1"
@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -32,17 +32,17 @@
   <sodipodi:namedview
      inkscape:current-layer="svg844"
      inkscape:window-maximized="1"
-     inkscape:window-y="23"
-     inkscape:window-x="0"
-     inkscape:cy="8.0706786"
-     inkscape:cx="8.52448"
-     inkscape:zoom="46.264422"
+     inkscape:window-y="-8"
+     inkscape:window-x="-8"
+     inkscape:cy="11.350961"
+     inkscape:cx="18.092832"
+     inkscape:zoom="30.797043"
      inkscape:guide-bbox="true"
      showguides="true"
      showgrid="false"
      id="namedview846"
-     inkscape:window-height="811"
-     inkscape:window-width="1440"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      guidetolerance="10"
@@ -50,15 +50,16 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff">
+     pagecolor="#ffffff"
+     inkscape:document-rotation="0">
     <sodipodi:guide
        id="guide1422"
        orientation="1,0"
-       position="2.2479477,10.315286" />
+       position="3.6635875,7.6930284" />
     <sodipodi:guide
        id="guide1424"
        orientation="1,0"
-       position="13.811909,10.380131" />
+       position="12.417858,8.9071243" />
     <sodipodi:guide
        id="guide1426"
        orientation="0,-1"
@@ -68,11 +69,14 @@
        orientation="0,-1"
        position="9.7340667,3.6034424" />
   </sodipodi:namedview>
-  <rect
-     y="10.265094"
-     x="5.2180195"
-     height="1.4698119"
-     width="11.563961"
-     id="rect1545"
-     style="fill:#f5f5f5;fill-opacity:1;stroke:none;stroke-width:1.88976" />
+  <path
+     style="fill:#800080;stroke:#f5f5f5;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 7.1449937,7.2261705 14.855006,14.77383"
+     id="path981"
+     sodipodi:nodetypes="cc" />
+  <path
+     style="fill:#f5f5f5;stroke:#f5f5f5;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+     d="M 14.773829,7.1449936 7.2261706,14.855006"
+     id="path983"
+     sodipodi:nodetypes="cc" />
 </svg>
