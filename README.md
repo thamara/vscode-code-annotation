@@ -1,22 +1,14 @@
 # Code Annotation - Visual Studio Code Extension
 
+<div align="center">
+  <img src="resources/code-annotation.png" alt="Code Annotation Logo">
+</div>
+
 Create and track annotations from your source code without actually committing comments on your code.
 
 ![](https://github.com/thamara/vscode-code-annotation/blob/main/demo/Code%20Annotation.png)
 
-### Attention
-
-This is still a **work in progress**. You are welcome to test and give feedback on the extension, but we cannot guarantee compatibility with upcoming releases.
-
-To test the extension download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/master/code-annotation-0.0.1.vsix) and follow the steps on your VSCode:
-
-1. Go to the "Extensions" pane
-2. Click on the ... on the top right of the "Extensions" pane
-3. Select "Install from VSIX"
-4. Select the VSIX file you downloaded and click install
-
 The "Code Annotation" can be found in the Activity pane.
-Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/issues) and suggest [new features](https://github.com/thamara/vscode-code-annotation/projects/1) for the extension.
 
 ## Features
 
@@ -26,7 +18,22 @@ Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/iss
 - Check/Uncheck items as you complete them
 - Generate a report in Markdown with a summary of the pending and completed items
 
-## Development
+# Feedback and feature requests
+
+Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/issues) and suggest [new features](https://github.com/thamara/vscode-code-annotation/projects/1) for the extension.
+
+
+# Installing
+
+## Using a VSIX file
+Download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/master/code-annotation-0.0.1.vsix) and follow the steps on your VSCode:
+
+1. Go to the "Extensions" pane
+2. Click on the ... on the top right of the "Extensions" pane
+3. Select "Install from VSIX"
+4. Select the VSIX file you downloaded and click install
+
+# Development
 
 - For the development you'll need to use VSCode
 - Install Node/Npm
@@ -37,7 +44,7 @@ npm run compile
 ```
 - And to run/test the extension, go the the Run pane and hit the green button on `Run Extension`. This will open a new VSCode window with the extension enabled.
 
-### Creating a VSIX file for instalation
+## Creating a VSIX file for instalation
 
 - "Compile" the extension as usual
   - `npm install`
@@ -45,14 +52,3 @@ npm run compile
   - `npm install -g vsce`
 - Create the VSIX file
   - `vsce package`
-
-## Requirements
-
-TODO
-
-## Extension Settings
-
-TODO
-
------------------------------------------------------------------------------------------------------------
-
