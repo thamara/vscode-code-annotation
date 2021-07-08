@@ -31,6 +31,8 @@ export interface Color {
 
 export interface Configuration {
     showFileName: boolean;
+    showCreatedAtTimestamp: boolean;
+    showResolvedAtTimestamp: boolean;
     customTODO: string[];
     enableDecoration: boolean;
     decorationColors: Color;
@@ -38,13 +40,17 @@ export interface Configuration {
 
 export const getConfiguration = (): Configuration => {
     const configuration = vscode.workspace.getConfiguration('code-annotation');
-    const showFileName = configuration.get('showFileName');
+    const showFileName : boolean = configuration.get('showFileName') || false;
+    const showCreatedAtTimestamp : boolean = configuration.get('showTimeStampForNoteCreation') || false;
+    const showResolvedAtTimestamp : boolean = configuration.get('showTimeStampForNoteResolution') || false;
     const customTODO: string[] = configuration.get('customTODO') || [];
     const enableDecoration : boolean = configuration.get('annotationBG.enableDecoration') || false;
     const decorationDarkColor: string = configuration.get('annotationBG.color.dark') || '';
     const decorationLightColor: string = configuration.get('annotationBG.color.light') || '';
     const config: Configuration = {
-        showFileName: typeof showFileName === 'boolean' ? showFileName : false,
+        showFileName: showFileName,
+        showCreatedAtTimestamp: showCreatedAtTimestamp,
+        showResolvedAtTimestamp: showResolvedAtTimestamp,
         customTODO: customTODO,
         enableDecoration: enableDecoration,
         decorationColors: {

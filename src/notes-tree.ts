@@ -25,23 +25,25 @@ const getContextValue = (status: string): string => {
 
 const createNoteItem = (note: Note): NoteItem => {
     const fullPathFileName = note.fileName;
-    let details = undefined;
+    let details : NoteItem[] = [];
 
     if (getConfiguration().showFileName && fullPathFileName.length > 0) {
         // Creates an item under the main note with the File name (if existing)
         const relativePath = getRelativePathForFileName(note.fileName);
-        details = [new NoteItem(`File: ${relativePath}`)];
-		if (note.createdAt)
-			details.push(new NoteItem(`Created at: ${getTimeStampsString(note.createdAt)}`));
-		if (note.resolvedAt)
-			details.push(new NoteItem(`Resolved at: ${getTimeStampsString(note.resolvedAt)}`));
+        details.push(new NoteItem(`File: ${relativePath}`));
     }
+	if (getConfiguration().showCreatedAtTimestamp && note.createdAt) {
+		details.push(new NoteItem(`Created at: ${getTimeStampsString(note.createdAt)}`));
+	}
+	if (getConfiguration().showResolvedAtTimestamp && note.resolvedAt) {
+		details.push(new NoteItem(`Resolved at: ${getTimeStampsString(note.resolvedAt)}`));
+	}
 
     let noteItem = new NoteItem(note.text, details, note.id.toString());
     if (noteItem.id) {
         noteItem.command = new OpenNoteCommand(noteItem.id);
     }
-    if (details) {
+    if (details.length > 0) {
         // If details isn't undefined, set the command to the same as the parent
         details[0].command = noteItem.command;
     }

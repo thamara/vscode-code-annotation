@@ -258,6 +258,16 @@
           "default": true,
           "description": "Show file name under annotation"
         },
+        "code-annotation.showTimeStampForNoteCreation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show created at timestamp under annotation"
+        },
+        "code-annotation.showTimeStampForNoteResolution": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show resolved at timestamp under annotation"
+        },
         "code-annotation.customTODO": {
           "type": "array",
           "default": [],
