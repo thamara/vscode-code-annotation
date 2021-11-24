@@ -23,9 +23,8 @@ export const getNoteInMarkdown = (note: Note): string => {
     if (note.resolvedAt)
         result += `Resolved at ${getTimeStampsString(note.resolvedAt)}\n`;
 
-    result += '```\n';
     if (note.fileName.length > 0) {
-        result += `\`${getRelativePathForFileName(note.fileName)}\`\n\n`;
+        result += `\n\`${getRelativePathForFileName(note.fileName)}\`\n\n`;
         result += '```\n';
         result += `${getCodeSnippetString(note)}\n`;
         result += '```\n';
