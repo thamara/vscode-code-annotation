@@ -2,16 +2,14 @@ import * as vscode from 'vscode';
 import { getConfiguration } from '../configuration';
 import { getNotes } from '../note-db';
 
-const decorationType = () : vscode.TextEditorDecorationType => {
-    return vscode.window.createTextEditorDecorationType({
-        dark: {
-            backgroundColor: getConfiguration().decorationColors?.dark
-        },
-        light: {
-            backgroundColor: getConfiguration().decorationColors?.light
-        }
-    });
-};
+const decorationType = vscode.window.createTextEditorDecorationType({
+    dark: {
+        backgroundColor: getConfiguration().decorationColors?.dark
+    },
+    light: {
+        backgroundColor: getConfiguration().decorationColors?.light
+    }
+});
 
 export const setDecorations = (): void => {
     if (!getConfiguration().enableDecoration)
@@ -28,7 +26,8 @@ export const setDecorations = (): void => {
                 ranges.push(new vscode.Range(positionStart, positionEnd));
             }
         });
-        editor.setDecorations(decorationType(), ranges);
+        // editor.setDecorations(decorationType, []);
+        editor.setDecorations(decorationType, ranges);
     });
 };
 
