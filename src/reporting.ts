@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { getNotes, Note } from './note-db';
 import { getRelativePathForFileName,
-         getTimeStampsString } from './utils';
+    getTimeStampsString } from './utils';
 
 const getCodeSnippetString = (note: Note): string => {
     const moreThanOneLine = note.positionEnd.line !== note.positionStart.line;
@@ -19,9 +19,9 @@ const getCodeSnippetString = (note: Note): string => {
 export const getNoteInMarkdown = (note: Note): string => {
     let result = `### - ${note.text}\n\n`;
     if (note.createdAt)
-        result += `Created at ${getTimeStampsString(note.createdAt)}\n`;
+    { result += `Created at ${getTimeStampsString(note.createdAt)}\n`; }
     if (note.resolvedAt)
-        result += `Resolved at ${getTimeStampsString(note.resolvedAt)}\n`;
+    { result += `Resolved at ${getTimeStampsString(note.resolvedAt)}\n`; }
 
     result += '```\n';
     if (note.fileName.length > 0) {
@@ -68,7 +68,7 @@ export const generateMarkdownReport = (): void => {
         let notesSummary = getNotesInMarkdown();
 
         const existingContentRange = new vscode.Range(new vscode.Position(0, 0),
-                                     new vscode.Position(summaryFile.lineCount + 1, 0));
+            new vscode.Position(summaryFile.lineCount + 1, 0));
         edit.replace(newFile, existingContentRange, notesSummary);
 
         return vscode.workspace.applyEdit(edit).then(success => {

@@ -140,7 +140,7 @@ const getTODOFromSelectedText = (): string | undefined => {
 const getPlaceHolderLineFromText = (): string | undefined => {
     const todoText = getTODOFromSelectedText();
     if (todoText)
-        return todoText;
+    { return todoText; }
 
     // If there's no todo, use the first line from the text
     const editor = vscode.window.activeTextEditor;
