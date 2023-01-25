@@ -25,7 +25,7 @@ const getContextValue = (status: string): string => {
 
 const createNoteItem = (note: Note): NoteItem => {
     const fullPathFileName = note.fileName;
-    let details : NoteItem[] = [];
+    let details: NoteItem[] = [];
 
     if (getConfiguration().showFileName && fullPathFileName.length > 0) {
         // Creates an item under the main note with the File name (if existing)
@@ -39,9 +39,13 @@ const createNoteItem = (note: Note): NoteItem => {
         details.push(new NoteItem(`Resolved at: ${getTimeStampsString(note.resolvedAt)}`));
     }
 
-    let noteItem = new NoteItem(note.text, details, note.id.toString());
-    if (noteItem.id) {
-        noteItem.command = new OpenNoteCommand(noteItem.id);
+	let noteItem = new NoteItem(note.text, {
+		children: details,
+		noteId: note.id.toString(),
+		collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+	});
+	if (noteItem.id) {
+		noteItem.command = new OpenNoteCommand(noteItem.id);
     }
     if (details.length > 0) {
         // If details isn't undefined, set the command to the same as the parent
@@ -124,7 +128,7 @@ export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 	    let countPeding = 0;
 	    let countDone = 0;
 	    this.data = [];
-	    this.data = [new NoteItem('Pending', undefined, undefined, '$menu-pending'), new NoteItem('Done', undefined, undefined, '$menu-done')];
+	    this.data = [new NoteItem('Pending', { context: '$menu-pending' }), new NoteItem('Done', { context: '$menu-done' })];
 	    for (let note in annotations) {
 	        const noteItem = createNoteItem(annotations[note]);
 	        const isPending = annotations[note].status === 'pending';
@@ -266,27 +270,26 @@ class OpenNoteCommand implements vscode.Command {
 }
 
 class NoteItem extends vscode.TreeItem {
-	children: NoteItem[] | undefined;
+    children: NoteItem[];
 
-	constructor(label: string, children?: NoteItem[] | undefined, noteId?: string | undefined, context?: string | undefined) {
-	    super(
-	        label,
-	        children === undefined ? vscode.TreeItemCollapsibleState.None :
-	            vscode.TreeItemCollapsibleState.Expanded);
-	    this.children = children;
-	    if (noteId) {
-	        this.id = noteId;
-	    }
-	    if (context) {
-	        this.contextValue = context;
-	    }
-	}
+    constructor(label: string, options?: {
+        children?: NoteItem[];
+        noteId?: string;
+        context?: string;
+        collapsibleState?: vscode.TreeItemCollapsibleState;
+    }) {
+        super(label);
+        this.children = options?.children ?? [];
+        this.id = options?.noteId;
+        this.contextValue = options?.context;
+        this.collapsibleState = options?.collapsibleState ?? (
+            this.children.length === 0 ?
+                vscode.TreeItemCollapsibleState.None :
+                vscode.TreeItemCollapsibleState.Expanded);
+    }
 
-	addChild(element: NoteItem) {
-	    if (this.children === undefined) {
-	        this.children = [];
-	        this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
-	    }
-	    this.children.push(element);
-	}
+    addChild(element: NoteItem) {
+        this.children.push(element);
+        this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+    }
 }
