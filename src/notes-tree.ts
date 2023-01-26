@@ -3,8 +3,10 @@ import * as path from 'path';
 
 import { getNotes, saveNotes, Note } from './note-db';
 import { getConfiguration } from './configuration';
-import { getRelativePathForFileName,
-    getTimeStampsString } from './utils';
+import {
+    getRelativePathForFileName,
+    getTimeStampsString
+} from './utils';
 import { setDecorations } from './decoration/decoration';
 
 const getIconPathFromType = (type: string, theme: string): string => {
@@ -39,13 +41,13 @@ const createNoteItem = (note: Note): NoteItem => {
         details.push(new NoteItem(`Resolved at: ${getTimeStampsString(note.resolvedAt)}`));
     }
 
-	let noteItem = new NoteItem(note.text, {
-		children: details,
-		noteId: note.id.toString(),
-		collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
-	});
-	if (noteItem.id) {
-		noteItem.command = new OpenNoteCommand(noteItem.id);
+    let noteItem = new NoteItem(note.text, {
+        children: details,
+        noteId: note.id.toString(),
+        collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+    });
+    if (noteItem.id) {
+        noteItem.command = new OpenNoteCommand(noteItem.id);
     }
     if (details.length > 0) {
         // If details isn't undefined, set the command to the same as the parent
@@ -81,7 +83,7 @@ export class TreeActions {
     }
     uncheckAllNotes(data: any): void {
         const children = data.children;
-		
+
         if (!children) { return; }
 
         for (let index = 0; index < children.length; index++) {
@@ -91,7 +93,7 @@ export class TreeActions {
     }
     removeAllNotes(data: any): void {
         const children = data.children;
-		
+
         if (!children) { return; }
 
         for (let index = 0; index < children.length; index++) {
@@ -115,158 +117,158 @@ export class TreeActions {
 
 export class NotesTree implements vscode.TreeDataProvider<NoteItem> {
 
-	private _onDidChangeTreeData: vscode.EventEmitter<NoteItem | undefined | null | void> = new vscode.EventEmitter<NoteItem | undefined | null | void>();
-	readonly onDidChangeTreeData: vscode.Event<NoteItem | undefined | null | void> = this._onDidChangeTreeData.event;
+    private _onDidChangeTreeData: vscode.EventEmitter<NoteItem | undefined | null | void> = new vscode.EventEmitter<NoteItem | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<NoteItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-	refresh(): void {
-	    this.sourceData();
-	    this._onDidChangeTreeData.fire(null);
-	}
+    refresh(): void {
+        this.sourceData();
+        this._onDidChangeTreeData.fire(null);
+    }
 
-	sourceData(): void {
-	    const annotations = getNotes();
-	    let countPeding = 0;
-	    let countDone = 0;
-	    this.data = [];
-	    this.data = [new NoteItem('Pending', { context: '$menu-pending' }), new NoteItem('Done', { context: '$menu-done' })];
-	    for (let note in annotations) {
-	        const noteItem = createNoteItem(annotations[note]);
-	        const isPending = annotations[note].status === 'pending';
-	        if (isPending) {
-	            this.data[0].addChild(noteItem);
-	            countPeding++;
-	        } else {
-	            this.data[1].addChild(noteItem);
-	            countDone++;
-	        }
-	    }
-	    this.data[0].label += ` (${countPeding})`;
-	    this.data[1].label += ` (${countDone})`;
-	}
+    sourceData(): void {
+        const annotations = getNotes();
+        let countPeding = 0;
+        let countDone = 0;
+        this.data = [];
+        this.data = [new NoteItem('Pending', { context: '$menu-pending' }), new NoteItem('Done', { context: '$menu-done' })];
+        for (let note in annotations) {
+            const noteItem = createNoteItem(annotations[note]);
+            const isPending = annotations[note].status === 'pending';
+            if (isPending) {
+                this.data[0].addChild(noteItem);
+                countPeding++;
+            } else {
+                this.data[1].addChild(noteItem);
+                countDone++;
+            }
+        }
+        this.data[0].label += ` (${countPeding})`;
+        this.data[1].label += ` (${countDone})`;
+    }
 
-	removeItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const indexToRemove = notes.findIndex((item: { id: Number }) => {
-	        return item.id.toString() === id;
-	    });
+    removeItem(id: string | undefined): void {
+        const notes = getNotes();
+        const indexToRemove = notes.findIndex((item: { id: Number }) => {
+            return item.id.toString() === id;
+        });
 
-	    if (indexToRemove >= 0) {
-	        notes.splice(indexToRemove, 1);
-	    }
+        if (indexToRemove >= 0) {
+            notes.splice(indexToRemove, 1);
+        }
 
-	    saveNotes(notes);
-	    setDecorations();
-	}
+        saveNotes(notes);
+        setDecorations();
+    }
 
-	checkItem(id: string | undefined, status: 'pending' | 'done'): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
-	        return item.id.toString() === id;
-	    });
+    checkItem(id: string | undefined, status: 'pending' | 'done'): void {
+        const notes = getNotes();
+        const index = notes.findIndex((item: { id: Number }) => {
+            return item.id.toString() === id;
+        });
 
-	    if (index >= 0) {
-	        notes[index].status = status;
-	        const fromDoneToPending = notes[index].resolvedAt && status === 'done';
-	        notes[index].resolvedAt =  fromDoneToPending ? undefined : new Date();
-	    }
+        if (index >= 0) {
+            notes[index].status = status;
+            const fromDoneToPending = notes[index].resolvedAt && status === 'done';
+            notes[index].resolvedAt = fromDoneToPending ? undefined : new Date();
+        }
 
-	    saveNotes(notes);
-	}
+        saveNotes(notes);
+    }
 
-	editItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
-	        return item.id.toString() === id;
-	    });
-			
-	    vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text}).then(annotationText => {
-	        if (index >= 0 && annotationText) {
-	            notes[index].text = annotationText;
-	            saveNotes(notes);
-	            vscode.window.showInformationMessage('Annotation edited!');
-	        }
-	    });
-	}
+    editItem(id: string | undefined): void {
+        const notes = getNotes();
+        const index = notes.findIndex((item: { id: Number }) => {
+            return item.id.toString() === id;
+        });
 
-	openItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
-	        return item.id.toString() === id;
-	    });
+        vscode.window.showInputBox({ placeHolder: 'New text for annotation...', value: notes[index].text }).then(annotationText => {
+            if (index >= 0 && annotationText) {
+                notes[index].text = annotationText;
+                saveNotes(notes);
+                vscode.window.showInformationMessage('Annotation edited!');
+            }
+        });
+    }
 
-	    if (index >= 0) {
-	        const note = notes[index];
-	        const fileName = note.fileName;
-	        const fileLine = note.fileLine;
+    openItem(id: string | undefined): void {
+        const notes = getNotes();
+        const index = notes.findIndex((item: { id: Number }) => {
+            return item.id.toString() === id;
+        });
 
-	        if (fileName.length <= 0) {
-	            return;
-	        }
+        if (index >= 0) {
+            const note = notes[index];
+            const fileName = note.fileName;
+            const fileLine = note.fileLine;
 
-	        var openPath = vscode.Uri.file(fileName);
-	        vscode.workspace.openTextDocument(openPath).then(doc => {
-	            vscode.window.showTextDocument(doc).then(editor => {
-	                var range = new vscode.Range(fileLine, 0, fileLine, 0);
-	                editor.revealRange(range);
+            if (fileName.length <= 0) {
+                return;
+            }
 
-	                var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
-	                var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
-	                editor.selection = new vscode.Selection(start, end);
+            var openPath = vscode.Uri.file(fileName);
+            vscode.workspace.openTextDocument(openPath).then(doc => {
+                vscode.window.showTextDocument(doc).then(editor => {
+                    var range = new vscode.Range(fileLine, 0, fileLine, 0);
+                    editor.revealRange(range);
 
-	                var range = new vscode.Range(start, start);
-	                editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-	            });
-	        });
-	    }
-	}
+                    var start = new vscode.Position(note.positionStart.line, note.positionStart.character);
+                    var end = new vscode.Position(note.positionEnd.line, note.positionEnd.character);
+                    editor.selection = new vscode.Selection(start, end);
 
-	copyItem(id: string | undefined): void {
-	    const notes = getNotes();
-	    const index = notes.findIndex((item: { id: Number }) => {
-	        return item.id.toString() === id;
-	    });
+                    var range = new vscode.Range(start, start);
+                    editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+                });
+            });
+        }
+    }
 
-	    if (index === -1) {
-	        return;
-	    }
+    copyItem(id: string | undefined): void {
+        const notes = getNotes();
+        const index = notes.findIndex((item: { id: Number }) => {
+            return item.id.toString() === id;
+        });
 
-	    const content = notes[index].text;
-	    vscode.env.clipboard.writeText(content).then(() => {
-	        vscode.window.showInformationMessage('Note copied successfully');
-	    });
-	}
+        if (index === -1) {
+            return;
+        }
 
-	data: NoteItem[];
+        const content = notes[index].text;
+        vscode.env.clipboard.writeText(content).then(() => {
+            vscode.window.showInformationMessage('Note copied successfully');
+        });
+    }
 
-	constructor() {
-	    vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
-	        this.refresh()
-	    );
+    data: NoteItem[];
 
-	    this.data = [];
-	    this.sourceData();
-	}
+    constructor() {
+        vscode.commands.registerCommand('code-annotation.refreshEntry', () =>
+            this.refresh()
+        );
 
-	getTreeItem(element: NoteItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
-	    return element;
-	}
+        this.data = [];
+        this.sourceData();
+    }
 
-	getChildren(element?: NoteItem | undefined): vscode.ProviderResult<NoteItem[]> {
-	    if (element === undefined) {
-	        return this.data;
-	    }
-	    return element.children;
-	}
+    getTreeItem(element: NoteItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
+        return element;
+    }
+
+    getChildren(element?: NoteItem | undefined): vscode.ProviderResult<NoteItem[]> {
+        if (element === undefined) {
+            return this.data;
+        }
+        return element.children;
+    }
 }
 
 class OpenNoteCommand implements vscode.Command {
-	command = 'code-annotation.openNoteFromId';
-	title = 'Open File';
-	arguments?: any[];
+    command = 'code-annotation.openNoteFromId';
+    title = 'Open File';
+    arguments?: any[];
 
-	constructor(id: string) {
-	    this.arguments = [id];
-	}
+    constructor(id: string) {
+        this.arguments = [id];
+    }
 }
 
 class NoteItem extends vscode.TreeItem {
