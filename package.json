@@ -10,7 +10,7 @@
     "type": "git",
     "url": "github:thamara/vscode-code-annotation.git"
   },
-  "version": "0.0.2",
+  "version": "0.0.3-dev",
   "engines": {
     "vscode": "^1.47.0"
   },
