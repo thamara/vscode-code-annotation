@@ -1,6 +1,8 @@
 # Change Log
 
 ## In development
+
+## v0.0.2
 - Fix report generation to correctly use code tags
 - #43: Fixed highlight not being immediately removed when removing a note
 - #44: Make collabsible state configurable and collapse file info by default (by cellador)
