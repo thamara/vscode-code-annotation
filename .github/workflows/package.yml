@@ -35,6 +35,6 @@ jobs:
           
       - name: Commit file
         run: |
-          git add code-annotation-0.0.2-dev.vsix
+          git add *.vsix
           git commit -nm "Updated vsix package"
           git push
