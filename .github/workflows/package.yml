@@ -31,10 +31,10 @@ jobs:
 
       - name: Package
         run: |
-          vsce package
+          vsce package -o "code-annotation.vsix"
           
       - name: Commit file
         run: |
-          git add *.vsix
+          git add code-annotation.vsix
           git commit -nm "Updated vsix package"
           git push
