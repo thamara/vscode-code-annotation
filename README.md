@@ -26,7 +26,7 @@ Feel free to open [issues](https://github.com/thamara/vscode-code-annotation/iss
 You can install the latest version of the extension via the Visual Studio Marketplace [here](https://marketplace.visualstudio.com/items?itemName=tkcandrade.code-annotation).
 
 ## Using a VSIX file
-Download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/master/code-annotation-0.0.1.vsix) and follow the steps on your VSCode:
+Download the [VSIX file](https://github.com/thamara/vscode-code-annotation/blob/master/code-annotation.vsix) and follow the steps on your VSCode:
 
 1. Go to the "Extensions" pane
 2. Click on the ... on the top right of the "Extensions" pane
